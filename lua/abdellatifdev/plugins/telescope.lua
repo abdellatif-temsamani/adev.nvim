@@ -5,6 +5,13 @@ return {
     module = false,
     lazy = true,
     dependencies = {
+        {
+            'nvim-telescope/telescope-fzf-native.nvim',
+            build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release',
+            config = function()
+                require("telescope").load_extension("fzf")
+            end,
+        },
         { "nvim-lua/popup.nvim", },
         { "nvim-lua/plenary.nvim", },
     },
@@ -42,6 +49,9 @@ return {
                 },
             },
         },
+        extensions = {
+            fzf = {}
+        },
         defaults = {
             layout_strategy = 'horizontal',
             layout_config = {
@@ -49,7 +59,7 @@ return {
                     prompt_position = 'bottom',
                     height = .99,
                     width = .99,
-                    preview_width = 0.65,     -- Fraction of the layout width
+                    preview_width = 0.65, -- Fraction of the layout width
                 },
             },
             prompt_prefix = " ",
