@@ -46,6 +46,22 @@ settings are located in:
 - **[lua/abdellatifdev/plugins](./lua/abdellatifdev/plugins)** for individual
   plugin configurations.
 
+## ⚡ Blazingly Fast
+
+This configuration is optimized for speed and responsiveness. Some key
+techniques used to ensure a fast Neovim experience:
+
+- **Lazy Loading:** Plugins are only loaded when needed, minimizing startup
+  time.
+- **Efficient Caching:** Leverages features like Treesitter and native Neovim
+  caching for smooth performance.
+- **Minimal Bloat:** Only essential plugins and settings are included to reduce
+  unnecessary overhead.
+
+Whether you're working on small files or massive projects, this setup ensures
+Neovim runs at lightning speed.
+![Nvim startup time](./images/startuptime.png)
+
 ## 📜 Key Features Breakdown
 
 ### Core Plugins
