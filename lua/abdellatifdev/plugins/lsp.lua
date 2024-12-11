@@ -294,6 +294,16 @@ return {
             on_attach = on_attach,
         }
 
+        lspconfig.glslls.setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+        }
+
+        lspconfig.glsl_analyzer.setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+        }
+
         lspconfig.jdtls.setup({
             capabilities = capabilities,
             on_attach = on_attach,
