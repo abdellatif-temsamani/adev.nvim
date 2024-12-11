@@ -1,9 +1,6 @@
 return {
     'brenoprata10/nvim-highlight-colors',
-    ft = {
-        'css', 'scss', 'sass', 'less', 'html', 'typescript', 'typescriptreact',
-        'javascript', 'javascriptreact', 'vue', 'markdown', 'php'
-    },
+    event = require("abdellatifdev.consts").file_event,
     lazy = true,
     opts = {
         render = 'background',

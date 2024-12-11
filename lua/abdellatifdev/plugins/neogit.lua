@@ -7,7 +7,7 @@ return {
     event = require("abdellatifdev.consts").file_event,
     lazy = true,
     keys = {
-        { "<leader>go", function() require('neogit').open({}) end, desc = "gitsigns toggle deleted", mode = "n" },
+        { "<leader>to", function() require('neogit').open({}) end, desc = "gitsigns toggle deleted", mode = "n" },
     },
     dependencies = {
         "nvim-lua/plenary.nvim",

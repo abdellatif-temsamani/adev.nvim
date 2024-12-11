@@ -3,17 +3,21 @@ local ignored_files = {
     "build", "dist", "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
 }
 
-local file_event = { "BufRead", "BufNewFile" }
-local pre_file_event = { "BufReadPre" }
-local lsp_event = { "LspAttach" }
-local insert_event = { "InsertEnter" }
-local cmd_event = { "CmdlineEnter" }
+
+local event = {
+    file = { "BufRead", "BufNewFile" },
+    pre = { "BufReadPre" },
+    lsp = { "LspAttach" },
+    insert = { "InsertEnter" },
+    cmd = { "CmdlineEnter" },
+
+}
 
 return {
     ignored_files = ignored_files,
-    file_event = file_event,
-    lsp_event = lsp_event,
-    insert_event = insert_event,
-    cmd_event = cmd_event,
-    pre_file_event = pre_file_event,
+    file_event = event.file,
+    lsp_event = event.lsp,
+    insert_event = event.insert,
+    cmd_event = event.cmd,
+    pre_file_event = event.pre,
 }
