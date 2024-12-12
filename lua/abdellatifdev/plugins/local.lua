@@ -5,7 +5,7 @@ end
 return {
     {
         dir = "~/programming/twitch/tree-sitter-i3config/",
-        event = { "BufEnter i3config" , "BufEnter grammar.js" },
+        event = { "BufEnter i3config", "BufEnter grammar.js" },
         lazy = not is_i3config(),
 
         dependencies = {
@@ -13,9 +13,9 @@ return {
         },
         config = function()
             ---@module "i3config"
-            local i3config = require("i3config")
-            i3config.setup()
-            i3config.debugging()
+            require("i3config").setup {
+                debugging = false
+            }
         end
     }
 }
