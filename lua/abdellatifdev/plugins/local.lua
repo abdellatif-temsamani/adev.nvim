@@ -14,7 +14,7 @@ return {
         config = function()
             ---@module "i3config"
             require("i3config").setup {
-                debugging = false
+                debugging = true
             }
         end
     }
