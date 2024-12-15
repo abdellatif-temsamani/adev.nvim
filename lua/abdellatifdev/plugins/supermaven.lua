@@ -5,9 +5,8 @@ return {
             keymaps = {
                 -- alt-l
                 accept_suggestion = "<M-l>",
-               clear_suggestion = "<C-]>",
+                clear_suggestion = "<C-]>",
                 accept_word = "<C-j>",
-
             },
         })
     end,

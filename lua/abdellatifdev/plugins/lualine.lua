@@ -5,7 +5,6 @@ end
 return
 {
     "nvim-lualine/lualine.nvim",
-    event = require("abdellatifdev.consts").file_event,
     opts = {
         options = {
             theme = "auto",
@@ -25,9 +24,13 @@ return
         },
         winbar = {
             lualine_c = {
-                "navic",
-                color_correction = nil,
-                navic_opts = nil
+                "filename",
+                {
+
+                    "navic",
+                    color_correction = nil,
+                    navic_opts = nil
+                }
             }
         },
         tabline = {
