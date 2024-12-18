@@ -83,7 +83,7 @@ Neovim runs at lightning speed.
   [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
 
 - **File Explorer:**\
-  Integration with [nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua)
+  Integration with [oil.nvim](https://github.com/stevearc/oil.nvim)
 
 ## 🤝 Contributing
 
