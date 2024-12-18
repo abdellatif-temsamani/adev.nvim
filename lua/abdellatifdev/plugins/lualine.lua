@@ -5,6 +5,7 @@ end
 return
 {
     "nvim-lualine/lualine.nvim",
+    event = require("abdellatifdev.consts").file_event,
     opts = {
         options = {
             theme = "auto",
