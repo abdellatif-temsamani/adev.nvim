@@ -2,6 +2,19 @@ return {
     'saghen/blink.cmp',
     build = "cargo build --release",
     event = require("abdellatifdev.consts").insert_event,
+    dependencies = {
+        'rafamadriz/friendly-snippets',
+        'honza/vim-snippets',
+        {
+            'L3MON4D3/LuaSnip',
+            event = require("abdellatifdev.consts").insert_event,
+            build = "make install_jsregexp",
+            config = function()
+                require("luasnip.loaders.from_vscode").lazy_load()
+                require("luasnip.loaders.from_snipmate").lazy_load()
+            end,
+        }
+    },
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -29,7 +42,7 @@ return {
                     name = "path",
                     enabled = true,
                     module = "blink.cmp.sources.path",
-                    score_offset = 1000, -- the higher the number, the higher the priority
+                    score_offset = 960, -- the higher the number, the higher the priority
                 },
                 lsp = {
                     name = "lsp",
@@ -37,17 +50,17 @@ return {
                     module = "blink.cmp.sources.lsp",
                     score_offset = 1000, -- the higher the number, the higher the priority
                 },
-                luasnip = {
-                    name = "luasnip",
-                    enabled = true,
-                    module = "blink.cmp.sources.luasnip",
-                    score_offset = 950, -- the higher the number, the higher the priority
-                },
                 snippets = {
                     name = "snippets",
                     enabled = true,
                     module = "blink.cmp.sources.snippets",
-                    score_offset = 900, -- the higher the number, the higher the priority
+                    score_offset = 990, -- the higher the number, the higher the priority
+                },
+                luasnip = {
+                    name = "luasnip",
+                    enabled = true,
+                    module = "blink.cmp.sources.luasnip",
+                    score_offset = 990, -- the higher the number, the higher the priority
                 },
                 buffer = {
                     name = "buffer",
