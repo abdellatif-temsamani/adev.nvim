@@ -7,9 +7,7 @@ return {
         require("luasnip.loaders.from_snipmate").lazy_load()
     end,
     dependencies = {
-        "hrsh7th/nvim-cmp",
         'rafamadriz/friendly-snippets',
-        { 'saadparwaiz1/cmp_luasnip' },
         'honza/vim-snippets',
     }
 }
