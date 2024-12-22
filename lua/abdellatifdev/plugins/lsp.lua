@@ -295,6 +295,11 @@ return {
             on_attach = on_attach,
         }
 
+        lspconfig.gleam.setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+        }
+
         lspconfig.glslls.setup {
             capabilities = capabilities,
             on_attach = on_attach,
