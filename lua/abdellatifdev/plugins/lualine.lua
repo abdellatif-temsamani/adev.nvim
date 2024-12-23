@@ -8,12 +8,12 @@ return
     event = require("abdellatifdev.consts").file_event,
     opts = {
         options = {
-            theme = "auto",
+            theme = "catppuccin-mocha",
             globalstatus = true,
             disabled_filetypes = { 'NvimTree' },
             always_divide_middle = true,
             component_separators = { left = '', right = '' },
-            section_separators = { left = '', right = '' },
+            section_separators = { left = '', right = '' },
         },
         sections = {
             lualine_a = { 'mode', 'branch' },
