@@ -36,44 +36,7 @@ return {
         },
 
         sources = {
-            default = { 'lsp', 'path', 'snippets', 'buffer', "lazydev" },
-            providers = {
-                path = {
-                    name = "path",
-                    enabled = true,
-                    module = "blink.cmp.sources.path",
-                    score_offset = 960, -- the higher the number, the higher the priority
-                },
-                lsp = {
-                    name = "lsp",
-                    enabled = true,
-                    module = "blink.cmp.sources.lsp",
-                    score_offset = 1000, -- the higher the number, the higher the priority
-                },
-                snippets = {
-                    name = "snippets",
-                    enabled = true,
-                    module = "blink.cmp.sources.snippets",
-                    score_offset = 990, -- the higher the number, the higher the priority
-                },
-                luasnip = {
-                    name = "luasnip",
-                    enabled = true,
-                    module = "blink.cmp.sources.luasnip",
-                    score_offset = 990, -- the higher the number, the higher the priority
-                },
-                buffer = {
-                    name = "buffer",
-                    enabled = true,
-                    module = "blink.cmp.sources.buffer",
-                    score_offset = 500, -- the higher the number, the higher the priority
-                },
-                lazydev = {
-                    name = "LazyDev",
-                    module = "lazydev.integrations.blink",
-                    score_offset = 100,
-                },
-            }
+            default = { 'lsp', 'path', 'snippets', 'buffer' },
         },
     },
     opts_extend = { "sources.default" }
