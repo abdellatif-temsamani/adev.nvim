@@ -1,10 +1,8 @@
 return {
-    'stevearc/oil.nvim',
+    'nvim-tree/nvim-tree.lua',
     keys = {
-        { "<leader>n", "<cmd>Oil<cr>", desc = "Open Oil" },
+        { "<leader>n", "<cmd>NvimTreeToggle<cr>", desc = "Open Oil" },
     },
-    ---@module 'oil'
-    ---@type oil.SetupOpts
     opts = {
         view_options={
             show_hidden=true,

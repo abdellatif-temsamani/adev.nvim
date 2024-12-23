@@ -1,5 +1,7 @@
 return function()
-    vim.cmd([[set termguicolors]])
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+    vim.opt.termguicolors = true
     vim.o.winbar = " "
     vim.g.mapleader = " "
     vim.g.maplocalleader = "\\"
