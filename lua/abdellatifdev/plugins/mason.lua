@@ -1,12 +1,12 @@
 return {
     "williamboman/mason-lspconfig.nvim",
-    event = require("abdellatifdev.consts").pre_file_event,
+    event = require("abdellatifdev.consts").events.pre,
     dependencies = {
         {
             "williamboman/mason.nvim",
             build = ":MasonUpdate",
             cmd = "Mason",
-            event = require("abdellatifdev.consts").pre_file_event,
+            event = require("abdellatifdev.consts").events.pre,
             opts = {
                 ui = {
                     check_outdated_packages_on_open = true,

@@ -4,7 +4,7 @@ local ignored_files = {
 }
 
 
-local event = {
+local events = {
     file = { "BufRead", "BufNewFile" },
     pre = { "BufReadPre" },
     lsp = { "LspAttach" },
@@ -15,9 +15,5 @@ local event = {
 
 return {
     ignored_files = ignored_files,
-    file_event = event.file,
-    lsp_event = event.lsp,
-    insert_event = event.insert,
-    cmd_event = event.cmd,
-    pre_file_event = event.pre,
+    events = events,
 }

@@ -1,7 +1,7 @@
 return {
     {
         "SmiteshP/nvim-navic",
-        event = require("abdellatifdev.consts").lsp_event,
+        event = require("abdellatifdev.consts").events.lsp,
         opts = {
             icons = {
                 File          = "󰈙 ",

@@ -1,7 +1,7 @@
 return {
     "supermaven-inc/supermaven-nvim",
     enabled = false,
-    event = require("abdellatifdev.consts").file_event,
+    event = require("abdellatifdev.consts").events.file,
     config = function()
         require("supermaven-nvim").setup({
             keymaps = {

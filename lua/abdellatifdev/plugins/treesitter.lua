@@ -10,11 +10,11 @@ local function treesitter_setup()
             enable_autocmd = false
         },
         ignore_install        = { "zimbu" },
-        highlight = {
+        highlight             = {
             enable = true,
-
             disable = function(lang, buf)
                 local max_filesize = 100 * 1024 -- 100 KB
+                ---@diagnostic disable-next-line: undefined-field
                 local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
                 if ok and stats and stats.size > max_filesize then
                     return true
@@ -27,7 +27,7 @@ end
 return {
     {
         "nvim-treesitter/nvim-treesitter-context",
-        event = require("abdellatifdev.consts").file_event,
+        event = require("abdellatifdev.consts").events.file,
         opts = {
             enable = true,
             max_lines = 2,
@@ -36,7 +36,7 @@ return {
     },
     {
         "windwp/nvim-autopairs",
-        event = require("abdellatifdev.consts").file_event,
+        event = require("abdellatifdev.consts").events.file,
         opts = {
             disable_filetype = { "TelescopePrompt" },
             ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
@@ -53,12 +53,12 @@ return {
     {
         'windwp/nvim-ts-autotag',
 
-        event = require("abdellatifdev.consts").file_event,
+        event = require("abdellatifdev.consts").events.file,
         opts = {},
     },
     {
         "nvim-treesitter/nvim-treesitter",
-        event = require("abdellatifdev.consts").file_event,
+        event = require("abdellatifdev.consts").events.file,
         build = ":TSUpdate",
         config = function()
             treesitter_setup()

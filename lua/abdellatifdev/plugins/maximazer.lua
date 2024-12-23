@@ -1,4 +1,4 @@
 return {
     "szw/vim-maximizer",
-    event = require("abdellatifdev.consts").file_event,
+    event = require("abdellatifdev.consts").events.file,
 }

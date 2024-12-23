@@ -5,7 +5,7 @@ end
 return
 {
     "nvim-lualine/lualine.nvim",
-    event = require("abdellatifdev.consts").file_event,
+    event = require("abdellatifdev.consts").events.file,
     opts = {
         options = {
             theme = "catppuccin-mocha",

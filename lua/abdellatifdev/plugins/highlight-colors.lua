@@ -1,7 +1,6 @@
-local color = "red"
 return {
     'brenoprata10/nvim-highlight-colors',
-    event = require("abdellatifdev.consts").file_event,
+    event = require("abdellatifdev.consts").events.file,
     lazy = true,
     opts = {
         render = 'virtual',
