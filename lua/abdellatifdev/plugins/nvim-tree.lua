@@ -1,15 +1,20 @@
 return {
-    'nvim-tree/nvim-tree.lua',
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
     keys = {
-        { "<leader>n", "<cmd>NvimTreeToggle<cr>", desc = "Open Tree" },
+        { "<leader>n", "<cmd>Neotree toggle<cr>", desc = "Open Tree" },
     },
     opts = {
-        filesystem_watchers = {
-            enable = true,
-            debounce_delay = 50,
-            ignore_dirs = require("abdellatifdev.consts").ignored_files,
+        close_if_last_window = true,
+        window = {
+            position = "left",
+            width = 30,
         },
     },
-    -- Optional dependencies
-    dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-tree/nvim-web-devicons",
+        "MunifTanjim/nui.nvim",
+        "3rd/image.nvim",
+    }
 }
