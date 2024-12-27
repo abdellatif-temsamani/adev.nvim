@@ -1,6 +1,6 @@
 return {
     "supermaven-inc/supermaven-nvim",
-    enabled = false,
+    enabled = true,
     event = require("abdellatifdev.consts").events.file,
     config = function()
         require("supermaven-nvim").setup({
