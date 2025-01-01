@@ -19,12 +19,11 @@ return {
     },
     lazy = true,
     after = "williamboman/mason.nvim",
-    config = function()
+    opt = function(_, opt)
         ---@module "lspconfig"
         local lspconfig = require("lspconfig")
 
-        local capabilities = require('blink.cmp').get_lsp_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
+        local capabilities = require('blink.cmp').get_lsp_capabilities(opt.capabilities)
 
         local function on_attach(client, bufnr)
             if client.server_capabilities.documentSymbolProvider then

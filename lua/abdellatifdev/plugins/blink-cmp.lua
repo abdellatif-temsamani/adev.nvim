@@ -30,9 +30,13 @@ return {
 
         },
 
+        appearance = {
+            nerd_font_variant = 'mono'
+        },
 
         sources = {
             default = { 'lsp', 'path', 'snippets', 'buffer' },
+
         },
     },
     opts_extend = { "sources.default" }
