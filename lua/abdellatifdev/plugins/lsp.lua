@@ -19,11 +19,12 @@ return {
     },
     lazy = true,
     after = "williamboman/mason.nvim",
-    opt = function(_, opt)
+    config = function()
         ---@module "lspconfig"
         local lspconfig = require("lspconfig")
 
-        local capabilities = require('blink.cmp').get_lsp_capabilities(opt.capabilities)
+        local capabilities = require('blink.cmp').get_lsp_capabilities()
+
 
         local function on_attach(client, bufnr)
             if client.server_capabilities.documentSymbolProvider then
@@ -142,12 +143,6 @@ return {
         lspconfig.cssmodules_ls.setup {
             capabilities = capabilities,
             on_attach = on_attach,
-
-            init_options = {
-                provideFormatter = true,
-                embeddedLanguages = { css = true, javascript = true },
-                configurationSection = { "html", "css", "javascript" }
-            }
         }
 
         lspconfig.dockerls.setup {
@@ -295,6 +290,11 @@ return {
         }
 
         lspconfig.gleam.setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+        }
+
+        lspconfig.vtsls.setup {
             capabilities = capabilities,
             on_attach = on_attach,
         }
