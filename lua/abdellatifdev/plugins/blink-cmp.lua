@@ -1,13 +1,13 @@
 return {
     'saghen/blink.cmp',
     build = "cargo build --release",
-    event = require("abdellatifdev.consts").events.insert,
+    event = require("abdellatifdev.consts").events.file,
     dependencies = {
         'rafamadriz/friendly-snippets',
         'honza/vim-snippets',
         {
             'L3MON4D3/LuaSnip',
-            event = require("abdellatifdev.consts").events.insert,
+            event = require("abdellatifdev.consts").events.file,
             build = "make install_jsregexp",
             config = function()
                 require("luasnip.loaders.from_vscode").lazy_load()
