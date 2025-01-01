@@ -32,6 +32,6 @@ return function()
             { import = "abdellatifdev.plugins" },
         },
         install = { colorscheme = { "tokyonight" } },
-        checker = { enabled = false },
+        checker = { enabled = true },
     })
 end
