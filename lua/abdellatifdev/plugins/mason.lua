@@ -18,6 +18,8 @@ return {
     },
     opts = {
         ensure_installed = {
+            "phpactor",
+            "intelephense",
             "lua_ls",
             "csharp_ls",
             "volar",
