@@ -1,5 +1,5 @@
 return {
     "numToStr/Comment.nvim",
     opts = {},
-    event = require("abdellatifdev.consts").file_event
+    event = require("abdellatifdev.consts").events.file,
 }
