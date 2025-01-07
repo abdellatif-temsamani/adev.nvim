@@ -71,7 +71,15 @@ return {
         'windwp/nvim-ts-autotag',
 
         event = require("abdellatifdev.consts").events.file,
-        opts = {},
+        opts = {
+            per_filetype = {
+                ["blade"] = {
+                    enable_close = true,
+                    enable_rename = true,
+                    enable_close_on_slash = false
+                }
+            }
+        },
     },
     {
         "nvim-treesitter/nvim-treesitter",
