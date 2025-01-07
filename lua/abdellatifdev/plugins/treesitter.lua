@@ -33,6 +33,12 @@ local function treesitter_setup()
         },
         filetype = "blade",
     }
+
+    vim.filetype.add({
+        pattern = {
+            [".*%.blade%.php"] = "blade",
+        },
+    })
 end
 
 return {

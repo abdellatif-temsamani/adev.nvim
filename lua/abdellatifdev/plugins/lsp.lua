@@ -23,7 +23,7 @@ return {
         ---@module "lspconfig"
         local lspconfig = require("lspconfig")
 
-             local capabilities = require("cmp_nvim_lsp").default_capabilities()
+        local capabilities = require("cmp_nvim_lsp").default_capabilities()
         capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 
@@ -117,6 +117,7 @@ return {
         }
 
         lspconfig.emmet_ls.setup {
+            filetypes = { "astro", "css", "eruby", "html", "htmldjango", "javascriptreact", "less", "pug", "sass", "scss", "svelte", "typescriptreact", "vue", "htmlangular", "blade" },
             capabilities = capabilities,
             on_attach = on_attach,
         }
@@ -162,7 +163,7 @@ return {
         }
 
         lspconfig.html.setup {
-            filetypes = { "html", "templ", "htmldjango" },
+            filetypes = { "astro", "css", "eruby", "html", "htmldjango", "templ", "blade" },
             capabilities = capabilities,
             on_attach = on_attach,
         }
