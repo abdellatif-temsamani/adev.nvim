@@ -1,5 +1,4 @@
-local ignored_files = require("consts").ingored_files
-
+local ignored_files = require("abdellatifdev.consts").ignored_files
 
 return {
     {
@@ -27,4 +26,3 @@ return {
 
     },
 }
-
