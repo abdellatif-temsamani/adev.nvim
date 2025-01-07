@@ -1,15 +1,30 @@
+local ignored_files = require("consts").ingored_files
+
+
 return {
-    'nvim-tree/nvim-tree.lua',
-    keys = {
-        { "<leader>n", "<cmd>NvimTreeToggle<cr>", desc = "Open Tree" },
-    },
-    opts = {
-        filesystem_watchers = {
-            enable = true,
-            debounce_delay = 50,
-            ignore_dirs = require("abdellatifdev.consts").ignored_files,
+    {
+        "kyazdani42/nvim-tree.lua",
+        keys = {
+            { "<leader>n", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" },
         },
+        opts = {
+            sort_by = "case_sensitive",
+            view = { adaptive_size = false },
+            update_cwd = false,
+            diagnostics = {
+                enable = true,
+                icons = { hint = "", info = "", warning = "", error = "" }
+            },
+            update_focused_file = {
+                enable = true,
+                update_cwd = true,
+                ignore_list = ignored_files
+            },
+            filters = { dotfiles = true, custom = ignored_files },
+            git = { enable = true, ignore = true, timeout = 500 },
+            trash = { cmd = "rm", require_confirm = false }
+        }
+
     },
-    -- Optional dependencies
-    dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
 }
+
