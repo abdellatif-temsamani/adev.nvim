@@ -11,7 +11,7 @@ autocmd("BufWritePre",
 autocmd("FileType", {
     group = group_gen,
     pattern = { "gitcommit", "markdown", "svelte", "cpp", "c", "dart" },
-    command = "setlocal spell spelllang=en_gb tabstop=2 shiftwidth=2 expandtab"
+    command = "setlocal spell spelllang=en_gb,fr tabstop=2 shiftwidth=2 expandtab"
 })
 
 autocmd("FileType",
