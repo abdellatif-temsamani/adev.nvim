@@ -38,8 +38,8 @@ return
             lualine_a = {
                 {
                     'tabs',
-                    mode = 2,
-                    max_length = vim.o.columns / 3,
+                    mode = 4,
+                    max_length = vim.o.columns / 2,
                 }
             },
             lualine_b = {},
