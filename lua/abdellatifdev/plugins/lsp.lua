@@ -292,6 +292,11 @@ return {
             on_attach = on_attach,
         }
 
+        lspconfig.phan.setup {
+            capabilities = capabilities,
+            on_attach = on_attach,
+        }
+
         lspconfig.gleam.setup {
             capabilities = capabilities,
             on_attach = on_attach,
