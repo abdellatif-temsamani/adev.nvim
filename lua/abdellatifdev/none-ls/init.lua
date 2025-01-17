@@ -28,6 +28,11 @@ local function setup()
             diagnostics.checkmake,
             diagnostics.hadolint,
             diagnostics.yamllint,
+            diagnostics.phpstan.with({
+                extra_args = {
+                    "--memory-limit=8G",
+                },
+            }),
             diagnostics.djlint,
             -- formatting  --------------
             formatting.duster,

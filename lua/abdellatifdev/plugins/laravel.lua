@@ -1,6 +1,6 @@
 return {
     "adalessa/laravel.nvim",
-    ft = { "ft", "blade" },
+    event = require("abdellatifdev.consts").events.file,
     dependencies = {
         "tpope/vim-dotenv",
         "nvim-telescope/telescope.nvim",
