@@ -1,6 +1,6 @@
 return {
     "neovim/nvim-lspconfig",
-    dependencies = { 'saghen/blink.cmp' },
+    -- dependencies = { 'saghen/blink.cmp' },
     module = false,
     event = require("abdellatifdev.consts").events.file,
     keys = {
@@ -289,18 +289,26 @@ return {
 
         lspconfig.intelephense.setup {
             capabilities = capabilities,
+            -- init_options = {
+            --     licenceKey = "your-premium-key-here",     -- Replace with your actual license key
+            -- },
             on_attach = on_attach,
         }
 
         lspconfig.phpactor.setup {
             capabilities = capabilities,
+            root_dir = function(_)
+                ---@diagnostic disable-next-line: undefined-field
+                return vim.loop.cwd()
+            end,
             on_attach = on_attach,
             init_options = {
                 ["language_server.diagnostics_on_update"] = false,
                 ["language_server.diagnostics_on_open"] = false,
                 ["language_server.diagnostics_on_save"] = false,
-                ["language_server_phpstan.enabled"] = false,
                 ["language_server_psalm.enabled"] = false,
+                ['language_server_phpstan.enabled'] = false,
+                ['phpunit.enabled'] = true,
             }
         }
 
