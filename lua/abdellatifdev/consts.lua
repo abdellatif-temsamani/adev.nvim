@@ -1,7 +1,7 @@
 local ignored_files = {
     "Cargo.lock", "__pycache__", "node_modules", ".git",
-    "/.ccls-cache", "/build", "/node_modules", "/target",
-    "build", "dist", "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
+    "/.ccls-cache", "/build/", "/node_modules", "/target",
+     "dist/", "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
 }
 
 
