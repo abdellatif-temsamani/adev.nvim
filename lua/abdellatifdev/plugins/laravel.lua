@@ -7,7 +7,7 @@ return {
             "MunifTanjim/nui.nvim",
             "kevinhwang91/promise-async",
         },
-        cmd = { "Laravel" },
+        ft = {"blade", "php"},
         keys = {
             { "<leader>la", ":Laravel artisan<cr>" },
             { "<leader>lr", ":Laravel routes<cr>" },
@@ -18,7 +18,7 @@ return {
     },
     {
         "Bleksak/laravel-ide-helper.nvim",
-        event = require("abdellatifdev.consts").events.file,
+        ft = {"blade", "php"},
         opts = {
             write_to_models = true,
             save_before_write = true,

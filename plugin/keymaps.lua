@@ -28,14 +28,14 @@ keymap_set('n', '<leader>wo', '<cmd>tabnew<cr>', { noremap = true, silent = true
 -- }}}}}}}}}
 
 -- split{{{
-keymap_set('n', '<m-k>', '<C-w>k', { noremap = true, silent = true, desc = "to go up split" })
-keymap_set('n', '<m-j>', '<C-w>j', { noremap = true, silent = true, desc = "to go down split" })
-keymap_set('n', '<m-l>', '<C-w>l', { noremap = true, silent = true, desc = "to go left split" })
-keymap_set('n', '<m-h>', '<C-w>h', { noremap = true, silent = true, desc = "to go right split" })
-keymap_set('n', '<c-k>', '<CMD>resize +2<CR>', { silent = true, desc = "resize split to up" })
-keymap_set('n', '<c-j>', '<CMD>resize -2<CR>', { silent = true, desc = "resize split to down" })
-keymap_set('n', '<c-l>', '<CMD>vertical resize -2<CR>', { silent = true, desc = "resize split to left" })
-keymap_set('n', '<c-h>', '<CMD>vertical resize +2<CR>', { silent = true, desc = "resize split to right" })
+keymap_set('n', '<c-k>', '<C-w>k', { noremap = true, silent = true, desc = "to go up split" })
+keymap_set('n', '<c-j>', '<C-w>j', { noremap = true, silent = true, desc = "to go down split" })
+keymap_set('n', '<c-l>', '<C-w>l', { noremap = true, silent = true, desc = "to go left split" })
+keymap_set('n', '<c-h>', '<C-w>h', { noremap = true, silent = true, desc = "to go right split" })
+keymap_set('n', '<m-k>', '<CMD>resize +2<CR>', { silent = true, desc = "resize split to up" })
+keymap_set('n', '<m-j>', '<CMD>resize -2<CR>', { silent = true, desc = "resize split to down" })
+keymap_set('n', '<m-l>', '<CMD>vertical resize -2<CR>', { silent = true, desc = "resize split to left" })
+keymap_set('n', '<m-h>', '<CMD>vertical resize +2<CR>', { silent = true, desc = "resize split to right" })
 -- }}}
 
 -- fold{{{
