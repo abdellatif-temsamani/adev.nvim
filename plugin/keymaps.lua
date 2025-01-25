@@ -46,6 +46,7 @@ keymap_set('n', '<leader>cq', '<cmd>foldclose<CR>', { noremap = true, silent = t
 
 -- terminal{{{
 keymap_set('t', '<c-t>', '<C-\\><C-n>', { noremap = true, silent = true })
+keymap_set('n', '<leader>to', function() Snacks.lazygit() end, { noremap = true, silent = true, desc = "close buffer" })
 -- }}}
 
 -- MISC{{{
