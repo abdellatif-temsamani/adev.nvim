@@ -12,13 +12,14 @@ keymap_set('n', 'k', 'gk', { noremap = true, silent = true, desc = "great k" })
 -- BUFFER{{{
 keymap_set('n', '<Leader>bs', '<cmd>write<CR>', { noremap = true, silent = true, desc = "save" })
 ---@diagnostic disable-next-line<cmd> undefined-global
-keymap_set('n', '<leader>bq', function() Snacks.bufdelete() end, { noremap = true, silent = true, desc = "close buffer" })
+keymap_set('n', '<leader>bq', function() require('mini.bufremove').wipeout() end,
+    { noremap = true, silent = true, desc = "close buffer" })
 keymap_set('n', '<leader>bp', '<cmd>bprevious<CR>', { noremap = true, silent = true, desc = "prev buffer" })
 keymap_set('n', '<leader>bn', '<cmd>bnext<CR>', { noremap = true, silent = true, desc = "next buffer" })
 -- }}}
 
 -- WINDOW{{{
-keymap_set('n', '<leader>wq', '<cmd>close<CR>', { noremap = true, silent = true, desc = "close window" })
+keymap_set('n', '<leader>wq', '<cmd>bwipeout<CR>', { noremap = true, silent = true, desc = "close window" })
 keymap_set('n', '<leader>wv', '<cmd>vsplit<CR>', { noremap = true, silent = true, desc = "vertical split" })
 keymap_set('n', '<leader>wh', '<cmd>split<CR>', { noremap = true, silent = true, desc = "horizontal split" })
 keymap_set('n', '<leader>wa', '<cmd>MaximizerToggle<CR>', { noremap = true, silent = true, desc = "maximize buffer" })
