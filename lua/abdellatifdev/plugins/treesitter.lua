@@ -52,22 +52,6 @@ return {
         }
     },
     {
-        "windwp/nvim-autopairs",
-        event = require("abdellatifdev.consts").events.file,
-        opts = {
-            disable_filetype = { "TelescopePrompt" },
-            ignored_next_char = string.gsub([[ [%w%%%'%[%"%.] ]], "%s+", ""),
-            enable_moveright = true,
-            enable_afterquote = true,
-            enable_check_bracket_line = true,
-            check_ts = true,
-            ts_config = {
-                lua = { "string" },
-                javascript = { "template_string" }
-            }
-        }
-    },
-    {
         'windwp/nvim-ts-autotag',
 
         event = require("abdellatifdev.consts").events.file,

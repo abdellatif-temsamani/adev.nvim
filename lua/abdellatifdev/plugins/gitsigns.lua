@@ -12,16 +12,14 @@ return {
         { "<leader>ts",  function() require('gitsigns').stage_hunk() end,                desc = "stage hunk", },
         { "<leader>tv",  function() require('gitsigns').select_hunk() end,               desc = "select hunk", },
         { "<leader>th",  function() require('gitsigns').preview_hunk() end,              desc = "preview hunk", },
-        { "<leader>tD",  function() require('gitsigns').toggle_deleted() end,            desc = "gitsigns toggle deleted", },
         { "<leader>td",  function() require('gitsigns').diffthis() end,                  desc = "diff this", },
         { "<leader>tl",  function() require('gitsigns').blame_line { full = false } end, desc = "blame line", },
-        { "<leader>tu",  function() require('gitsigns').undo_stage_hunk() end,           desc = "undo stage hunk", },
         { "<leader>tbs", function() require('gitsigns').stage_buffer() end,              desc = "stage buffer", },
         { "<leader>tbr", function() require('gitsigns').reset_buffer() end,              desc = "reset buffer", },
-
     },
     opts = {
         current_line_blame = false,
+        signcolumn = false,
         current_line_blame_opts = {
             virt_text = true,
             virt_text_pos = "eol",

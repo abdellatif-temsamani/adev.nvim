@@ -4,7 +4,7 @@ require('mini.files').setup({
         preview = true,
         width_focus = 50,
         width_nofocus = 15,
-        width_preview = 25,
+        width_preview = 50,
     },
 })
 
@@ -63,3 +63,13 @@ miniclue.setup({
 })
 
 require('mini.comment').setup()
+
+require('mini.git').setup()
+
+require('mini.diff').setup()
+
+require('mini.icons').setup()
+MiniIcons.mock_nvim_web_devicons()
+MiniIcons.tweak_lsp_kind()
+
+require('mini.pairs').setup()

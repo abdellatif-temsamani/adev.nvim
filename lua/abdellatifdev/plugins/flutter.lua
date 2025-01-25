@@ -19,7 +19,7 @@ return {
 
 
             require("flutter-tools").setup({
-                debugger = { enabled = false, },
+                debugger = { enabled = true, },
                 outline = { auto_open = false },
                 flutter_path = "/home/flagmate/.local/share/flutterup/bin/flutter",
                 decorations = { statusline = { device = true, app_version = true } },

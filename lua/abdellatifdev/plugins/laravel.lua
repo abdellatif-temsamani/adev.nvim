@@ -1,6 +1,9 @@
 return {
     {
         "adalessa/laravel.nvim",
+        cond = function()
+            return vim.fn.filereadable("artisan") ~= 0
+        end,
         dependencies = {
             "tpope/vim-dotenv",
             "nvim-telescope/telescope.nvim",
@@ -24,7 +27,7 @@ return {
             save_before_write = true,
             format_after_gen = true,
         },
-        enabled = function()
+        cond = function()
             return vim.fn.filereadable("artisan") ~= 0
         end,
         keys = {
