@@ -19,7 +19,7 @@ keymap_set('n', '<leader>bn', '<cmd>bnext<CR>', { noremap = true, silent = true,
 -- }}}
 
 -- WINDOW{{{
-keymap_set('n', '<leader>wq', '<cmd>bwipeout<CR>', { noremap = true, silent = true, desc = "close window" })
+keymap_set('n', '<leader>wq', '<cmd>close<CR>', { noremap = true, silent = true, desc = "close window" })
 keymap_set('n', '<leader>wv', '<cmd>vsplit<CR>', { noremap = true, silent = true, desc = "vertical split" })
 keymap_set('n', '<leader>wh', '<cmd>split<CR>', { noremap = true, silent = true, desc = "horizontal split" })
 keymap_set('n', '<leader>wa', '<cmd>MaximizerToggle<CR>', { noremap = true, silent = true, desc = "maximize buffer" })
