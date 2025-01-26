@@ -6,11 +6,23 @@ return {
         lazygit      = { enabled = true },
         bigfile      = { enabled = true },
         scroll       = { enabled = true },
+        dashboard    = {
+            enabled = true,
+            sections = {
+                {
+                    section = "terminal",
+                    indent = 9,
+                    height= 5,
+                    cmd = "toilet -f future 'Abdellatif Dev'",
+                },
+                { section = "startup" },
+            },
+        },
         animate      = {
             enabled = true,
-            duration = 100,   -- ms per step
+            duration = 100, -- ms per step
             easing = "linear",
-            fps = 60,        -- f
+            fps = 60,       -- f
         },
         statuscolumn = {
             enabled = true,
