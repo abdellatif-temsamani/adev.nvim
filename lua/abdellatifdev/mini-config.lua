@@ -15,7 +15,7 @@ require('mini.ai').setup()
 require('mini.notify').setup()
 vim.notify = MiniNotify.make_notify()
 
-require('mini.animate').setup()
+-- require('mini.animate').setup()
 
 local miniclue = require('mini.clue')
 miniclue.setup({
@@ -63,10 +63,6 @@ miniclue.setup({
 })
 
 require('mini.comment').setup()
-
-require('mini.git').setup()
-
-require('mini.diff').setup()
 
 require('mini.icons').setup()
 MiniIcons.mock_nvim_web_devicons()
