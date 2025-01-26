@@ -1,6 +1,7 @@
 return {
     {
         "RicardoRamirezR/blade-nav.nvim",
+        ft = { "blade", "php" },
         dependencies = {
             "hrsh7th/nvim-cmp",
         },
