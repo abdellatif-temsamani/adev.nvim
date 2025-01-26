@@ -23,7 +23,7 @@
   "git-conflict.nvim": { "branch": "main", "commit": "4bbfdd92d547d2862a75b4e80afaf30e73f7bbb4" },
   "gitsigns.nvim": { "branch": "main", "commit": "d8918f06624dd53b9a82bd0e29c31bcfd541b40d" },
   "laravel-ide-helper.nvim": { "branch": "main", "commit": "d36ab889153cda9ce67ef3fbbf2b6c30e079d7c9" },
-  "laravel.nvim": { "branch": "main", "commit": "7923db815e0ecf483e9c9b60a742a7cd366f1ab0" },
+  "laravel.nvim": { "branch": "main", "commit": "dca3d24b317054feff09de053daccfa4a64265c7" },
   "lazy.nvim": { "branch": "main", "commit": "d8f26efd456190241afd1b0f5235fe6fdba13d4a" },
   "lazydev.nvim": { "branch": "main", "commit": "a1b78b2ac6f978c72e76ea90ae92a94edf380cfc" },
   "lua-json5": { "branch": "master", "commit": "18d8308656f79fdaa5936b4e42bb07b4bbd2354e" },
