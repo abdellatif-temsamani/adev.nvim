@@ -3,7 +3,6 @@ return {
     priority = 1000,
     lazy = false,
     opts = {
-        input        = { enabled = true },
         lazygit      = { enabled = true },
         bigfile      = { enabled = true },
         scroll       = { enabled = true },

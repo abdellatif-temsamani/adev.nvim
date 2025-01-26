@@ -1,5 +1,14 @@
 return {
     {
+        "RicardoRamirezR/blade-nav.nvim",
+        dependencies = {
+            "hrsh7th/nvim-cmp",
+        },
+        cond = function()
+            return vim.fn.filereadable("artisan") ~= 0
+        end,
+    },
+    {
         "adalessa/laravel.nvim",
         cond = function()
             return vim.fn.filereadable("artisan") ~= 0
@@ -10,7 +19,7 @@ return {
             "MunifTanjim/nui.nvim",
             "kevinhwang91/promise-async",
         },
-        ft = {"blade", "php"},
+        ft = { "blade", "php" },
         keys = {
             { "<leader>la", ":Laravel artisan<cr>" },
             { "<leader>lr", ":Laravel routes<cr>" },
@@ -21,7 +30,7 @@ return {
     },
     {
         "Bleksak/laravel-ide-helper.nvim",
-        ft = {"blade", "php"},
+        ft = { "blade", "php" },
         opts = {
             write_to_models = true,
             save_before_write = true,
