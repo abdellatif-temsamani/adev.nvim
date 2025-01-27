@@ -18,12 +18,6 @@ return {
                 { section = "startup" },
             },
         },
-        animate      = {
-            enabled = true,
-            duration = 100, -- ms per step
-            easing = "linear",
-            fps = 60,       -- f
-        },
         statuscolumn = {
             enabled = true,
             left = { "mark", "sign" },
