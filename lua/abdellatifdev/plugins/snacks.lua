@@ -5,7 +5,6 @@ return {
     opts = {
         lazygit      = { enabled = true },
         bigfile      = { enabled = true },
-        scroll       = { enabled = true },
         dashboard    = {
             enabled = true,
             sections = {
