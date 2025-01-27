@@ -11,7 +11,7 @@ return {
             sections = {
                 {
                     section = "terminal",
-                    indent = 9,
+                    indent = 10,
                     height= 5,
                     cmd = "toilet -f future 'Abdellatif Dev'",
                 },
