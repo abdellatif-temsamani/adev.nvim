@@ -12,7 +12,7 @@ local function treesitter_setup()
         ignore_install        = { "zimbu" },
         highlight             = {
             enable = true,
-            disable = function(lang, buf)
+            disable = function(_, buf)
                 local max_filesize = 100 * 1024 -- 100 KB
                 ---@diagnostic disable-next-line: undefined-field
                 local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
@@ -58,6 +58,11 @@ return {
         opts = {
             per_filetype = {
                 ["blade"] = {
+                    enable_close = true,
+                    enable_rename = true,
+                    enable_close_on_slash = false
+                },
+                ["xml"] = {
                     enable_close = true,
                     enable_rename = true,
                     enable_close_on_slash = false
