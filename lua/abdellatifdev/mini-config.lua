@@ -15,7 +15,7 @@ require('mini.ai').setup()
 require('mini.notify').setup()
 vim.notify = MiniNotify.make_notify()
 
-require('mini.animate').setup()
+-- require('mini.animate').setup()
 
 local miniclue = require('mini.clue')
 miniclue.setup({

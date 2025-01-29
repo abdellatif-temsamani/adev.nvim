@@ -15,7 +15,6 @@ return {
         { "<leader>gn", function() vim.diagnostic.goto_next() end,    desc = "next diagnostic", },
         { "<leader>gr", function() vim.lsp.buf.rename() end,          desc = "lsp rename", },
         { "<leader>gt", function() vim.lsp.buf.type_definition() end, desc = "lsp type definition", },
-
     },
     lazy = true,
     after = "williamboman/mason.nvim",
