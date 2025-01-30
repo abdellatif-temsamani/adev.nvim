@@ -49,7 +49,7 @@ return {
                 desc = "Generate Model Info for current model"
             },
             {
-                "<leader>lgM",
+                "<leader>lga",
                 function()
                     require("laravel-ide-helper").generate_models()
                 end,
