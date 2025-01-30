@@ -22,9 +22,9 @@ return {
         },
         ft = { "blade", "php" },
         keys = {
-            { "<leader>la", ":Laravel artisan<cr>",  desc = "artisan commands" },
-            { "<leader>lr", ":Laravel routes<cr>",   desc = "routes" },
-            { "<leader>lm", ":Laravel related<cr>",  desc = "related" },
+            { "<leader>la", ":Laravel artisan<cr>", desc = "artisan commands" },
+            { "<leader>lr", ":Laravel routes<cr>",  desc = "routes" },
+            { "<leader>lm", ":Laravel related<cr>", desc = "related" },
         },
         opts = {},
         config = true,
