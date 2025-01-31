@@ -8,6 +8,9 @@ return {
         { "<leader>gd", function() vim.lsp.buf.definition() end,      desc = "go to definition", },
         { "<leader>gD", function() vim.lsp.buf.declaration() end,     desc = "go to declaration", },
         { "<leader>gh", function() vim.lsp.buf.hover() end,           desc = "lsp hover", },
+        { "<leader>gi", function() vim.lsp.buf.implementation() end,  desc = "lsp implementation", },
+        { "<leader>gr", function() vim.lsp.buf.references() end,      desc = "lsp implementation", },
+        { "<leader>gt", function() vim.lsp.buf.type_definition() end, desc = "lsp type definition", },
         { "<leader>gc", function() vim.lsp.buf.code_action() end,     desc = "lsp code action",     mode = { "n", "v" } },
         { "<leader>gs", function() vim.lsp.buf.signature_help() end,  desc = "lsp signature help", },
         { "<leader>go", function() vim.diagnostic.open_float() end,   desc = "line diagnostic", },
@@ -285,15 +288,6 @@ return {
             end
         }
 
-        -- NOTE: a secure way to handle licence key
-        local licenceKey = vim.fn.system({ "pass", "secrets/intelephense" }):gsub("\n", "")
-        lspconfig.intelephense.setup {
-            capabilities = capabilities,
-            init_options = {
-                licenceKey = licenceKey,
-            },
-            on_attach = on_attach,
-        }
 
         lspconfig.phan.setup {
             capabilities = capabilities,
@@ -323,6 +317,22 @@ return {
         lspconfig.jdtls.setup({
             capabilities = capabilities,
             on_attach = on_attach,
+        })
+
+
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = { "php", "blade" },
+            callback = function()
+                -- NOTE: a secure way to handle licence key
+                lspconfig.intelephense.setup {
+                    capabilities = capabilities,
+                    filetypes = { "php", "blade" },
+                    init_options = {
+                        licenceKey = vim.fn.system({ "pass", "secrets/intelephense" }):gsub("\n", ""),
+                    },
+                    on_attach = on_attach,
+                }
+            end,
         })
     end
 }
