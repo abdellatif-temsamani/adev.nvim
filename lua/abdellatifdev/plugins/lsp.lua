@@ -285,29 +285,14 @@ return {
             end
         }
 
+        -- NOTE: a secure way to handle licence key
+        local licenceKey = vim.fn.system({ "pass", "secrets/intelephense" }):gsub("\n", "")
         lspconfig.intelephense.setup {
             capabilities = capabilities,
-            -- init_options = {
-            --     licenceKey = "your-premium-key-here",     -- Replace with your actual license key
-            -- },
-            on_attach = on_attach,
-        }
-
-        lspconfig.phpactor.setup {
-            capabilities = capabilities,
-            root_dir = function(_)
-                ---@diagnostic disable-next-line: undefined-field
-                return vim.loop.cwd()
-            end,
-            on_attach = on_attach,
             init_options = {
-                ["language_server.diagnostics_on_update"] = false,
-                ["language_server.diagnostics_on_open"] = false,
-                ["language_server.diagnostics_on_save"] = false,
-                ["language_server_psalm.enabled"] = false,
-                ['language_server_phpstan.enabled'] = false,
-                ['phpunit.enabled'] = true,
-            }
+                licenceKey = licenceKey,
+            },
+            on_attach = on_attach,
         }
 
         lspconfig.phan.setup {
