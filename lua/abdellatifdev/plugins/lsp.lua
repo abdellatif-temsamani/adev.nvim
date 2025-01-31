@@ -323,7 +323,7 @@ return {
         lspconfig.intelephense.setup {
             capabilities = capabilities,
             init_options = {
-                licenceKey = vim.fn.system("cat", "~/.secrets/intelephense"):gsub("\n", "")
+                licenceKey = vim.fn.system({"cat", "/home/flagmate/.secrets/intelephense"}):gsub("\n", "")
             },
             on_attach = on_attach,
         }
