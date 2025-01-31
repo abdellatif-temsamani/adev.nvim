@@ -322,9 +322,8 @@ return {
         -- NOTE: a secure way to handle licence key
         lspconfig.intelephense.setup {
             capabilities = capabilities,
-            filetypes = { "php", "blade" },
             init_options = {
-                licenceKey = "~/.secrets/intelephense"
+                licenceKey = vim.fn.system("cat", "~/.secrets/intelephense"):gsub("\n", "")
             },
             on_attach = on_attach,
         }
