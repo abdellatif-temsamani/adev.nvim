@@ -319,20 +319,14 @@ return {
             on_attach = on_attach,
         })
 
-
-        vim.api.nvim_create_autocmd("FileType", {
-            pattern = { "php", "blade" },
-            callback = function()
-                -- NOTE: a secure way to handle licence key
-                lspconfig.intelephense.setup {
-                    capabilities = capabilities,
-                    filetypes = { "php", "blade" },
-                    init_options = {
-                        licenceKey = vim.fn.system({ "pass", "secrets/intelephense" }):gsub("\n", ""),
-                    },
-                    on_attach = on_attach,
-                }
-            end,
-        })
+        -- NOTE: a secure way to handle licence key
+        lspconfig.intelephense.setup {
+            capabilities = capabilities,
+            filetypes = { "php", "blade" },
+            init_options = {
+                licenceKey = "~/.secrets/intelephense"
+            },
+            on_attach = on_attach,
+        }
     end
 }
