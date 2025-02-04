@@ -28,6 +28,13 @@ keymap_set('n', '<leader>wn', '<cmd>tabnext<cr>', { noremap = true, silent = tru
 keymap_set('n', '<leader>wo', '<cmd>tabnew<cr>', { noremap = true, silent = true, desc = "new tab" })
 -- }}}}}}}}}
 
+-- QUICKFIX{{{
+keymap_set('n', '<leader>qq', '<cmd>cclose<CR>', { noremap = true, silent = true, desc = "close window" })
+keymap_set('n', '<leader>qo', '<cmd>copen<CR>', { noremap = true, silent = true, desc = "close window" })
+keymap_set('n', '<leader>qp', '<cmd>cprevious<cr>', { noremap = true, silent = true, desc = "prev tab" })
+keymap_set('n', '<leader>qn', '<cmd>cnext<cr>', { noremap = true, silent = true, desc = "next tab" })
+-- }}}}}}}}}
+
 -- split{{{
 keymap_set('n', '<c-k>', '<C-w>k', { noremap = true, silent = true, desc = "to go up split" })
 keymap_set('n', '<c-j>', '<C-w>j', { noremap = true, silent = true, desc = "to go down split" })
