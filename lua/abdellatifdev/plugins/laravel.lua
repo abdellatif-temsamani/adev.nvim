@@ -1,15 +1,5 @@
 return {
     {
-        "RicardoRamirezR/blade-nav.nvim",
-        ft = { "blade", "php" },
-        dependencies = {
-            "hrsh7th/nvim-cmp",
-        },
-        cond = function()
-            return vim.fn.filereadable("artisan") ~= 0
-        end,
-    },
-    {
         "adalessa/laravel.nvim",
         cond = function()
             return vim.fn.filereadable("artisan") ~= 0

@@ -19,6 +19,7 @@ return {
             { name = "nvim_lua" },
             { name = "nvim_lsp_signature_help" },
             { name = "luasnip" },
+            { name = "laravel" },
             { name = "path" },
             { name = "crates" },
             { name = "buffer" },
