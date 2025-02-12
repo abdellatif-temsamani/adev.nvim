@@ -29,10 +29,10 @@ keymap_set('n', '<leader>wo', '<cmd>tabnew<cr>', { noremap = true, silent = true
 -- }}}}}}}}}
 
 -- QUICKFIX{{{
-keymap_set('n', '<leader>qq', '<cmd>cclose<CR>', { noremap = true, silent = true, desc = "close window" })
-keymap_set('n', '<leader>qo', '<cmd>copen<CR>', { noremap = true, silent = true, desc = "close window" })
-keymap_set('n', '<leader>qp', '<cmd>cprevious<cr>', { noremap = true, silent = true, desc = "prev tab" })
-keymap_set('n', '<leader>qn', '<cmd>cnext<cr>', { noremap = true, silent = true, desc = "next tab" })
+keymap_set('n', '<leader>qq', '<cmd>cclose<CR>', { noremap = true, silent = true, desc = "close quickfix" })
+keymap_set('n', '<leader>qo', '<cmd>copen<CR>', { noremap = true, silent = true, desc = "open quickfix" })
+keymap_set('n', '<leader>qp', '<cmd>cprevious<cr>', { noremap = true, silent = true, desc = "prev quickfix" })
+keymap_set('n', '<leader>qn', '<cmd>cnext<cr>', { noremap = true, silent = true, desc = "next quickfix" })
 -- }}}}}}}}}
 
 -- split{{{
