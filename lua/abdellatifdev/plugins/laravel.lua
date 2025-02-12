@@ -4,6 +4,7 @@ return {
         cond = function()
             return vim.fn.filereadable("artisan") ~= 0
         end,
+        event = require("abdellatifdev.consts").events.file,
         dependencies = {
             "tpope/vim-dotenv",
             "nvim-telescope/telescope.nvim",
@@ -16,7 +17,6 @@ return {
             { "<leader>lm", ":Laravel related<cr>", desc = "related" },
         },
         opts = {},
-        config = true,
     },
     {
         "Bleksak/laravel-ide-helper.nvim",
@@ -25,6 +25,7 @@ return {
             save_before_write = true,
             format_after_gen = true,
         },
+        event = require("abdellatifdev.consts").events.file,
         cond = function()
             return vim.fn.filereadable("artisan") ~= 0
         end,
