@@ -10,7 +10,6 @@ return {
             "MunifTanjim/nui.nvim",
             "kevinhwang91/promise-async",
         },
-        ft = { "blade", "php" },
         keys = {
             { "<leader>la", ":Laravel artisan<cr>", desc = "artisan commands" },
             { "<leader>lr", ":Laravel routes<cr>",  desc = "routes" },
@@ -21,7 +20,6 @@ return {
     },
     {
         "Bleksak/laravel-ide-helper.nvim",
-        ft = { "blade", "php" },
         opts = {
             write_to_models = true,
             save_before_write = true,
