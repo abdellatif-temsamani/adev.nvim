@@ -193,10 +193,10 @@ return {
             }
         }
 
-        lspconfig.pyright.setup {
-            pabilities = capabilities,
-            on_attach = on_attach,
-        }
+        -- lspconfig.pyright.setup {
+        --     pabilities = capabilities,
+        --     on_attach = on_attach,
+        -- }
 
         lspconfig.rust_analyzer.setup {
             apabilities = capabilities,
