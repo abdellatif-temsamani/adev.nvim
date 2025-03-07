@@ -4,7 +4,17 @@ return {
         name = "catppuccin",
         priority = 1000,
         config = function()
-            vim.cmd [[ colorscheme catppuccin-mocha ]]
+            require("catppuccin").setup({
+                transparent_background = true,
+                integrations = {
+                    telescope = {
+                        enabled = true,
+                        style = "nvchad",
+                    },
+                },
+            })
+
+            vim.cmd("colorscheme catppuccin")
         end
     }
 }
