@@ -28,9 +28,16 @@ return {
             { name = 'cmp_pandoc' },
             { name = "pandoc_references" },
         })
+        local window = {
+            completion = cmp.config.window.bordered(),
+            documentation = cmp.config.window.bordered(),
+        }
+
+        opts.window = window
         opts.mapping = mapping
         opts.snippet = snippet
         opts.sources = sources
+
         -- Set configuration for specific filetype.
         cmp.setup.filetype("gitcommit", {
             sources = cmp.config.sources({
