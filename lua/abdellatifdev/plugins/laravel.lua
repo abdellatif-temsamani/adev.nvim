@@ -5,12 +5,12 @@ return {
             return vim.fn.filereadable("artisan") ~= 0
         end,
         event = require("abdellatifdev.consts").events.file,
-        after ={"nvim-treesitter/nvim-treesitter"},
         dependencies = {
             "tpope/vim-dotenv",
             "nvim-telescope/telescope.nvim",
             "MunifTanjim/nui.nvim",
             "kevinhwang91/promise-async",
+            "nvim-treesitter/nvim-treesitter",
         },
         keys = {
             { "<leader>la", ":Laravel artisan<cr>", desc = "artisan commands" },
