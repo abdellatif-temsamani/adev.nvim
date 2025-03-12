@@ -5,6 +5,7 @@ return {
             return vim.fn.filereadable("artisan") ~= 0
         end,
         event = require("abdellatifdev.consts").events.file,
+        after ={"nvim-treesitter/nvim-treesitter"},
         dependencies = {
             "tpope/vim-dotenv",
             "nvim-telescope/telescope.nvim",
