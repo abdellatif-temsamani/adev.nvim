@@ -61,6 +61,7 @@ return {
                 "phpactor",
                 "intelephense",
                 "lua_ls",
+                "vtsls",
                 "csharp_ls",
                 "volar",
                 "htmx",
