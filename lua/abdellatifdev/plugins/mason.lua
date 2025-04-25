@@ -48,6 +48,7 @@ return {
                 "prettier",
                 "prettierd",
                 "pyre",
+                "pretty_php",
                 "shellharden",
                 "yamllint",
                 "alex",

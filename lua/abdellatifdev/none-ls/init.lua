@@ -37,6 +37,7 @@ local function setup()
             formatting.blade_formatter,
             formatting.bibclean,
             formatting.shellharden,
+            formatting.pretty_php,
             formatting.asmfmt,
             formatting.rustywind,
             formatting.djlint,

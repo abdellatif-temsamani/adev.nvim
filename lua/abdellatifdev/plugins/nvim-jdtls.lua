@@ -1,6 +1,7 @@
 return {
     "mfussenegger/nvim-jdtls",
     event = require("abdellatifdev.consts").events.file,
+    ft = { "java" },
     config = function()
         local config = {
             cmd = {
@@ -16,10 +17,8 @@ return {
                 '--add-modules=ALL-SYSTEM',
                 '--add-opens', 'java.base/java.util=ALL-UNNAMED',
                 '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-
-                '-jar', '/home/flagmate/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.7.0.v20250331-1702.jar',
-
-
+                '-jar',
+                '/home/flagmate/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.7.0.v20250331-1702.jar',
                 '-configuration', '/home/flagmate/.local/share/nvim/mason/packages/jdtls/config_linux',
                 -- See `data directory configuration` section in the README
                 '-data', '/home/flagmate/programming/java'
