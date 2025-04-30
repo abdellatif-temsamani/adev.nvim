@@ -43,7 +43,8 @@ return {
             },
         },
         extensions = {
-            fzf = {}
+            fzf       = {},
+            worktrees = {}
         },
         defaults = {
             layout_strategy = 'horizontal',
