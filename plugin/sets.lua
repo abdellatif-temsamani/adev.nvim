@@ -57,4 +57,4 @@ g.spellfile = os.getenv("HOME") .. "/.config/nvim/spell/en.utf-8.add"
 g.markdown_fenced_languages = { "ts=typescript" }
 
 
-vim.lsp.inlay_hint.enable()
+-- vim.lsp.inlay_hint.enable()
