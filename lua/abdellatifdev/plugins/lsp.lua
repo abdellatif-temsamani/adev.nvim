@@ -299,10 +299,10 @@ return {
             on_attach = on_attach,
         }
 
-        lspconfig.vtsls.setup {
+        --[[ lspconfig.vtsls.setup {
             capabilities = capabilities,
             on_attach = on_attach,
-        }
+        } ]]
 
         lspconfig.glslls.setup {
             capabilities = capabilities,

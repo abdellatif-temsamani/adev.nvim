@@ -1,6 +1,5 @@
 return {
     "mfussenegger/nvim-jdtls",
-    event = require("abdellatifdev.consts").events.file,
     ft = { "java" },
     config = function()
         local config = {
