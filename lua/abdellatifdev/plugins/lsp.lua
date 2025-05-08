@@ -4,20 +4,20 @@ return {
     module = false,
     event = require("abdellatifdev.consts").events.file,
     keys = {
-        { "<leader>gl", function() vim.lsp.buf.format() end,          desc = "lint buffer",         mode = { "v", "n" } },
-        { "<leader>gd", function() vim.lsp.buf.definition() end,      desc = "go to definition", },
-        { "<leader>gD", function() vim.lsp.buf.declaration() end,     desc = "go to declaration", },
-        { "<leader>gh", function() vim.lsp.buf.hover() end,           desc = "lsp hover", },
-        { "<leader>gi", function() vim.lsp.buf.implementation() end,  desc = "lsp implementation", },
-        { "<leader>gr", function() vim.lsp.buf.references() end,      desc = "lsp implementation", },
-        { "<leader>gt", function() vim.lsp.buf.type_definition() end, desc = "lsp type definition", },
-        { "<leader>gc", function() vim.lsp.buf.code_action() end,     desc = "lsp code action",     mode = { "n", "v" } },
-        { "<leader>gs", function() vim.lsp.buf.signature_help() end,  desc = "lsp signature help", },
-        { "<leader>go", function() vim.diagnostic.open_float() end,   desc = "line diagnostic", },
-        { "<leader>gp", function() vim.diagnostic.jump({count=-1, float=true}) end,    desc = "previous diagnostic", },
-        { "<leader>gn", function() vim.diagnostic.jump({count=1, float=true}) end,    desc = "next diagnostic", },
-        { "<leader>gr", function() vim.lsp.buf.rename() end,          desc = "lsp rename", },
-        { "<leader>gt", function() vim.lsp.buf.type_definition() end, desc = "lsp type definition", },
+        { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
+        { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },
+        { "<leader>gD", function() vim.lsp.buf.declaration() end,                         desc = "go to declaration", },
+        { "<leader>gh", function() vim.lsp.buf.hover() end,                               desc = "lsp hover", },
+        { "<leader>gi", function() vim.lsp.buf.implementation() end,                      desc = "lsp implementation", },
+        { "<leader>gr", function() vim.lsp.buf.references() end,                          desc = "lsp implementation", },
+        { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
+        { "<leader>gc", function() vim.lsp.buf.code_action() end,                         desc = "lsp code action",     mode = { "n", "v" } },
+        { "<leader>gs", function() vim.lsp.buf.signature_help() end,                      desc = "lsp signature help", },
+        { "<leader>go", function() vim.diagnostic.open_float() end,                       desc = "line diagnostic", },
+        { "<leader>gp", function() vim.diagnostic.jump({ count = -1, float = true }) end, desc = "previous diagnostic", },
+        { "<leader>gn", function() vim.diagnostic.jump({ count = 1, float = true }) end,  desc = "next diagnostic", },
+        { "<leader>gr", function() vim.lsp.buf.rename() end,                              desc = "lsp rename", },
+        { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
     },
     lazy = true,
     after = "williamboman/mason.nvim",
@@ -289,10 +289,10 @@ return {
         }
 
 
-        lspconfig.phan.setup {
+        --[[ lspconfig.phan.setup {
             capabilities = capabilities,
             on_attach = on_attach,
-        }
+        } ]]
 
         lspconfig.gleam.setup {
             capabilities = capabilities,
@@ -323,7 +323,7 @@ return {
         lspconfig.intelephense.setup {
             capabilities = capabilities,
             init_options = {
-                licenceKey = vim.fn.system({"cat", "/home/flagmate/.secrets/intelephense"}):gsub("\n", "")
+                licenceKey = vim.fn.system({ "cat", "/home/flagmate/.secrets/intelephense" }):gsub("\n", "")
             },
             on_attach = on_attach,
         }
