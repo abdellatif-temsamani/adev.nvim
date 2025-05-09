@@ -72,7 +72,6 @@ return {
                 "astro",
                 "svelte",
                 "svlangserver",
-                "phan",
                 "svls",
                 "bashls",
                 "clangd",
