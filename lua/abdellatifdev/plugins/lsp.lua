@@ -289,21 +289,14 @@ return {
         }
 
 
-
-        -- -- NOTE: install from aur
-        -- lspconfig.phan.setup {
-        --     capabilities = capabilities,
-        --     on_attach = on_attach,
-        -- }
-
         lspconfig.gleam.setup {
             capabilities = capabilities,
             on_attach = on_attach,
         }
 
-        lspconfig.vtsls.setup {
-            capabilities = capabilities,
-        }
+        -- lspconfig.vtsls.setup {
+        --     capabilities = capabilities,
+        -- }
 
         lspconfig.glslls.setup {
             capabilities = capabilities,
