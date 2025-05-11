@@ -208,9 +208,10 @@ return {
             on_attach = on_attach,
         }
 
-        --[[ lspconfig.ts_ls.setup {
+        lspconfig.ts_ls.setup {
             capabilities = capabilities,
-        } ]]
+            on_attach = on_attach,
+        }
 
         lspconfig.cssls.setup {
             capabilities = capabilities,
@@ -229,7 +230,6 @@ return {
 
         lspconfig.tailwindcss.setup {
             capabilities = capabilities,
-            filetypes = { "aspnetcorerazor", "astro", "astro-markdown", "blade", "clojure", "django-html", "htmldjango", "edge", "eelixir", "elixir", "ejs", "erb", "eruby", "gohtml", "gohtmltmpl", "haml", "handlebars", "hbs", "html", "htmlangular", "html-eex", "heex", "jade", "leaf", "liquid", "markdown", "mdx", "mustache", "njk", "nunjucks", "php", "razor", "slim", "twig", "css", "less", "postcss", "sass", "scss", "stylus", "sugarss", "javascript", "javascriptreact", "reason", "rescript", "typescript", "typescriptreact", "vue", "svelte", "templ", "blade" },
             on_attach = on_attach,
             settings = {
                 tailwindCSS = {
@@ -303,7 +303,6 @@ return {
 
         lspconfig.vtsls.setup {
             capabilities = capabilities,
-            on_attach = on_attach,
         }
 
         lspconfig.glslls.setup {

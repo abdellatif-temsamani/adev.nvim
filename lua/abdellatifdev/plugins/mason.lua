@@ -16,7 +16,6 @@ return {
         "jay-babu/mason-nvim-dap.nvim",
         event = require("abdellatifdev.consts").events.pre,
         after = "williamboman/mason.nvim",
-        opts = {
             ensure_installed = {
                 "bash-debug-adapter",
                 "chrome-debug-adapter",
@@ -60,6 +59,7 @@ return {
         event = require("abdellatifdev.consts").events.pre,
         after = "williamboman/mason.nvim",
         opts = {
+            automatic_enable = false,
             ensure_installed = {
                 "intelephense",
                 "lua_ls",
