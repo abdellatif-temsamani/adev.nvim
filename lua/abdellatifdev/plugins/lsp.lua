@@ -289,10 +289,12 @@ return {
         }
 
 
-        --[[ lspconfig.phan.setup {
-            capabilities = capabilities,
-            on_attach = on_attach,
-        } ]]
+
+        -- -- NOTE: install from aur
+        -- lspconfig.phan.setup {
+        --     capabilities = capabilities,
+        --     on_attach = on_attach,
+        -- }
 
         lspconfig.gleam.setup {
             capabilities = capabilities,
