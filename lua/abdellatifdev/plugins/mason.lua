@@ -61,7 +61,6 @@ return {
         after = "williamboman/mason.nvim",
         opts = {
             ensure_installed = {
-                "phpactor",
                 "intelephense",
                 "lua_ls",
                 "vtsls",
