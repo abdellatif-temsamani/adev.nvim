@@ -9,7 +9,7 @@ return {
         { "<leader>gD", function() vim.lsp.buf.declaration() end,                         desc = "go to declaration", },
         { "<leader>gh", function() vim.lsp.buf.hover() end,                               desc = "lsp hover", },
         { "<leader>gi", function() vim.lsp.buf.implementation() end,                      desc = "lsp implementation", },
-        { "<leader>gr", function() vim.lsp.buf.references() end,                          desc = "lsp implementation", },
+        { "<leader>gr", function() vim.lsp.buf.references() end,                          desc = "lsp reference", },
         { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
         { "<leader>gc", function() vim.lsp.buf.code_action() end,                         desc = "lsp code action",     mode = { "n", "v" } },
         { "<leader>gs", function() vim.lsp.buf.signature_help() end,                      desc = "lsp signature help", },

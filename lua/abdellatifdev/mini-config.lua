@@ -12,8 +12,8 @@ require('mini.bufremove').setup()
 
 require('mini.ai').setup()
 
-require('mini.notify').setup()
-vim.notify = MiniNotify.make_notify()
+-- require('mini.notify').setup()
+-- vim.notify = MiniNotify.make_notify()
 
 -- require('mini.animate').setup()
 
