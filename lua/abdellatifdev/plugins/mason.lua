@@ -77,7 +77,7 @@ return {
                 "bashls",
                 "clangd",
                 "eslint",
-                -- "cmake",
+                "cmake",
                 "cssmodules_ls",
                 "jdtls",
                 "dockerls",

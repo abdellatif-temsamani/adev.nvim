@@ -74,8 +74,6 @@ return {
         "nvim-treesitter/nvim-treesitter",
         event = require("abdellatifdev.consts").events.file,
         build = ":TSUpdate",
-        config = function()
-            treesitter_setup()
-        end,
+        config = treesitter_setup,
     },
 }

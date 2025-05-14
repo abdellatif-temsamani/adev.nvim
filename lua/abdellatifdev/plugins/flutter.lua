@@ -1,6 +1,7 @@
 return {
     {
         'nvim-flutter/flutter-tools.nvim',
+        -- NOTE: change to cond
         ft = { "dart" },
         event = require('abdellatifdev.consts').events.file,
         dependencies = {
