@@ -45,6 +45,7 @@ return {
                 "phpcs",
                 "phpmd",
                 "proselint",
+                "rustywind",
                 "prettier",
                 "prettierd",
                 "pyre",
