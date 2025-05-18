@@ -1,6 +1,15 @@
 -- tailwind-tools.lua
 return {
     "luckasRanarison/tailwind-tools.nvim",
+    settings = {
+        experimental = {
+            classRegex = {
+                { "tw\\('([^']*)'\\)" },
+                { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" }
+            },
+        },
+    },
     event = require("abdellatifdev.consts").events.lsp,
     name = "tailwind-tools",
     build = ":UpdateRemotePlugins",
