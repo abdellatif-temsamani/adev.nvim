@@ -1,8 +1,6 @@
 return {
     'brenoprata10/nvim-highlight-colors',
-    enabled= false,
     event = require("abdellatifdev.consts").events.file,
-    lazy = true,
     opts = {
         render = 'virtual',
         virtual_symbol = '■',
