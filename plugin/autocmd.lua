@@ -1,26 +1,34 @@
-local autocmd = vim.api.nvim_create_autocmd
-local autogroup = vim.api.nvim_create_augroup
+-- Create (or clear) the GENERAL augroup
+local autocmd     = vim.api.nvim_create_autocmd
+local general_grp = vim.api.nvim_create_augroup("GENERAL", { clear = true })
 
-local group = autogroup("GENERAL", { clear = true })
+-- Trim trailing whitespace on save{{{
+autocmd("BufWritePre", {
+    group    = general_grp,
+    pattern  = "*",
+    callback = function()
+        vim.cmd([[%s/\s\+$//e]])
+    end,
+}) -- }}}
 
-autocmd("BufWritePre",
-    { group = group, callback = function() vim.cmd("%s/\\s\\+$//e") end })
-
+-- Enable spell checking, 2‑space tabs, and expandtab for certain filetypes{{{
 autocmd("FileType", {
-    group = group,
+    group   = general_grp,
     pattern = { "gitcommit", "markdown", "svelte", "cpp", "c", "dart" },
-    command = "setlocal spell spelllang=en_gb,fr tabstop=2 shiftwidth=2 expandtab"
-})
+    command = "setlocal spell spelllang=en_gb,fr tabstop=2 shiftwidth=2 expandtab",
+}) -- }}}
 
-autocmd("FileType",
-    { group = group, pattern = { "tf" }, command = "set ft=terraform" })
-
+-- Disable automatic comment insertion on Enter for all filetypes{{{
 autocmd("FileType", {
-    group = group,
-    command = "set formatoptions-=r formatoptions-=c formatoptions-=o"
-})
+    group   = general_grp,
+    pattern = "*",
+    command = "setlocal formatoptions-=r formatoptions-=c formatoptions-=o",
+}) -- }}}
 
+-- Briefly highlight yanked text{{{
 autocmd("TextYankPost", {
-    group = group,
-    callback = function() vim.highlight.on_yank({ timeout = 60 }) end
-})
+    group    = general_grp,
+    callback = function()
+        vim.highlight.on_yank({ timeout = 60 })
+    end,
+}) -- }}}

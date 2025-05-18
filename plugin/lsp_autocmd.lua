@@ -1,7 +1,6 @@
 local autocmd = vim.api.nvim_create_autocmd
-local autogroup = vim.api.nvim_create_augroup
 
-local group = autogroup("LSP", { clear = true })
+local group = vim.api.nvim_create_augroup("LSP", { clear = true })
 
 
 autocmd("BufEnter", {
@@ -11,8 +10,6 @@ autocmd("BufEnter", {
         vim.g.completion_trigger_character = { '.', '::', '=' }
     end
 })
-
-vim.cmd [[ autocmd BufRead,BufNewFile *.slint set filetype=slint ]]
 
 autocmd("BufEnter", {
     group = group,
