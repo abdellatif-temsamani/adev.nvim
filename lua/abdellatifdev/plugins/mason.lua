@@ -43,6 +43,8 @@ return {
                 "hadolint",
                 "npm-groovy-lint",
                 "phpcs",
+                "black",
+                "isort",
                 "phpmd",
                 "proselint",
                 "rustywind",
