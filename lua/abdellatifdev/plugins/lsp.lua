@@ -158,6 +158,7 @@ return {
             "glsl_analyzer",
             "jdtls",
             "intelephense",
+            "lua_ls",
         })
     end
 }
