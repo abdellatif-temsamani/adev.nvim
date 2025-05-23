@@ -138,7 +138,7 @@ return {
             "slint_lsp",
             "svlangserver",
             "biome",
-            "volar",
+            "vue_ls",
             "svls",
             "emmet_ls",
             "bashls",
