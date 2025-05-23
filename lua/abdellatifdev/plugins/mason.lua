@@ -69,7 +69,7 @@ return {
                 "lua_ls",
                 "vtsls",
                 "csharp_ls",
-                "volar",
+                "vue_ls",
                 "htmx",
                 "ts_ls",
                 "emmet_ls",
