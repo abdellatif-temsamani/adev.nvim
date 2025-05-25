@@ -53,7 +53,6 @@ g.noerrorbells = true
 g.linebreak = true
 g.indentexpr = ''
 g.formatoptions = 'tqlnwa'
-g.spellfile = os.getenv("HOME") .. "/.config/nvim/spell/en.utf-8.add"
 g.markdown_fenced_languages = { "ts=typescript" }
 
 

@@ -11,13 +11,6 @@ autocmd("BufWritePre", {
     end,
 }) -- }}}
 
--- Enable spell checking, 2‑space tabs, and expandtab for certain filetypes{{{
-autocmd("FileType", {
-    group   = general_grp,
-    pattern = { "gitcommit", "markdown", "svelte", "cpp", "c", "dart" },
-    command = "setlocal spell spelllang=en_gb,fr tabstop=2 shiftwidth=2 expandtab",
-}) -- }}}
-
 -- Disable automatic comment insertion on Enter for all filetypes{{{
 autocmd("FileType", {
     group   = general_grp,
