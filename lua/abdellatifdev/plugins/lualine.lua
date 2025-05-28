@@ -2,6 +2,16 @@ local function abdellatif_dev()
     return [[Abdellatif Dev]]
 end
 
+local function macro_recording()
+    local recording_register = vim.fn.reg_recording()
+    if recording_register == '' then
+        return ''
+    else
+        return 'Recording @' .. recording_register
+    end
+end
+
+
 return
 {
     "nvim-lualine/lualine.nvim",
@@ -16,7 +26,7 @@ return
         },
         sections = {
             lualine_a = { 'mode', 'branch' },
-            lualine_b = {},
+            lualine_b = { macro_recording },
             lualine_c = { 'branch', 'diff', 'diagnostics' },
             lualine_x = { 'selectioncount', 'encoding', 'filetype' },
             lualine_y = {},
