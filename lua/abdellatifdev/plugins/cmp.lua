@@ -16,17 +16,12 @@ return {
         local sources = cmp.config.sources({
             { name = "lazydev",                group_index = 0 },
             { name = "nvim_lsp" },
-            { name = "nvim_lua" },
             { name = "nvim_lsp_signature_help" },
             { name = "luasnip" },
             { name = "laravel" },
             { name = "path" },
             { name = "crates" },
             { name = "buffer" },
-            { name = "calc" },
-            { name = "latex_symbols" },
-            { name = 'cmp_pandoc' },
-            { name = "pandoc_references" },
         })
         local window = {
             completion = cmp.config.window.bordered(),
@@ -45,14 +40,16 @@ return {
                 { name = "conventionalcommits" }
             }, { { name = "buffer" } })
         })
+
         cmp.setup.cmdline({ "/", "?" }, {
             mapping = cmp.mapping.preset.cmdline(),
             sources = { { name = "buffer" } }
         })
+
         cmp.setup.cmdline(":", {
             mapping = cmp.mapping.preset.cmdline(),
             sources = cmp.config.sources({ { name = "path" } },
-                { { name = "cmdline" }, { name = "nvim_lua" } })
+                { { name = "cmdline" }, { name = "lsp" } })
         })
     end,
 }

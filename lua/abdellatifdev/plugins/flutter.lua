@@ -1,16 +1,15 @@
 return {
     {
         'nvim-flutter/flutter-tools.nvim',
-        -- NOTE: change to cond
-        ft = { "dart" },
+        cond = function()
+            return vim.fn.filereadable("pubspec.yaml") ~= 0
+        end,
         event = require('abdellatifdev.consts').events.file,
         dependencies = {
             'nvim-lua/plenary.nvim',
         },
         config = function()
-            local capabilities = require("cmp_nvim_lsp").default_capabilities()
-            capabilities.textDocument.completion.completionItem.snippetSupport = true
-
+            local capabilities = require('blink.cmp').get_lsp_capabilities()
 
             local function on_attach(client, bufnr)
                 if client.server_capabilities.documentSymbolProvider then

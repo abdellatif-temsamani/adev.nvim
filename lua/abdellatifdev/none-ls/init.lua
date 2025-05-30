@@ -1,6 +1,6 @@
 local function setup()
-    -- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md
-    ---module ""
+    -- https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md
+    ---@module "null-ls"
     local null_ls = require("null-ls")
     local h = require("null-ls.helpers")
 

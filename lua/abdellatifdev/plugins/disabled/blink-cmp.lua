@@ -14,10 +14,17 @@ return {
         },
 
         completion = {
+            list = { selection = { preselect = true, auto_insert = true } },
             accept = { auto_brackets = { enabled = false }, },
-            documentation = { auto_show = true, auto_show_delay_ms = 500 },
+            documentation = {
+                auto_show = true,
+                auto_show_delay_ms = 500,
+                indow = {
+                    border = 'single'
+                }
+            },
             menu = {
-                border = "rounded",
+                border = 'single',
                 draw = {
                     columns = { { "label", gap = 1, "kind_icon" } },
                 }
@@ -29,9 +36,10 @@ return {
             default = { 'lsp', 'path', 'snippets', 'buffer', },
         },
 
+        snippets = { preset = 'luasnip' },
+
         per_filetype = {
             lua = { inherit_defaults = true, 'lazydev' },
-            php = { inherit_defaults = true, 'laravel' }
         },
         providers = {
             lazydev = {
@@ -41,5 +49,6 @@ return {
             },
         },
     },
-    opts_extend = { "sources.default" }
+    signature = { enabled = true },
+    opts_extend = { "sources.default" },
 }
