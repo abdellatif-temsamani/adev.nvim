@@ -1,19 +1,10 @@
 return {
     'saghen/blink.cmp',
     -- build = "cargo build --release",
-    enabled = false,
     version = '*',
     dependencies = {
         'rafamadriz/friendly-snippets',
         'honza/vim-snippets',
-        {
-            'L3MON4D3/LuaSnip',
-            build = "make install_jsregexp",
-            config = function()
-                require("luasnip.loaders.from_vscode").lazy_load()
-                require("luasnip.loaders.from_snipmate").lazy_load()
-            end,
-        }
     },
     opts = {
         keymap = {
@@ -25,12 +16,29 @@ return {
         completion = {
             accept = { auto_brackets = { enabled = false }, },
             documentation = { auto_show = true, auto_show_delay_ms = 500 },
+            menu = {
+                border = "rounded",
+                draw = {
+                    columns = { { "label", gap = 1, "kind_icon" } },
+                }
+            },
 
         },
 
         sources = {
-            default = { 'lsp', 'path', 'snippets', 'buffer' },
+            default = { 'lsp', 'path', 'snippets', 'buffer', },
+        },
 
+        per_filetype = {
+            lua = { inherit_defaults = true, 'lazydev' },
+            php = { inherit_defaults = true, 'laravel' }
+        },
+        providers = {
+            lazydev = {
+                name = "LazyDev",
+                module = "lazydev.integrations.blink",
+                score_offset = 100,
+            },
         },
     },
     opts_extend = { "sources.default" }
