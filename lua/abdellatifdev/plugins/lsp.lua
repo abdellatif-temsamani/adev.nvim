@@ -24,15 +24,8 @@ return {
     config = function()
         local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-        local function on_attach(client, bufnr)
-            if client.server_capabilities.documentSymbolProvider then
-                require("nvim-navic").attach(client, bufnr)
-            end
-        end
-
         vim.lsp.config('*', {
             capabilities = capabilities,
-            on_attach = on_attach,
         })
 
         vim.lsp.config('lua_ls', {
@@ -93,7 +86,6 @@ return {
         vim.lsp.config('html', {
             filetypes = {
                 "astro",
-                "css",
                 "eruby",
                 "html",
                 "htmldjango",
@@ -114,8 +106,7 @@ return {
 
         vim.lsp.config('texlab', {
             filetypes = { "tex", "bib", "markdown", "plaintex" },
-            on_attach = function(client, bufnr)
-                on_attach(client, bufnr)
+            on_attach = function(client)
                 client.server_capabilities.documentFormattingProvider = false
                 client.server_capabilities.documentRangeFormattingProvider = false
             end

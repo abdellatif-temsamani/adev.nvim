@@ -35,12 +35,6 @@ return
         winbar = {
             lualine_c = {
                 "filename",
-                {
-
-                    "navic",
-                    color_correction = nil,
-                    navic_opts = nil
-                }
             }
         },
         tabline = {
@@ -49,7 +43,7 @@ return
                     'tabs',
                     mode = 4,
                     max_length = vim.o.columns / 2,
-                }
+                },
             },
             lualine_b = {},
             lualine_c = {},

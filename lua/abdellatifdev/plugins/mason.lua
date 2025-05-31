@@ -13,20 +13,6 @@ return {
 
     },
     {
-        "jay-babu/mason-nvim-dap.nvim",
-        event = require("abdellatifdev.consts").events.pre,
-        after = "williamboman/mason.nvim",
-        opts = {
-            ensure_installed = {
-                "bash-debug-adapter",
-                "chrome-debug-adapter",
-                "codelldb",
-                "debugpy",
-
-            }
-        }
-    },
-    {
         "jay-babu/mason-null-ls.nvim",
         event = require("abdellatifdev.consts").events.pre,
         after = "williamboman/mason.nvim",

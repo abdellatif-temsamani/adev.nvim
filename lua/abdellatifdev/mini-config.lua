@@ -12,10 +12,8 @@ require('mini.bufremove').setup()
 
 require('mini.ai').setup()
 
--- require('mini.animate').setup()
-
 local miniclue = require('mini.clue')
-miniclue.setup({
+require('mini.clue').setup({
     triggers = {
         -- Leader triggers
         { mode = 'n', keys = '<Leader>' },
@@ -49,7 +47,6 @@ miniclue.setup({
     },
 
     clues = {
-        -- Enhance this by adding descriptions for <Leader> mapping groups
         miniclue.gen_clues.builtin_completion(),
         miniclue.gen_clues.g(),
         miniclue.gen_clues.marks(),

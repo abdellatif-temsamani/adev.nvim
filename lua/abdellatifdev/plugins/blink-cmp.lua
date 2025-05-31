@@ -1,7 +1,7 @@
 return {
     {
         'saghen/blink.compat',
-        version = '2.*',
+        version = '*',
         lazy = true,
         opts = {},
     },
@@ -32,7 +32,7 @@ return {
                 menu = {
                     border = 'single',
                     draw = {
-                        columns = { { "label", gap = 1, "kind_icon" } },
+                        columns = { { "kind_icon", gap = 1, "label", } },
                     }
                 },
 
