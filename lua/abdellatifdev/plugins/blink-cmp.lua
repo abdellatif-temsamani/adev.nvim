@@ -11,7 +11,6 @@ return {
         dependencies = {
             'rafamadriz/friendly-snippets',
             'honza/vim-snippets',
-            'dmitmel/cmp-digraphs'
         },
         opts = {
             keymap = {
