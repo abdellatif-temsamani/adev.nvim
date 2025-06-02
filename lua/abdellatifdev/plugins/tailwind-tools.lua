@@ -3,12 +3,7 @@ return {
     "luckasRanarison/tailwind-tools.nvim",
     settings = {
         experimental = {
-            classRegex = {
-                { "twMerge\\('([^']*)'\\)" },
-                { "tw\\('([^']*)'\\)" },
-                { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-                { "cx\\(([^)]*)\\)",  "(?:'|\"|`)([^']*)(?:'|\"|`)" }
-            },
+            classRegex = { "tw\\('([^']*)'\\)" }
         },
     },
     event = require("abdellatifdev.consts").events.lsp,
