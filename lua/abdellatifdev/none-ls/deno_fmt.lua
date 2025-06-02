@@ -7,13 +7,7 @@ local methods = require("null-ls.methods")
 local FORMATTING = methods.internal.FORMATTING
 
 local extensions = {
-    javascript = "js",
-    javascriptreact = "jsx",
-    json = "json",
-    jsonc = "jsonc",
     markdown = "md",
-    typescript = "ts",
-    typescriptreact = "tsx",
 }
 
 return h.make_builtin({
@@ -34,13 +28,7 @@ local sources = {
     },
     method = FORMATTING,
     filetypes = {
-        "javascript",
-        "javascriptreact",
-        "json",
-        "jsonc",
         "markdown",
-        "typescript",
-        "typescriptreact",
     },
     generator_opts = {
         command = "deno",

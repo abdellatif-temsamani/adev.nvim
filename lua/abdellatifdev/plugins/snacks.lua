@@ -4,19 +4,6 @@ return {
     lazy = false,
     opts = {
         lazygit      = { enabled = true },
-        bigfile      = { enabled = true },
-        dashboard    = {
-            enabled = true,
-            sections = {
-                {
-                    section = "terminal",
-                    indent = 10,
-                    height= 5,
-                    cmd = "toilet -f future 'Abdellatif Dev'",
-                },
-                { section = "startup" },
-            },
-        },
         statuscolumn = {
             enabled = true,
             left = { "mark", "sign" },
