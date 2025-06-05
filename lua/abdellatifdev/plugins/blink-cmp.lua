@@ -64,7 +64,6 @@ return {
 
             snippets = { preset = 'luasnip' },
             signature = { enabled = true },
-            opts_extend = { "sources.default" },
         }
     }
 }
