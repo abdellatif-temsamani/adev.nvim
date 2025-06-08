@@ -1,6 +1,7 @@
 local o = vim.o
 
 o.termguicolors = true
+o.syntax = "true"
 o.foldmethod = "marker"
 o.splitbelow = true
 o.splitright = true
@@ -30,7 +31,6 @@ o.concealcursor = "vin"
 o.linebreak = true
 
 vim.cmd [[ set mouse= ]]
-vim.cmd [[ syntax on ]]
 
 
 vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
