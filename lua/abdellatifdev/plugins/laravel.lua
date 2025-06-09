@@ -14,8 +14,8 @@ return {
         },
         keys = {
             { "<leader>la", ":Laravel artisan<cr>", desc = "artisan commands" },
-            { "<leader>lr", ":Laravel routes<cr>",  desc = "routes" },
-            { "<leader>lm", ":Laravel related<cr>", desc = "related" },
+            { "<leader>lr", ":Laravel routes<cr>",  desc = "artisan route:list" },
+            { "<leader>lm", ":Laravel make<cr>", desc = "artisan make" },
         },
         opts = {},
     },
