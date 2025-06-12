@@ -1,4 +1,5 @@
 return function()
+    vim.cmd [[ filetype plugin indent on ]]
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
     vim.opt.termguicolors = true
