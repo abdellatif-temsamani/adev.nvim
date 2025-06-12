@@ -51,10 +51,15 @@ return {
                     'snippets',
                     'buffer',
                     'laravel',
+                    'creates',
                     'cmdline',
                     'omni',
                 },
                 providers = {
+                    creates = {
+                        name = "crates",
+                        module = "blink.compat.source",
+                    },
                     laravel = {
                         name = "laravel",
                         module = "blink.compat.source",
