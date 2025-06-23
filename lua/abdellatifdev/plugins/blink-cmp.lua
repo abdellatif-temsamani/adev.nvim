@@ -13,7 +13,6 @@ return {
             'honza/vim-snippets',
         },
         opts =
-
         {
             cmdline = {
                 keymap = { preset = 'inherit' },
