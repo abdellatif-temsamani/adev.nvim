@@ -17,7 +17,7 @@ return {
         { "<leader>go", function() vim.diagnostic.open_float() end,                       desc = "line diagnostic", },
         { "<leader>gp", function() vim.diagnostic.jump({ count = -1, float = true }) end, desc = "previous diagnostic", },
         { "<leader>gn", function() vim.diagnostic.jump({ count = 1, float = true }) end,  desc = "next diagnostic", },
-        { "<leader>gr", function() vim.lsp.buf.rename() end,                              desc = "lsp rename", },
+        { "<leader>ga", function() vim.lsp.buf.rename() end,                              desc = "lsp rename", },
         { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
     },
     after = "williamboman/mason.nvim",

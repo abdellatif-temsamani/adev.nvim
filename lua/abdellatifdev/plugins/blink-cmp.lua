@@ -12,8 +12,7 @@ return {
             'rafamadriz/friendly-snippets',
             'honza/vim-snippets',
         },
-        opts =
-        {
+        opts = {
             cmdline = {
                 keymap = { preset = 'inherit' },
                 completion = { menu = { auto_show = true } },
@@ -50,15 +49,10 @@ return {
                     'snippets',
                     'buffer',
                     'laravel',
-                    'creates',
                     'cmdline',
                     'omni',
                 },
                 providers = {
-                    creates = {
-                        name = "crates",
-                        module = "blink.compat.source",
-                    },
                     laravel = {
                         name = "laravel",
                         module = "blink.compat.source",
@@ -68,6 +62,7 @@ return {
 
             snippets = { preset = 'luasnip' },
             signature = { enabled = true },
+            opts_extend = { "sources.default" },
         }
     }
 }
