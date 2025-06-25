@@ -1,13 +1,14 @@
 return {
     {
         'saghen/blink.compat',
-        version = '*',
+        version = '2.*',
         lazy = true,
         opts = {},
     },
     {
         'saghen/blink.cmp',
-        version = '*',
+        version = '1.*',
+        -- build = 'cargo build --release',
         dependencies = {
             'rafamadriz/friendly-snippets',
             'honza/vim-snippets',
