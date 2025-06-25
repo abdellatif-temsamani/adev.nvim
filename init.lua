@@ -1,2 +1,2 @@
-vim.loader.enable()
+vim.loader.enable(true)
 require "abdellatifdev" ()

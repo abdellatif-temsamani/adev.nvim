@@ -48,21 +48,20 @@ return {
                     'path',
                     'snippets',
                     'buffer',
-                    'laravel',
+                    -- 'laravel',
                     'cmdline',
                     'omni',
                 },
                 providers = {
-                    laravel = {
-                        name = "laravel",
-                        module = "blink.compat.source",
-                    },
+                    -- laravel = {
+                    --     name = "laravel",
+                    --     module = "blink.compat.source",
+                    -- },
                 }
             },
 
             snippets = { preset = 'luasnip' },
             signature = { enabled = true },
-            opts_extend = { "sources.default" },
         }
     }
 }
