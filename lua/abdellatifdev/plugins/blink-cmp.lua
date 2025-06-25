@@ -2,11 +2,13 @@ return {
     {
         'saghen/blink.compat',
         lazy = true,
+        version = "2.*",
         opts = {},
     },
     {
         'saghen/blink.cmp',
-        build = 'cargo build --release',
+        -- build = 'cargo build --release',
+        version = "v1.3.1",
         dependencies = {
             'rafamadriz/friendly-snippets',
             'neovim/nvim-lspconfig',
