@@ -1,6 +1,6 @@
 return {
     {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         build = ":MasonUpdate",
         cmd = "Mason",
         event = require("abdellatifdev.consts").events.pre,
@@ -58,6 +58,7 @@ return {
     {
         "williamboman/mason-lspconfig.nvim",
         event = require("abdellatifdev.consts").events.pre,
+        dependencies = { 'mason-org/mason.nvim', 'neovim/nvim-lspconfig' },
         after = "williamboman/mason.nvim",
         opts = {
             automatic_enable = false,

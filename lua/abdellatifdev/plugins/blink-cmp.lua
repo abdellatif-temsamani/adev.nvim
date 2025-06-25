@@ -1,16 +1,15 @@
 return {
     {
         'saghen/blink.compat',
-        version = '2.*',
         lazy = true,
         opts = {},
     },
     {
         'saghen/blink.cmp',
-        version = '1.*',
-        -- build = 'cargo build --release',
+        build = 'cargo build --release',
         dependencies = {
             'rafamadriz/friendly-snippets',
+            'neovim/nvim-lspconfig',
             'honza/vim-snippets',
         },
         opts = {
@@ -49,15 +48,15 @@ return {
                     'path',
                     'snippets',
                     'buffer',
-                    -- 'laravel',
+                    'laravel',
                     'cmdline',
                     'omni',
                 },
                 providers = {
-                    -- laravel = {
-                    --     name = "laravel",
-                    --     module = "blink.compat.source",
-                    -- },
+                    laravel = {
+                        name = "laravel",
+                        module = "blink.compat.source",
+                    },
                 }
             },
 
