@@ -22,7 +22,10 @@ return {
     },
     after = "williamboman/mason.nvim",
     config = function()
-        local capabilities = require('blink.cmp').get_lsp_capabilities()
+        local caps = vim.lsp.protocol.make_client_capabilities()
+
+        local capabilities = require('blink.cmp').get_lsp_capabilities(caps)
+        capabilities.textDocument.completion.completionItem.snippetSupport = true
 
         vim.lsp.config('*', {
             capabilities = capabilities,
