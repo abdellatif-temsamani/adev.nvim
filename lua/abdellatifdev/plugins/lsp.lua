@@ -158,7 +158,6 @@ return {
             "zls",
             "solidity",
             "solidity_ls_nomicfoundation",
-            "asm_lsp",
             "yamlls",
             "lemminx",
             "texlab",
