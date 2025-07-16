@@ -15,8 +15,10 @@ return {
         keys = {
             { "<leader>la", ":Laravel artisan<cr>", desc = "artisan commands" },
             { "<leader>lr", ":Laravel routes<cr>",  desc = "artisan route:list" },
-            { "<leader>lm", ":Laravel make<cr>", desc = "artisan make" },
+            { "<leader>lm", ":Laravel make<cr>",    desc = "artisan make" },
         },
-        opts = {},
+        opts = {
+            lsp_server = "intelephense:",
+        },
     },
 }
