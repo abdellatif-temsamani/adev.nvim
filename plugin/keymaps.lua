@@ -41,7 +41,7 @@ keymap_set('n', '<leader>cq', '<cmd>foldclose<CR>', { noremap = true, silent = t
 
 keymap_set('t', '<c-t>', '<C-\\><C-n>', { noremap = true, silent = true })
 keymap_set('n', '<leader>to', function() Snacks.lazygit() end, { noremap = true, silent = true, desc = "lazygit" })
-keymap_set('n', '<leader>tr', function()
+keymap_set('n', '<leader>tq', function()
         local defaults = {
             win = { style = "terminal" },
         }
