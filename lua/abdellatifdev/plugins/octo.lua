@@ -5,10 +5,12 @@ return {
         'nvim-telescope/telescope.nvim',
     },
     keys = {
-        { "<leader>ol", "<CMD>Octo pr list<CR>", desc = "pr list", mode = "n" },
+        { "<leader>o", "<CMD>Octo<CR>", desc = "Octo commands", mode = "n" },
     },
     cond = function()
         return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
     end,
-    opts = {},
+    opts = {
+        enable_builtin = true
+    },
 }
