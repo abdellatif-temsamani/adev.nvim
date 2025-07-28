@@ -4,7 +4,7 @@ return
     event = "VeryLazy",
     opts = {
         notify = {
-            enabled = false,
+            enabled = true,
         },
 
         cmdline = {

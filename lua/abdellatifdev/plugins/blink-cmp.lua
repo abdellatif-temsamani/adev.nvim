@@ -1,13 +1,16 @@
+local events = require("abdellatifdev.consts").events
+
 return {
     {
         'saghen/blink.compat',
+        after = 'saghen/blink.cmp',
         lazy = true,
         version = "2.*",
         opts = {},
     },
     {
         'saghen/blink.cmp',
-        -- build = 'cargo build --release',
+        event = events:merge({ "file", "cmd", "lsp" }),
         version = "v1.3.1",
         dependencies = {
             'rafamadriz/friendly-snippets',

@@ -17,6 +17,7 @@ return {
         { "<leader>fs", function() require("telescope.builtin").commands() end,   desc = "commands", },
         { "<leader>fa", function() require("telescope.builtin").treesitter() end, desc = "treesitter", },
         { "<leader>ft", function() vim.cmd [[ TodoTelescope ]] end,               desc = "TodoTelescope", },
+        { "<leader>fn", function() vim.cmd [[ NoiceTelescope ]] end,              desc = "NoiceTelescope", },
     },
 
     opts = {
@@ -44,7 +45,8 @@ return {
         },
         extensions = {
             fzf       = {},
-            worktrees = {}
+            worktrees = {},
+            noice     = {},
         },
         defaults = {
             layout_strategy = 'horizontal',

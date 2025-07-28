@@ -18,7 +18,7 @@ return {
             { "<leader>lm", ":Laravel make<cr>",    desc = "artisan make" },
         },
         opts = {
-            lsp_server = "intelephense:",
+            lsp_server = "intelephense",
         },
     },
 }

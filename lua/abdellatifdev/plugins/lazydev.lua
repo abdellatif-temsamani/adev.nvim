@@ -1,5 +1,6 @@
 return {
     "folke/lazydev.nvim",
+    event = require "abdellatifdev.consts".events:merge({"lsp","file"}),
     cond = function()
         return vim.fn.filereadable("lua") ~= 0 or vim.fn.isdirectory("lua") ~= 0
     end,
