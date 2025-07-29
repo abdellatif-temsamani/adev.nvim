@@ -5,6 +5,25 @@ return {
     keys = {
         { "<leader>n",  function() Snacks.explorer() end, desc = "Files" },
         { "<leader>wa", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
+        {
+            "<leader>N",
+            desc = "Neovim News",
+            function()
+                Snacks.win({
+                    file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
+                    border = "rounded",
+                    width = 0.9,
+                    height = 0.9,
+                    wo = {
+                        spell = false,
+                        wrap = false,
+                        signcolumn = "yes",
+                        statuscolumn = " ",
+                        conceallevel = 3,
+                    },
+                })
+            end,
+        }
     },
     opts = {
         explorer     = {
