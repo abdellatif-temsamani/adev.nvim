@@ -14,17 +14,11 @@ return h.make_builtin({
     name = "deno_fmt",
     meta = {
         url = "https://deno.land/manual/tools/formatter",
-        description = "Use [Deno](https://deno.land/) to format TypeScript, JavaScript/JSON and markdown.",
+        description = "Use [Deno](https://deno.land/) markdown.",
         notes = {
-            "`deno fmt` supports formatting JS/X, TS/X, JSON and markdown. If you only want deno to format a subset of these filetypes you can overwrite these with `.with({filetypes={}}`)",
+            "`deno fmt` supports formatting markdown.",
         },
-        usage = [[
-local sources = {
-    null_ls.builtins.formatting.deno_fmt, -- will use the source for all supported file types
-    null_ls.builtins.formatting.deno_fmt.with({
-		filetypes = { "markdown" }, -- only runs `deno fmt` for markdown
-    }),
-}]],
+        usage = "it's already in use",
     },
     method = FORMATTING,
     filetypes = {

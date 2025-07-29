@@ -1,25 +1,24 @@
 local function setup()
-    -- https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md
-    ---@module "null-ls"
-    local null_ls = require("null-ls")
+    -- DOCS: https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md
+    local null_setup = require("null-ls").setup
+    local builtins = require("null-ls.builtins")
     local h = require("null-ls.helpers")
 
-    local code_actions = null_ls.builtins.code_actions
+    local code_actions = builtins.code_actions
 
     -- diagnostic sources
-    local diagnostics = null_ls.builtins.diagnostics
+    local diagnostics = builtins.diagnostics
 
     -- formatting sources
-    local formatting = null_ls.builtins.formatting
+    local formatting = builtins.formatting
 
     -- completion sources
-    local completion = null_ls.builtins.completion
-
+    local completion = builtins.completion
 
     -- deno_fmt
     local deno_fmt = require('abdellatifdev.none-ls.deno_fmt')
 
-    null_ls.setup({
+    null_setup({
         sources = {
             -- diagnostics  -------------
             diagnostics.gitlint,
