@@ -2,7 +2,20 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
+    keys = {
+        { "<leader>n", function() Snacks.explorer() end, desc = "Files" },
+    },
     opts = {
+        explorer     = {
+            enabled = true,
+            replace_netrw = true,
+        },
+        picker       = {
+            sources = {
+                explorer = {
+                }
+            }
+        },
         input        = { enabled = true },
         lazygit      = { enabled = true },
         statuscolumn = {

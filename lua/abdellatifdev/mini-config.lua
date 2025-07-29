@@ -1,13 +1,3 @@
-require('mini.files').setup({
-    windows = {
-        max_number = math.huge,
-        preview = true,
-        width_focus = 50,
-        width_nofocus = 15,
-        width_preview = 50,
-    },
-})
-
 require('mini.bufremove').setup()
 
 require('mini.ai').setup()
