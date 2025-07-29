@@ -3,7 +3,8 @@ return {
     priority = 1000,
     lazy = false,
     keys = {
-        { "<leader>n", function() Snacks.explorer() end, desc = "Files" },
+        { "<leader>n",  function() Snacks.explorer() end, desc = "Files" },
+        { "<leader>wa", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
     },
     opts = {
         explorer     = {
