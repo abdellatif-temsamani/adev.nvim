@@ -60,6 +60,7 @@ return {
         },
         input        = { enabled = true },
         lazygit      = { enabled = true },
+        image        = { enabled = true },
         statuscolumn = {
             enabled = true,
             left = { "mark", "sign" },
