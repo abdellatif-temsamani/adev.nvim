@@ -11,11 +11,9 @@ return {
                 gitsigns = true,
                 snacks = {
                     enabled = true,
-                    picker_style = "nvchad_outlined",
                 },
                 telescope = {
                     enabled = true,
-                    style = "nvchad_outlined",
                 },
             },
         })
