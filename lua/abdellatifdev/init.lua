@@ -4,7 +4,7 @@
 ---@field _VERSION string
 ---@field git "git" | string
 local M = {
-    _NAME = "Adev",
+    _NAME = "Adev.nvim",
     _AUTHOR = "Abdellatif Dev",
     _VERSION = "1.1.0",
 

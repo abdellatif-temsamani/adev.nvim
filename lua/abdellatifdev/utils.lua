@@ -5,7 +5,7 @@
 ---and initializes it with your plugin spec.
 ---
 ---If the clone fails, it notifies the user and exits Neovim.
----@param git string
+---@param git "git" | string
 local function setup_lazy(git)
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
@@ -42,7 +42,7 @@ end
 --- Runs `git pull --ff-only` asynchronously inside the Neovim config directory (`~/.config/nvim`),
 --- then displays the command output in a floating window using Snacks.nvim.
 ---
---- @param git string? The git executable path or command name (default: "git").
+---@param git "git" | string
 local function update_adev(git)
     git = git or "git"
 
