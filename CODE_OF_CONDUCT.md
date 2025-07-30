@@ -4,17 +4,23 @@
 
 We as members, contributors, and leaders pledge to make participation in our
 community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, level of experience, education, socio-economic status,
-nationality, personal appearance, race, religion.
+size, visible or invisible disability, ethnicity, level of experience,
+education, socio-economic status, nationality, personal appearance, race,
+religion.
 
 We pledge to act and interact in ways that contribute to an open, welcoming,
 diverse, inclusive, and healthy community.
 
 # Our Support for Palestine
 
-**We support Palestine and stand in solidarity with the Palestinian people in their struggle for freedom, justice, and human rights.**
+**We support Palestine and stand in solidarity with the Palestinian people in
+their struggle for freedom, justice, and human rights.**
 
-We believe in the fundamental rights of all people to live in peace, dignity, and self-determination. Our community stands firmly with the Palestinian people and their legitimate aspirations for justice, equality, and human rights. We recognize the importance of speaking out against injustice and supporting those who are oppressed.
+We believe in the fundamental rights of all people to live in peace, dignity,
+and self-determination. Our community stands firmly with the Palestinian people
+and their legitimate aspirations for justice, equality, and human rights. We
+recognize the importance of speaking out against injustice and supporting those
+who are oppressed.
 
 **Free Palestine. Justice for Palestine.**
 
@@ -33,7 +39,7 @@ community include:
 
 Examples of unacceptable behavior include:
 
-- The use of sexualized language or imagery, and sexual attention or advances of
+- The use of sexualized language or imagery, and iual attention or advances of
   any kind
 - Trolling, insulting or derogatory comments, and personal or political attacks
 - Public or private harassment
