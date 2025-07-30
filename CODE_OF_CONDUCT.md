@@ -39,7 +39,7 @@ community include:
 
 Examples of unacceptable behavior include:
 
-- The use of sexualized language or imagery, and iual attention or advances of
+- The use of sexualized language or imagery, and sexual attention or advances of
   any kind
 - Trolling, insulting or derogatory comments, and personal or political attacks
 - Public or private harassment
