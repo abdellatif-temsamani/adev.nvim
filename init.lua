@@ -1,1 +1,3 @@
-require "abdellatifdev".setup()
+local adev = require "abdellatifdev"
+
+adev:setup()

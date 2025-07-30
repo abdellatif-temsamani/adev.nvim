@@ -4,6 +4,9 @@ return {
         build = ":MasonUpdate",
         cmd = "Mason",
         event = require("abdellatifdev.consts").events.pre,
+        keys = {
+            { "<leader>mm", function() vim.cmd [[ Mason ]] end, desc = "go to declaration", },
+        },
         opts = {
             ui = {
                 check_outdated_packages_on_open = true,

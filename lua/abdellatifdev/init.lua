@@ -1,7 +1,14 @@
----Module metadata and public interface.
+---@class M
+---@field _NAME string
+---@field _AUTHOR string
+---@field _VERSION string
+---@field git "git" | string
 local M = {
-    _AUTHOR = "Abdellatif Dev", ---@type string
-    _VERSION = "1.0.0", ---@type string
+    _NAME = "Adev",
+    _AUTHOR = "Abdellatif Dev",
+    _VERSION = "1.1.0",
+
+    git = "git"
 }
 
 ---Display author and version information using `vim.notify`.
@@ -9,48 +16,27 @@ local M = {
 ---This is primarily for debugging or user reference.
 function M:info()
     vim.notify(
-        "\n" ..
+        self._NAME .. "\n" ..
         "Author: " .. self._AUTHOR .. "\n" ..
         "Version: " .. self._VERSION,
         vim.log.levels.INFO
     )
 end
 
----@private
----Bootstraps and sets up the lazy.nvim plugin manager.
+--- Sets up custom user commands for the Adev module.
 ---
----This function ensures that `lazy.nvim` is installed in the standard data path.
----If not, it clones the stable branch from GitHub. It then prepends it to the runtime path
----and initializes it with your plugin spec.
+--- Creates the following Neovim user commands:
+--- - `:ADInfo` — Calls `self:info()` to show information about the Adev distro.
+--- - `:ADUpdate` — Runs the asynchronous update function `update_adev` from `abdellatifdev.utils`
+---   to pull updates from the git repository located in `~/.config/nvim`.
 ---
----If the clone fails, it notifies the user and exits Neovim.
-function M.__setup_lazy()
-    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-
-    ---@diagnostic disable-next-line: undefined-field
-    if not (vim.uv or vim.loop).fs_stat(lazypath) then
-        local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-        local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-        if vim.v.shell_error ~= 0 then
-            vim.api.nvim_echo({
-                { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-                { out,                            "WarningMsg" },
-                { "\nPress any key to exit..." },
-            }, true, {})
-            vim.fn.getchar()
-            os.exit(1)
-        end
-    end
-    vim.opt.rtp:prepend(lazypath)
-
-
-    -- Setup lazy.nvim
-    require("lazy").setup({
-        spec = {
-            { import = "abdellatifdev.plugins" },
-        },
-        install = { colorscheme = { "tokyonight" } },
-        checker = { enabled = true },
+--- Both commands include descriptive `desc` fields for `:help` and completion.
+function M:setup_commands()
+    vim.api.nvim_create_user_command("ADInfo", function() self:info() end, { desc = "info about Adev distro" })
+    vim.api.nvim_create_user_command("ADUpdate", function()
+        require("abdellatifdev.utils").update_adev(self.git)
+    end, {
+        desc = "Update Neovim config by git pulling ~/.config/nvim",
     })
 end
 
@@ -58,14 +44,28 @@ end
 ---
 ---This function enables Lua module caching, configures UI options,
 ---sets key mapping leaders, and initializes lazy.nvim plugin manager.
-function M.setup()
+---@param opts? { clommands?: boolean, git: "git" | string }
+function M:setup(opts)
+    opts = opts or {
+        commands = true,
+        git = "git"
+    }
+
+    if vim.fn.executable(self.git) == 0 then
+        vim.notify(self.git .. " executable not found in PATH!", vim.log.levels.ERROR)
+    end
+
     vim.loader.enable(true)
-    vim.opt.termguicolors = true
     vim.o.winbar = " "
     vim.g.mapleader = " "
-    vim.g.maplocalleader = "\\"
+    vim.g.maplocalleader = " "
 
-    M.__setup_lazy()
+    require("abdellatifdev.utils").setup_lazy(self.git)
+
+    vim.opt.termguicolors = true
+    if opts.commands == true then
+        self:setup_commands()
+    end
 end
 
 return M

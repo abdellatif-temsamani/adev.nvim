@@ -1,4 +1,4 @@
-# README for `config.nvim`
+# README for `adev.nvim`
 
 Welcome to my Neovim configuration repository! This repo contains all the
 configuration files and settings I use to customize and enhance my Neovim

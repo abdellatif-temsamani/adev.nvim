@@ -6,6 +6,28 @@ return {
         { "<leader>n",  function() Snacks.explorer() end, desc = "Files" },
         { "<leader>wa", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
         {
+            "<leader>to",
+            function()
+                Snacks.lazygit({ win = { style = "terminal", border = "rounded" }, })
+            end,
+            desc = "lazygit"
+        },
+        {
+            "<leader>tq",
+            function()
+                local defaults = {
+                    win = {
+                        style = "terminal",
+                        border = "rounded",
+                    },
+                }
+
+                local opts = Snacks.config.get("lazygit", defaults)
+                Snacks.terminal({ "gh-dash" }, opts)
+            end,
+            desc = "lazygit"
+        },
+        {
             "<leader>N",
             desc = "Neovim News",
             function()

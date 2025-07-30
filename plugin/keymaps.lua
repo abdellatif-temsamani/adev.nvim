@@ -8,8 +8,6 @@ keymap_set('n', 'j', 'gj', { noremap = true, silent = true, desc = "great j" })
 keymap_set('n', 'k', 'gk', { noremap = true, silent = true, desc = "great k" })
 
 keymap_set('n', '<Leader>bs', '<cmd>write<CR>', { noremap = true, silent = true, desc = "save" })
-keymap_set('n', '<leader>bq', function() require('mini.bufremove').wipeout() end,
-    { noremap = true, silent = true, desc = "close buffer" })
 keymap_set('n', '<leader>bp', '<cmd>bprevious<CR>', { noremap = true, silent = true, desc = "prev buffer" })
 keymap_set('n', '<leader>bn', '<cmd>bnext<CR>', { noremap = true, silent = true, desc = "next buffer" })
 
@@ -38,18 +36,6 @@ keymap_set('n', '<m-h>', '<CMD>vertical resize +2<CR>', { silent = true, desc = 
 keymap_set({ 'v', 'n' }, '<leader>cc', ":'<,'>fold<CR>", { noremap = true, silent = true, desc = "create fold" })
 keymap_set('n', '<leader>co', '<cmd>foldopen<CR>', { noremap = true, silent = true, desc = "open fold" })
 keymap_set('n', '<leader>cq', '<cmd>foldclose<CR>', { noremap = true, silent = true, desc = "close fold" })
-
 keymap_set('t', '<c-t>', '<C-\\><C-n>', { noremap = true, silent = true })
-keymap_set('n', '<leader>to', function() Snacks.lazygit({win = { style = "terminal", border ="rounded" },}) end, { noremap = true, silent = true, desc = "lazygit" })
-keymap_set('n', '<leader>tq', function()
-        local defaults = {
-            win = { style = "terminal", border ="rounded" },
-        }
-
-        local opts = Snacks.config.get("lazygit", defaults)
-        Snacks.terminal({ "gh-dash" }, opts)
-    end,
-    { noremap = true, silent = true, desc = "gh-dash" })
 
 keymap_set('n', '<leader>ml', '<cmd>Lazy<CR>', { noremap = true, silent = true, desc = "Lazy Nvim" })
-keymap_set('n', '<leader>mm', '<cmd>Mason<CR>', { noremap = true, silent = true, desc = "Mason Nvim" })
