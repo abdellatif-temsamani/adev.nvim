@@ -1,3 +1,13 @@
+> ⚠️ **IMPORTANT NOTICE:**\
+> **Israeli users are strictly prohibited from using this project.**\
+> **FREE PALESTINE.**
+>
+> This restriction is imposed as a clear and urgent protest against the ongoing
+> occupation, violence, and human rights violations committed by the Israeli
+> state against the Palestinian people.\
+> By banning usage in Israel, this project stands in solidarity with Palestine
+> and calls for justice, freedom, and an end to oppression.
+
 # Adev.nvim 🚀
 
 > The over-engineered Neovim distribution for developers who want everything
