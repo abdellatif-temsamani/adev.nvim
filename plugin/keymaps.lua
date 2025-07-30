@@ -40,10 +40,10 @@ keymap_set('n', '<leader>co', '<cmd>foldopen<CR>', { noremap = true, silent = tr
 keymap_set('n', '<leader>cq', '<cmd>foldclose<CR>', { noremap = true, silent = true, desc = "close fold" })
 
 keymap_set('t', '<c-t>', '<C-\\><C-n>', { noremap = true, silent = true })
-keymap_set('n', '<leader>to', function() Snacks.lazygit() end, { noremap = true, silent = true, desc = "lazygit" })
+keymap_set('n', '<leader>to', function() Snacks.lazygit({win = { style = "terminal", border ="rounded" },}) end, { noremap = true, silent = true, desc = "lazygit" })
 keymap_set('n', '<leader>tq', function()
         local defaults = {
-            win = { style = "terminal" },
+            win = { style = "terminal", border ="rounded" },
         }
 
         local opts = Snacks.config.get("lazygit", defaults)

@@ -1,2 +1,1 @@
-vim.loader.enable(true)
-require "abdellatifdev" ()
+require "abdellatifdev".setup()

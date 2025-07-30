@@ -1,5 +1,3 @@
-local events = require("abdellatifdev.consts").events
-
 return {
     {
         'saghen/blink.compat',
@@ -10,7 +8,7 @@ return {
     },
     {
         'saghen/blink.cmp',
-        event = events:merge({ "file", "cmd", "lsp" }),
+        event = require("abdellatifdev.consts").events:merge({ "file", "cmd", "lsp" }),
         version = "v1.3.1",
         dependencies = {
             'rafamadriz/friendly-snippets',

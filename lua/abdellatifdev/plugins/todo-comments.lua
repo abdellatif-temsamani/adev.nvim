@@ -18,7 +18,9 @@ return {
                 DONE = { icon = "", color = "hint", alt = alts.DONE },
                 TODO = { icon = "", color = "info", alt = alts.TODO },
                 WARN = { icon = "", color = "warning", alt = alts.WARN },
-                PREF = { icon = "", alt = alts.PREF }
+                PREF = { icon = "", alt = alts.PREF },
+                NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+                TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
             },
             merge_keywords = true,
             highlight = {

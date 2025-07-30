@@ -12,6 +12,7 @@ local function treesitter_setup()
         ignore_install        = { "zimbu" },
         highlight             = {
             enable = true,
+            additional_vim_regex_highlighting = false,
         },
     })
 end

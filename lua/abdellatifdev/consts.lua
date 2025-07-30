@@ -1,9 +1,18 @@
+---List of file and directory patterns to be ignored by tools (e.g., search, linting).
+---@type string[]
 local ignored_files = {
     "Cargo.lock", "__pycache__/", "node_modules/", ".git/",
-    ".ccls-cache/", "build/", "node_modules/", "target/",
-    "dist/", "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
+    ".ccls-cache/", "build/", "target/", "dist/",
+    "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
 }
 
+---Grouped autocommand event categories used for plugin setups or internal triggers.
+---@class EventCategories
+---@field file string[] Events related to reading or opening a file
+---@field pre string[] Events triggered before reading or opening a file
+---@field lsp string[] Events related to attaching the LSP client
+---@field insert string[] Events triggered on insert mode entry
+---@field cmd string[] Events triggered when entering the command line
 local events = {
     file = { "BufRead", "BufNewFile" },
     pre = { "BufReadPre", "BufNewFile" },
@@ -12,9 +21,12 @@ local events = {
     cmd = { "CmdlineEnter" },
 }
 
---- Merges selected event categories into one unique list
----@param selected_keys string[] @List of keys from the `events` table
----@return string[]
+---Merges selected event categories into one unique, flattened list of event names.
+---
+---Useful when configuring autocommands or plugin triggers with multiple categories.
+---
+---@param selected_keys string[] List of keys from the `events` table to merge.
+---@return string[] Unique list of all autocommand event names.
 function events:merge(selected_keys)
     local result = {}
     local seen = {}
@@ -37,6 +49,8 @@ function events:merge(selected_keys)
     return result
 end
 
+---Module exports.
+---@type { ignored_files: string[], events: EventCategories }
 return {
     ignored_files = ignored_files,
     events = events,
