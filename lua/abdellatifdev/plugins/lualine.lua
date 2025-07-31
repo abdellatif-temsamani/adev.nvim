@@ -1,5 +1,5 @@
-local function abdellatif_dev()
-    return [[Abdellatif Dev]]
+local function adev_nvim()
+    return [[Adev.nvim]]
 end
 
 local function macro_recording()
@@ -49,7 +49,7 @@ return
             lualine_c = {},
             lualine_x = {},
             lualine_y = {},
-            lualine_z = { abdellatif_dev },
+            lualine_z = { adev_nvim },
         },
         extensions = {}
 
