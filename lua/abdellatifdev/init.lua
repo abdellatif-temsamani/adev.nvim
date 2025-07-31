@@ -16,10 +16,10 @@ local M = {
 ---This is primarily for debugging or user reference.
 function M:info()
     vim.notify(
-        self._NAME .. "\n" ..
         "Author: " .. self._AUTHOR .. "\n" ..
         "Version: " .. self._VERSION,
-        vim.log.levels.INFO
+        vim.log.levels.INFO,
+        { title = self._NAME }
     )
 end
 
