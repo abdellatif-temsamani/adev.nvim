@@ -66,6 +66,8 @@ function M:setup(opts)
     if opts.commands == true then
         self:setup_commands()
     end
+    -- TODO: add other theme support
+    vim.cmd [[ colorscheme catppuccin-mocha ]]
 end
 
 return M
