@@ -6,7 +6,7 @@
 local M = {
     _NAME = "Adev.nvim",
     _AUTHOR = "Abdellatif Dev",
-    _VERSION = "1.1.0",
+    _VERSION = "1.2.0",
 
     git = "git"
 }
