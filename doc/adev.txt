@@ -1,0 +1,664 @@
+*adev.txt*   Adev.nvim - The over-engineered Neovim distribution     *adev* *adev.nvim*
+
+                              ADEV.NVIM DOCUMENTATION
+
+Author:       Abdellatif Dev
+Version:      1.2.0
+License:      MIT
+
+==============================================================================
+CONTENTS                                                      *adev-contents*
+
+1.  Overview ......................................... |adev-overview|
+2.  Architecture & Structure ......................... |adev-architecture|
+3.  Core Components .................................. |adev-components|
+4.  Plugin Configuration ............................. |adev-plugins|
+5.  Key Mappings ..................................... |adev-mappings|
+6.  Commands ......................................... |adev-commands|
+7.  Installation & Setup ............................. |adev-installation|
+8.  Configuration Examples ........................... |adev-config-examples|
+9.  LSP Configuration ................................ |adev-lsp|
+10. Customization .................................... |adev-customization|
+11. Troubleshooting .................................. |adev-troubleshooting|
+12. FAQ .............................................. |adev-faq|
+
+==============================================================================
+1. OVERVIEW                                                  *adev-overview*
+
+Adev.nvim is a feature-rich Neovim configuration that provides a complete
+development environment out of the box. Built with modern Neovim features and
+carefully selected plugins, it offers blazing-fast performance while maintaining
+extensive functionality.
+
+Key Features:~
+- Modern UI with Catppuccin Mocha theme
+- Comprehensive LSP support via Mason
+- Fuzzy finding with Telescope
+- Git integration with Gitsigns
+- Advanced completion with Blink.cmp
+- Treesitter syntax highlighting
+- Integrated terminal and file explorer
+- Custom commands and utilities
+- Lazy loading for optimal performance
+- Modular plugin architecture
+
+==============================================================================
+2. ARCHITECTURE & STRUCTURE                           *adev-architecture*
+
+The configuration follows a modular Lua-based architecture: >
+
+    ~/.config/nvim/
+    ├── init.lua                  -- Entry point
+    ├── lua/adev/
+    │   ├── init.lua              -- Main module
+    │   ├── utils.lua             -- Utility functions
+    │   ├── consts.lua            -- Constants and events
+    │   ├── health.lua            -- Health checks
+    │   ├── config/               -- Configuration files
+    │   └── plugins/              -- Plugin specifications
+    │       ├── blink-cmp.lua     -- Completion engine
+    │       ├── lsp.lua           -- LSP configuration
+    │       ├── mason.lua         -- LSP/tool installer
+    │       ├── telescope.lua     -- Fuzzy finder
+    │       ├── theme.lua         -- Colorscheme
+    │       ├── treesitter.lua    -- Syntax highlighting
+    │       ├── gitsigns.lua      -- Git integration
+    │       ├── lualine.lua       -- Statusline
+    │       └── [other plugins]
+    ├── doc/
+    │   └── adev.txt              -- This documentation
+    ├── plugin/                   -- Vim plugin files
+    ├── lazy-lock.json            -- Plugin lockfile
+    └── .luarc.json               -- Lua language server config
+<
+
+==============================================================================
+3. CORE COMPONENTS                                      *adev-components*
+
+*adev-init*~
+3.1 Initialization (`init.lua`):~
+- Enables Lua loader for faster startup: `vim.loader.enable(true)`
+- Sets winbar to empty space: `vim.o.winbar = " "`
+- Configures leader keys: `vim.g.mapleader = " "` and `vim.g.maplocalleader = " "`
+- Enables true color support: `vim.opt.termguicolors = true`
+- Calls `require("adev").setup()` to bootstrap the configuration
+
+*adev-main-module*~
+3.2 Main Module (`lua/adev/init.lua`):~
+- Defines metadata: `_NAME`, `_AUTHOR`, `_VERSION`
+- Provides `info()` function to display configuration information
+- Registers custom commands via `setup_commands()`
+- Initializes Lazy.nvim plugin manager via `utils.setup_lazy()`
+- Sets default colorscheme to `catppuccin-mocha`
+
+*adev-utils*~
+3.3 Utilities (`lua/adev/utils.lua`):~
+- `setup_lazy()`: Bootstraps Lazy.nvim plugin manager
+  - Auto-installs Lazy.nvim if not present
+  - Configures plugin loading with rocks support
+  - Sets up UI with single border and custom title
+- `update_adev()`: Asynchronous git pull for configuration updates
+  - Uses `git pull --ff-only` in config directory
+  - Provides notifications via Snacks.nvim
+
+*adev-constants*~
+3.4 Constants (`lua/adev/consts.lua`):~
+- `ignored_files`: List of patterns ignored by tools (node_modules, .git, etc.)
+- `events`: Categorized autocommand events for plugin loading
+  - `file`: BufRead, BufNewFile
+  - `pre`: BufReadPre, BufNewFile
+  - `lsp`: LspAttach
+  - `insert`: InsertEnter
+  - `cmd`: CmdlineEnter
+- `events:merge()`: Function to combine event categories
+
+==============================================================================
+4. PLUGIN CONFIGURATION                                 *adev-plugins*
+
+4.1 Plugin Manager~
+- Uses Lazy.nvim with lazy loading enabled by default
+- Rocks support for Lua packages
+- Performance optimizations with caching
+- UI customization with single border
+- Automatic plugin checking enabled
+
+4.2 Core Plugins~
+
+LSP & Completion:~
+- nvim-lspconfig: LSP client configurations
+- mason.nvim: LSP/DAP/linter installer
+- mason-lspconfig.nvim: Mason-lspconfig integration
+- mason-null-ls.nvim: Mason-null-ls integration
+- blink.cmp: Modern completion engine
+- none-ls.nvim: Null-ls for formatting/diagnostics
+- nvim-jdtls: Java development tools
+
+UI & Navigation:~
+- telescope.nvim: Fuzzy finder and picker
+- catppuccin: Color scheme (mocha variant)
+- lualine.nvim: Statusline
+- noice.nvim: UI improvements
+- snacks.nvim: UI components and utilities
+- nvim-treesitter: Syntax highlighting
+
+Git Integration:~
+- gitsigns.nvim: Git signs and hunks
+- git-conflict.nvim: Merge conflict resolution
+- octo.nvim: GitHub integration
+
+Development Tools:~
+- todo-comments.nvim: TODO/FIXME highlighting
+- cloak.nvim: Environment variable concealing
+- highlight-colors.nvim: Color highlighting
+- lazydev.nvim: Lua development enhancements
+- mini.nvim: Various mini plugins
+
+Language Specific:~
+- laravel.nvim: Laravel development tools
+- crates.nvim: Rust crate management
+- luasnip: Snippet engine
+
+4.3 Loading Strategy~
+- Event-based loading using `adev.consts.events`
+- Key-based loading for interactive commands
+- Command-based loading for specific functionality
+- Filetype-based loading for language-specific plugins
+
+==============================================================================
+5. KEY MAPPINGS                                          *adev-mappings*
+
+*adev-leader*~
+5.1 Leader Keys:~
+- `<Space>` for both leader and localleader
+
+*adev-lsp-mappings*~
+5.2 LSP Mappings (`<leader>g` prefix):~
+
+    <leader>gl    Format buffer (visual/normal mode)
+    <leader>gd    Go to definition
+    <leader>gD    Go to declaration
+    <leader>gh    Show hover information
+    <leader>gi    Go to implementation
+    <leader>gr    Show references
+    <leader>gt    Go to type definition
+    <leader>gc    Code actions (normal/visual mode)
+    <leader>gs    Signature help
+    <leader>go    Open diagnostic float
+    <leader>gp    Previous diagnostic
+    <leader>gn    Next diagnostic
+    <leader>ga    Rename symbol
+
+*adev-telescope-mappings*~
+5.3 Telescope Mappings (`<leader>f` prefix):~
+
+    <leader>ff    Find files
+    <leader>fg    Live grep
+    <leader>fb    Find buffers
+    <leader>fh    Help tags
+    <leader>fm    Man pages
+    <leader>fs    Commands
+    <leader>fa    Treesitter symbols
+    <leader>ft    Todo comments (TodoTelescope)
+    <leader>fn    Noice messages (NoiceTelescope)
+
+*adev-mason-mappings*~
+5.4 Mason Mappings:~
+
+    <leader>mm    Open Mason interface
+
+==============================================================================
+6. COMMANDS                                              *adev-commands*
+
+*:ADInfo* *ADInfo*
+:ADInfo       Display Adev version, author, and runtime information.
+              Shows:
+              - Configuration name and version
+              - Author information
+              - Neovim version
+              - LuaJIT version
+
+*:ADUpdate* *ADUpdate*
+:ADUpdate     Update Adev configuration via git pull.
+              - Runs `git pull --ff-only` in ~/.config/nvim
+              - Shows progress notifications
+              - Handles errors gracefully
+
+Note: Commands are registered lazily on first `CmdlineEnter` event.
+
+==============================================================================
+7. INSTALLATION & SETUP                             *adev-installation*
+
+*adev-requirements*~
+7.1 Requirements:~
+- Neovim >= 0.10.0
+- Git
+- Nerd Font (for icons)
+- ripgrep (for telescope live_grep)
+- fd (for telescope find_files)
+- Node.js and npm (for JavaScript/TypeScript LSP servers)
+- Rust and Cargo (for rust-analyzer and Rust-based tools)
+- Go (for gopls and Go development)
+- Python (for Python LSP servers and tools)
+- Optional: Various language-specific tools for additional LSP servers
+
+7.2 Installation:~
+1. Backup existing Neovim configuration: >
+    mv ~/.config/nvim ~/.config/nvim.backup
+<
+2. Clone Adev.nvim: >
+    git clone <repository-url> ~/.config/nvim
+<
+3. Launch Neovim: >
+    nvim
+<
+4. Run health check: >
+    :checkhealth
+<
+
+7.3 First Run:~
+- Lazy.nvim will automatically install
+- All plugins will be downloaded and configured
+- LSP servers will be installed via Mason
+- Treesitter parsers will be installed on-demand
+- Default colorscheme (catppuccin-mocha) will be applied
+
+==============================================================================
+8. CONFIGURATION EXAMPLES                            *adev-config-examples*
+
+*adev-custom-plugin*~
+8.1 Adding a Custom Plugin:~
+
+Create a new file in `lua/adev/plugins/`: >
+    -- lua/adev/plugins/my-plugin.lua
+    return {
+      "author/plugin-name",
+      event = "VeryLazy",
+      config = function()
+        require("plugin-name").setup({
+          -- your configuration here
+        })
+      end,
+    }
+<
+
+*adev-custom-lsp*~
+8.2 Adding Custom LSP Server:~
+
+Add to the `ensure_installed` list in `lua/adev/plugins/mason.lua`: >
+    opts = {
+      ensure_installed = {
+        "lua_ls",
+        "pyright",
+        "your_custom_lsp", -- Add your LSP here
+        -- ... other servers
+      },
+    }
+<
+
+Then add configuration in `lua/adev/plugins/lsp.lua`: >
+    vim.lsp.config('your_custom_lsp', {
+      settings = {
+        -- LSP-specific settings
+      },
+    })
+    
+    -- Add to the vim.lsp.enable() list
+    vim.lsp.enable({
+      "lua_ls",
+      "your_custom_lsp",
+      -- ... other servers
+    })
+<
+
+*adev-custom-keymaps*~
+8.3 Custom Key Mappings:~
+
+Add to any plugin file or create a new one: >
+    return {
+      "folke/which-key.nvim",
+      keys = {
+        {
+          "<leader>m",
+          function()
+            -- Your custom function
+          end,
+          desc = "My custom mapping"
+        },
+      },
+    }
+<
+
+==============================================================================
+9. LSP CONFIGURATION                                        *adev-lsp*
+
+*adev-lsp-servers*~
+9.1 Enabled LSP Servers:~
+
+Adev.nvim has the following LSP servers enabled via `vim.lsp.enable()`:
+
+    astro                           -- Astro framework
+    bashls                          -- Bash scripting
+    biome                           -- JavaScript/TypeScript toolchain
+    clangd                          -- C/C++ language server
+    cmake                           -- CMake build system
+    csharp_ls                       -- C# language server
+    css_variables                   -- CSS variables support
+    cssls                           -- CSS language server
+    cssmodules_ls                   -- CSS modules support
+    docker_compose_language_service -- Docker Compose
+    dockerls                        -- Docker language server
+    emmet_ls                        -- Emmet abbreviations
+    eslint                          -- JavaScript/TypeScript linting
+    gdscript                        -- Godot scripting
+    gleam                           -- Gleam language
+    glsl_analyzer                   -- GLSL shader analysis
+    glslls                          -- GLSL language server
+    gopls                           -- Go language server
+    html                            -- HTML language server
+    htmx                            -- HTMX support
+    intelephense                    -- PHP language server (premium)
+    jdtls                           -- Java development tools
+    jsonls                          -- JSON language server
+    lemminx                         -- XML language server
+    lua_ls                          -- Lua language server
+    prismals                        -- Prisma ORM support
+    pylsp                           -- Python LSP server
+    pyre                            -- Python type checker
+    pyright                         -- Python language server
+    rust_analyzer                   -- Rust language server
+    slint_lsp                       -- Slint UI language
+    solidity                        -- Solidity smart contracts
+    solidity_ls_nomicfoundation     -- Solidity (Nomic Foundation)
+    sqlls                           -- SQL language server
+    svelte                          -- Svelte framework
+    svlangserver                    -- SystemVerilog
+    svls                            -- SystemVerilog language server
+    tailwindcss                     -- Tailwind CSS
+    taplo                           -- TOML language server
+    texlab                          -- LaTeX language server
+    ts_ls                           -- TypeScript language server
+    vue_ls                          -- Vue.js language server
+    yamlls                          -- YAML language server
+    zls                             -- Zig language server
+
+*adev-none-ls-tools*~
+9.2 None-ls Tools (Formatters/Linters):~
+
+Adev.nvim includes these formatting and linting tools via mason-null-ls:
+
+    actionlint          -- GitHub Actions workflow linter
+    alex                -- Inclusive language linter
+    asmfmt              -- Assembly formatter
+    bibclean            -- BibTeX formatter
+    black               -- Python code formatter
+    blade_formatter     -- Laravel Blade template formatter
+    cbfmt               -- Format code blocks in markdown
+    cfn_lint            -- AWS CloudFormation linter
+    checkmake           -- Makefile linter
+    cmake_format        -- CMake formatter
+    deno                -- Deno formatter/linter
+    djlint              -- Django template linter
+    duster              -- PHP code style fixer
+    gitlint             -- Git commit message linter
+    gitrebase           -- Git rebase helper
+    hadolint            -- Dockerfile linter
+    isort               -- Python import sorter
+    npm-groovy-lint     -- Groovy linter
+    phpcs               -- PHP code sniffer
+    phpmd               -- PHP mess detector
+    prettier            -- Multi-language formatter
+    prettierd           -- Prettier daemon (faster)
+    pretty_php          -- PHP formatter
+    proselint           -- Prose linter
+    pyre                -- Python type checker
+    rustywind           -- Tailwind CSS class sorter
+    shellharden         -- Shell script hardener
+    shfmt               -- Shell script formatter
+    sql_formatter       -- SQL formatter
+    yamllint            -- YAML linter
+
+*adev-lsp-features*~
+9.2 LSP Features:~
+- Inlay hints enabled by default
+- Virtual diagnostic lines for current line
+- Blink.cmp integration for completions
+- Snippet support enabled
+- Custom handlers for hover and signature help
+- Automatic server installation via Mason
+
+*adev-lsp-special-configs*~
+9.3 Special Configurations:~
+
+Lua Language Server:~
+- Auto-detects .luarc.json/.luarc.jsonc
+- Neovim runtime integration
+- Third-party library support (luv, busted)
+
+Vue Language Server:~
+- TypeScript SDK integration
+- Custom tsdk path configuration
+
+Emmet Language Server:~
+- Supports multiple web frameworks
+- Astro, React, Vue, Svelte integration
+
+HTML Language Server:~
+- Extended filetype support
+- Template engine compatibility
+
+Python LSP:~
+- Pycodestyle configuration
+- Custom line length settings
+
+TeX Language Server:~
+- Formatting disabled (conflicts with other tools)
+- Multiple filetype support
+
+Intelephense (PHP):~
+- Secure license key handling
+- Reads from ~/.secrets/intelephense
+
+==============================================================================
+10. CUSTOMIZATION                                     *adev-customization*
+
+*adev-custom-plugins*~
+10.1 Adding Plugins:~
+Create files in `lua/adev/plugins/` following Lazy.nvim specification.
+Use event-based loading for optimal performance.
+
+*adev-custom-settings*~
+10.2 Core Settings:~
+- Main configuration: `lua/adev/init.lua`
+- Plugin configurations: `lua/adev/plugins/*.lua`
+- Constants and events: `lua/adev/consts.lua`
+- Utility functions: `lua/adev/utils.lua`
+
+*adev-custom-theme*~
+10.3 Theme Customization:~
+Edit `lua/adev/plugins/theme.lua` to change colorscheme.
+Default: `catppuccin-mocha`
+
+*adev-custom-mappings*~
+10.4 Key Mappings:~
+Mappings are defined per-plugin in their respective files.
+Use the `keys` table in plugin specifications for lazy loading.
+
+*adev-custom-lsp*~
+10.5 LSP Customization:~
+- Add servers to Mason configuration
+- Configure servers in `lsp.lua`
+- Use `vim.lsp.config()` for server-specific settings
+- Add servers to `vim.lsp.enable()` list
+
+==============================================================================
+11. TROUBLESHOOTING                               *adev-troubleshooting*
+
+*adev-common-issues*~
+11.1 Common Issues:~
+
+Plugin not loading:~
+- Check `:Lazy` for plugin status and errors
+- Verify plugin specification syntax
+- Check loading conditions (event, ft, cmd, keys)
+- Ensure dependencies are properly specified
+
+LSP not working:~
+- Run `:LspInfo` to check server status
+- Use `:Mason` to verify LSP installation
+- Check `:LspLog` for error messages
+- Ensure required external tools are installed
+- Verify server is in the `vim.lsp.enable()` list
+
+Slow startup:~
+- Run `:Lazy profile` to identify slow plugins
+- Check startup time with `nvim --startuptime startup.log`
+- Review plugin loading conditions
+- Consider deferring non-essential plugins
+
+Completion not working:~
+- Verify LSP server is running (`:LspInfo`)
+- Check Blink.cmp configuration
+- Ensure completion sources are enabled
+- Verify capabilities are properly set
+
+*adev-health-checks*~
+11.2 Health Checks:~
+
+Run comprehensive health checks: >
+    :checkhealth
+    :checkhealth adev
+    :checkhealth lazy
+    :checkhealth mason
+    :checkhealth nvim-treesitter
+    :checkhealth telescope
+    :checkhealth blink
+<
+
+*adev-debugging*~
+11.3 Debugging Steps:~
+
+1. Check Neovim version: >
+    :version
+<
+
+2. Verify Adev installation: >
+    :ADInfo
+<
+
+3. Check plugin status: >
+    :Lazy
+    :Lazy log
+<
+
+4. Review error messages: >
+    :messages
+<
+
+5. Test in minimal config: >
+    nvim --clean
+<
+
+*adev-updates*~
+11.4 Updating Components:~
+
+Update Adev configuration: >
+    :ADUpdate
+<
+
+Update plugins: >
+    :Lazy sync
+    :Lazy update
+<
+
+Update LSP servers and tools: >
+    :Mason
+    :MasonUpdate
+<
+
+Update Treesitter parsers: >
+    :TSUpdate
+<
+
+==============================================================================
+12. FAQ                                                     *adev-faq*
+
+*adev-faq-general*~
+12.1 General Questions:~
+
+Q: How do I change the colorscheme?~
+A: Edit `lua/adev/plugins/theme.lua` and modify the colorscheme setting.
+   The default is `catppuccin-mocha`.
+
+Q: Can I use Adev with my existing Neovim config?~
+A: It's recommended to backup and replace your existing config, as Adev
+   provides a complete configuration system with specific dependencies.
+
+Q: How do I add a new language server?~
+A: Add the server to the `ensure_installed` list in `mason.lua`, configure
+   it in `lsp.lua`, and add it to the `vim.lsp.enable()` list.
+
+Q: Why is startup slow?~
+A: Run `:Lazy profile` to identify slow plugins. Most plugins should be
+   lazy-loaded. Check loading conditions and consider deferring non-essential
+   plugins with `event = "VeryLazy"`.
+
+Q: How do I disable a plugin?~
+A: Add `enabled = false` to the plugin specification or comment out/remove
+   the plugin file.
+
+*adev-faq-customization*~
+12.2 Customization Questions:~
+
+Q: Can I use a different completion engine?~
+A: Yes, but you'll need to disable Blink.cmp and configure your preferred
+   completion engine. This may require updating LSP capabilities.
+
+Q: How do I add custom snippets?~
+A: Adev uses LuaSnip. Add snippets to your configuration or configure
+   LuaSnip to load from your preferred location.
+
+Q: How do I modify Telescope settings?~
+A: Edit `lua/adev/plugins/telescope.lua` and modify the `opts` table.
+   The configuration uses ripgrep with custom ignore patterns.
+
+Q: Can I change the leader key?~
+A: Yes, modify `vim.g.mapleader` in `init.lua`. Note that this may affect
+   existing key mappings throughout the configuration.
+
+*adev-faq-troubleshooting*~
+12.3 Troubleshooting Questions:~
+
+Q: Plugin X stopped working after update~
+A: Check `:Lazy log` for errors, run `:checkhealth`, and verify the plugin
+   configuration hasn't changed. Some plugins may have breaking changes.
+
+Q: LSP server keeps crashing~
+A: Check `:LspLog`, verify server installation with `:Mason`, ensure project
+   dependencies are installed, and check for conflicting configurations.
+
+Q: How do I report a bug?~
+A: Include output from `:ADInfo`, `:checkhealth adev`, reproduction steps,
+   error messages from `:messages`, and your system information.
+
+Q: Mason can't install servers~
+A: Ensure you have internet connectivity, required system dependencies
+   (Node.js, Python, etc.), and sufficient disk space. Check `:Mason` logs.
+
+==============================================================================
+NOTES                                                         *adev-notes*
+
+- Optimized for modern Neovim (0.10+)
+- Lazy loading ensures fast startup times
+- Modular architecture for easy customization
+- Built-in updater keeps configuration current
+- Comprehensive LSP support out of the box
+- Extensive plugin ecosystem with careful curation
+- Performance-focused with intelligent loading strategies
+- Regular updates and active maintenance
+
+For the latest updates and community discussions, visit the project repository.
+
+==============================================================================
+END OF DOCUMENTATION                                            *adev-end*
+
+ vim:tw=78:ts=8:ft=help:norl:
