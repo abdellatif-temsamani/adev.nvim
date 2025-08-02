@@ -30,6 +30,3 @@ o.linebreak = true
 
 vim.cmd [[ set mouse= ]]
 vim.cmd [[ set nowrap ]]
-
-
-vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())

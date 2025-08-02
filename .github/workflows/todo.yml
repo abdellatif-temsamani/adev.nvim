@@ -1,0 +1,35 @@
+---
+name: Create issues from TODOs
+
+on:
+    push:
+        branches:
+            - nightly
+            - "feat/**"
+
+permissions:
+    issues: write
+    repository-projects: read
+    contents: read
+
+jobs:
+    todos:
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+            repository-projects: read
+            contents: read
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Run Issue Bot
+              uses: derjuulsn/todo-issue@main
+              with:
+                  excludePattern: "^(node_modules/)"
+                  blobLines: 7
+                  blobLinesBefore: 4
+                  keywords: "BEGIN,BUG,DONE,DONE!,DONE.,ERROR,FIXED,FIXIT,FIXME,HACK,ISSUE,OPTIM,OPTIMIZE,PERF,PERFORMANCE,PLAN,START,TASK,TODO,WARN,WARNING,WONTFIX"
+                  reopenClosed: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
