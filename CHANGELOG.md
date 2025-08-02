@@ -12,6 +12,49 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [1.2.0] - 2025-08-02
+
+### 🚀 Features
+
+- _(snacks)_ Add image support
+- _(lsp)_ Diagonistic vertual line [expermental]
+- _(config)_ Mv config to lua/abdellatifdev/config
+- _(git-worktree)_ [**breaking**] Rm plugins
+
+### 🐛 Bug Fixes
+
+- _(theme)_ Align with telescope and snacks
+- _(lualine)_ Winbar now displays "Adev.nvim" instead of "abdellatif dev"
+- _(blink.cmp)_ Downgrade to "v1.3.1"
+- _(crates.nvim)_ Add event for lazy loading
+
+### 🚜 Refactor
+
+- _(notification)_ Changes notification handling
+- _(theme)_ Optimize opts
+- _(theme)_ Optimize config
+- _(plugins)_ Lazy = true as default value
+- _(comments)_ Change config
+- _(ui)_ Border styles
+- _(plugins)_ Lazy loading
+- _(config)_ Lua/abdellatifdev -> lua/adev
+- _(plugins)_ Cleaning plugins
+
+### 📚 Documentation
+
+- Add contributing and PR guidelines (#1)
+- Add contributing and PR guidelines
+
+### ⚙️ Miscellaneous Tasks
+
+- Updates docs
+- Adding humanity
+- _(issue templates)_ Refine templates (#2)
+- _(issue templates)_ Refine templates
+- _(todo)_ Todo comment to github issues
+- _(version)_ 1.2.0
+- _(github)_ Pull request template
+
 ## [1.1.0] - 2025-07-30
 
 ### 🚀 Features
