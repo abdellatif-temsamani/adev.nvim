@@ -7,9 +7,10 @@ return {
     },
     {
         'saghen/blink.cmp',
-        event = require("abdellatifdev.consts").events:merge({ "file", "cmd", "lsp" }),
-        version = "v1.3.1",
+        event = require("abdellatifdev.consts").events:merge({ "pre", "cmd", "lsp" }),
+        version = "v1.*",
         dependencies = {
+            'saghen/blink.compat',
             'rafamadriz/friendly-snippets',
             'neovim/nvim-lspconfig',
             'honza/vim-snippets',

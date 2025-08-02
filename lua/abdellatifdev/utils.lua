@@ -32,8 +32,32 @@ local function setup_lazy(git)
             lazy = true,
         },
 
+        rocks = {
+            enabled = true,
+            root = vim.fn.stdpath("data") .. "/lazy-rocks",
+            server = "https://nvim-neorocks.github.io/rocks-binaries/",
+            hererocks = false,
+        },
+        pkg = {
+            enabled = true,
+            sources = {
+                "lazy",
+                "rockspec",
+                "packspec",
+            },
+        },
         spec = {
             { import = "abdellatifdev.plugins" },
+        },
+        ui = {
+            border = 'single',
+            title = "Adev.nvim",
+
+        },
+        performance = {
+            cache = {
+                enabled = true,
+            },
         },
         install = { colorscheme = { "tokyonight" } },
         checker = { enabled = true },
