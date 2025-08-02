@@ -91,7 +91,7 @@ extensive functionality.
 
 ### Prerequisites
 
-- **Neovim >= 0.9.0**
+- **Neovim >= 0.11.0**
 - **Git** (for plugin management)
 - **ripgrep** (for telescope live grep)
 - **fd** (optional, for faster file finding)
