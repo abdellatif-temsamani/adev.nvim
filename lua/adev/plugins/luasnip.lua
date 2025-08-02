@@ -1,6 +1,7 @@
 return {
     'L3MON4D3/LuaSnip',
-    event = require("adev.consts").events.insert,
+    event = require("adev.consts").events.file,
+    priority = 10,
     build = "make install_jsregexp",
     config = function()
         require("luasnip.loaders.from_vscode").lazy_load()

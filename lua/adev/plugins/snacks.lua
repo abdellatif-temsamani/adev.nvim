@@ -76,7 +76,7 @@ return {
                 git_hl = false,
             },
             git = {
-                patterns = { "GitSign", "MiniDiffSign" },
+                patterns = { "GitSign" },
             },
             refresh = 50, -- refresh at most every 50ms
         },

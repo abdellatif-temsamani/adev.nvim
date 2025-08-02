@@ -19,7 +19,6 @@ return {
         { "<leader>ga", function() vim.lsp.buf.rename() end,                              desc = "lsp rename", },
         { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
     },
-    after = "williamboman/mason.nvim",
     config = function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
         vim.diagnostic.config { virtual_lines = { current_line = true } }
@@ -120,7 +119,7 @@ return {
         -- NOTE: a secure way to handle licence key
         vim.lsp.config('intelephense', {
             init_options = {
-                licenceKey = vim.fn.system({ "cat", "/home/flagmate/.secrets/intelephense" }):gsub("\n", "")
+                licenceKey = vim.fn.system({ "cat", os.getenv("HOME") .. "/.secrets/intelephense" }):gsub("\n", "")
             },
         })
 

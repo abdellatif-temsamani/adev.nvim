@@ -1,6 +1,10 @@
 return {
     "mfussenegger/nvim-jdtls",
     ft = { "java" },
+    cond = function()
+        local root = vim.fs.root(0, { "mvnw", "gradlew" })
+        return root ~= nil
+    end,
     config = function()
         local config = {
             cmd = {
@@ -15,11 +19,12 @@ return {
                 '--add-opens', 'java.base/java.util=ALL-UNNAMED',
                 '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
                 '-jar',
-                '/home/flagmate/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.7.0.v20250331-1702.jar',
-                '-configuration', '/home/flagmate/.local/share/nvim/mason/packages/jdtls/config_linux',
-                '-data', '/home/flagmate/.local/share/java'
+                os.getenv("HOME") ..
+                '/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.7.0.v20250331-1702.jar',
+                '-configuration', os.getenv("HOME") .. '/.local/share/nvim/mason/packages/jdtls/config_linux',
+                '-data', os.getenv("HOME") .. '/.local/share/java'
             },
-            root_dir = vim.fs.root(0, { ".git", "mvnw", "gradlew" }),
+            root_dir = vim.fs.root(0, { "mvnw", "gradlew" }),
             settings = {
                 java = {
                 }

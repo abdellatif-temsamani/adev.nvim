@@ -103,7 +103,6 @@ return {
                 "yamlls",
                 "lemminx",
                 "texlab",
-                -- "glslls",
                 "glsl_analyzer",
                 "jdtls",
                 "intelephense",

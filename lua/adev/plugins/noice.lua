@@ -6,7 +6,6 @@ return
         notify = {
             enabled = true,
         },
-
         cmdline = {
             enabled = true,
             view = "cmdline",

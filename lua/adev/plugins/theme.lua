@@ -6,9 +6,9 @@ return {
         flavour = "mocha",
         transparent_background = false,
         dim_inactive = {
-            enabled = true,        -- dims the background color of inactive window
+            enabled = true,
             shade = "dark",
-            percentage = 0.15,     -- percentage of the shade to apply to the inactive window
+            percentage = 0.15,
         },
         auto_integrations = true,
         integrations = {
