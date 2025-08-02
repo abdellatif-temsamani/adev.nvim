@@ -2,7 +2,6 @@ return {
     {
         'saghen/blink.compat',
         after = 'saghen/blink.cmp',
-        lazy = true,
         version = "2.*",
         opts = {},
     },

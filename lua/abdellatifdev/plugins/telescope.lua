@@ -3,7 +3,6 @@ local ignored_files = require("abdellatifdev.consts").ingored_files
 return {
     "nvim-telescope/telescope.nvim",
     module = false,
-    lazy = true,
     dependencies = {
         { "nvim-lua/popup.nvim", },
         { "nvim-lua/plenary.nvim", },

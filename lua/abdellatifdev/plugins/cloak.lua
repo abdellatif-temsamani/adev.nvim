@@ -1,7 +1,10 @@
 return {
     "laytan/cloak.nvim",
     event = { "BufEnter .env*" },
-    lazy = true,
+    cond = function()
+        local files = vim.fn.glob(".env*", false, true)
+        return #files > 0
+    end,
     opts = {
         enabled = true,
         cloak_character = "*",

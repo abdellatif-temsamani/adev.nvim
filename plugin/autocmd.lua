@@ -1,4 +1,3 @@
--- Create (or clear) the GENERAL augroup
 local autocmd     = vim.api.nvim_create_autocmd
 local general_grp = vim.api.nvim_create_augroup("GENERAL", { clear = true })
 

@@ -28,6 +28,10 @@ local function setup_lazy(git)
 
     -- Setup lazy.nvim
     require("lazy").setup({
+        defaults = {
+            lazy = true,
+        },
+
         spec = {
             { import = "abdellatifdev.plugins" },
         },
@@ -47,8 +51,6 @@ local function update_adev(git)
     git = git or "git"
 
     local config_path = vim.fn.stdpath('config')
-
-    local config_path = vim.fn.stdpath('config')
     local git_cmd = { "git", "pull", "--ff-only" }
 
     vim.fn.jobstart(git_cmd, {
@@ -66,7 +68,7 @@ local function update_adev(git)
                     if msg:find("Already up to date") then
                         vim.notify("Already up to date", vim.log.levels.INFO, { title = "Adev Update" })
                     else
-                        vim.notify("Updated successfully:\n" .. msg, vim.log.levels.INFO, { title = "Adev Update" })
+                        vim.notify("Updated successfully:\n", vim.log.levels.INFO, { title = "Adev Update" })
                     end
                 end
             end

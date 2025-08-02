@@ -3,7 +3,6 @@ return {
     dependencies = { 'saghen/blink.cmp' },
     module = false,
     event = require("abdellatifdev.consts").events.file,
-    lazy = true,
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
         { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },
@@ -22,6 +21,9 @@ return {
     },
     after = "williamboman/mason.nvim",
     config = function()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+        vim.diagnostic.config { virtual_lines = { current_line = true } }
+
         local caps = vim.lsp.protocol.make_client_capabilities()
 
         local capabilities = require('blink.cmp').get_lsp_capabilities(caps)
