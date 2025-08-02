@@ -29,7 +29,7 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter",
-        event = require("adev.consts").events.file,
+        event = require("adev.consts").events.pre,
         build = ":TSUpdate",
         config = function()
             require("adev.config.treesitter").setup()
