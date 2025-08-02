@@ -7,6 +7,6 @@ return {
     priority = 1000,
     lazy = false,
     config = function()
-        require("abdellatifdev.config.mini")
+        require("adev.config.mini")
     end,
 }

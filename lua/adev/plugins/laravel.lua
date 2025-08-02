@@ -4,7 +4,7 @@ return {
         cond = function()
             return vim.fn.filereadable("artisan") ~= 0
         end,
-        event = require("abdellatifdev.consts").events.file,
+        event = require("adev.consts").events.file,
         dependencies = {
             "tpope/vim-dotenv",
             "nvim-telescope/telescope.nvim",

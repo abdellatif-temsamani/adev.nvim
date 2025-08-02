@@ -1,4 +1,4 @@
-local ignored_files = require("abdellatifdev.consts").ingored_files
+local ignored_files = require("adev.consts").ingored_files
 
 return {
     "nvim-telescope/telescope.nvim",

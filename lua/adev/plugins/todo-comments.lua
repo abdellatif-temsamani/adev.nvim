@@ -9,7 +9,7 @@ local alts = {
 return {
     {
         "folke/todo-comments.nvim",
-        event = require("abdellatifdev.consts").events.file,
+        event = require("adev.consts").events.file,
         opts = {
             signs = true,
             sign_priority = 0,

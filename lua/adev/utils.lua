@@ -47,7 +47,7 @@ local function setup_lazy(git)
             },
         },
         spec = {
-            { import = "abdellatifdev.plugins" },
+            { import = "adev.plugins" },
         },
         ui = {
             border = 'single',

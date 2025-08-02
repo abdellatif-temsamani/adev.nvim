@@ -1,3 +1,3 @@
-local adev = require "abdellatifdev"
+local adev = require "adev"
 
 adev:setup()

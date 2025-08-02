@@ -34,7 +34,7 @@ end
 function M:setup_commands()
     vim.api.nvim_create_user_command("ADInfo", function() self:info() end, { desc = "info about Adev distro" })
     vim.api.nvim_create_user_command("ADUpdate", function()
-        require("abdellatifdev.utils").update_adev(self.git)
+        require("adev.utils").update_adev(self.git)
     end, {
         desc = "Update Neovim config by git pulling ~/.config/nvim",
     })
@@ -60,7 +60,7 @@ function M:setup(opts)
     vim.g.mapleader = " "
     vim.g.maplocalleader = " "
 
-    require("abdellatifdev.utils").setup_lazy(self.git)
+    require("adev.utils").setup_lazy(self.git)
 
     vim.opt.termguicolors = true
     if opts.commands == true then
