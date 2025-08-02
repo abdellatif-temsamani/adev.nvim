@@ -16,7 +16,7 @@ local function setup()
     local completion = builtins.completion
 
     -- deno_fmt
-    local deno_fmt = require('abdellatifdev.none-ls.deno_fmt')
+    local deno_fmt = require('abdellatifdev.config.none-ls.deno_fmt')
 
     null_setup({
         sources = {
