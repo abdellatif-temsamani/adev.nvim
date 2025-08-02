@@ -5,14 +5,13 @@
 ---and initializes it with your plugin spec.
 ---
 ---If the clone fails, it notifies the user and exits Neovim.
----@param git "git" | string
-local function setup_lazy(git)
+local function setup_lazy()
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
     ---@diagnostic disable-next-line: undefined-field
     if not (vim.uv or vim.loop).fs_stat(lazypath) then
         local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-        local out = vim.fn.system({ git, "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+        local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
         if vim.v.shell_error ~= 0 then
             vim.api.nvim_echo({
                 { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
@@ -70,10 +69,7 @@ end
 --- Runs `git pull --ff-only` asynchronously inside the Neovim config directory (`~/.config/nvim`),
 --- then displays the command output in a floating window using Snacks.nvim.
 ---
----@param git "git" | string
-local function update_adev(git)
-    git = git or "git"
-
+local function update_adev()
     local config_path = vim.fn.stdpath('config')
     local git_cmd = { "git", "pull", "--ff-only" }
 
