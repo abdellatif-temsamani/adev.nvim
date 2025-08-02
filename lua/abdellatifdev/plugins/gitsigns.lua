@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 return {
     "lewis6991/gitsigns.nvim",
     cond = function()

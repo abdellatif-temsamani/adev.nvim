@@ -2,7 +2,7 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = { 'saghen/blink.cmp' },
     module = false,
-    event = require("abdellatifdev.consts").events.file,
+    event = require("abdellatifdev.consts").events.pre,
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
         { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },
