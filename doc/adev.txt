@@ -3,7 +3,7 @@
                               ADEV.NVIM DOCUMENTATION
 
 Author:       Abdellatif Dev
-Version:      1.2.0
+Version:      1.2.1
 License:      MIT
 
 ==============================================================================
@@ -301,7 +301,7 @@ Then add configuration in `lua/adev/plugins/lsp.lua`: >
         -- LSP-specific settings
       },
     })
-    
+
     -- Add to the vim.lsp.enable() list
     vim.lsp.enable({
       "lua_ls",
