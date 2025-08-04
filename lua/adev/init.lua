@@ -6,20 +6,30 @@
 local M = {
     _NAME = "Adev.nvim",
     _AUTHOR = "Abdellatif Dev",
-    _VERSION = "1.2.0",
-
-    git = "git"
+    _VERSION = "1.2.1",
 }
 
 ---Display author and version information using `vim.notify`.
 ---
 ---This is primarily for debugging or user reference.
 function M:info()
+    local function nvim_version()
+        local v = vim.version()
+        return string.format("%d.%d.%d", v.major, v.minor, v.patch)
+    end
+
+    local lines = {
+        ("`Name`:    %s"):format(self._NAME),
+        ("`Version`: %s"):format(self._VERSION),
+        ("`Author`:  %s"):format(self._AUTHOR),
+        ("`Neovim`:  %s"):format(nvim_version()),
+        ("`LuaJIT`:  %s"):format(_VERSION),
+    }
+
     vim.notify(
-        "Author: " .. self._AUTHOR .. "\n" ..
-        "Version: " .. self._VERSION,
+        table.concat(lines, "\n"),
         vim.log.levels.INFO,
-        { title = self._NAME }
+        { title = self._NAME or "Adev info" }
     )
 end
 
@@ -31,12 +41,21 @@ end
 ---   to pull updates from the git repository located in `~/.config/nvim`.
 ---
 --- Both commands include descriptive `desc` fields for `:help` and completion.
-function M:setup_commands()
-    vim.api.nvim_create_user_command("ADInfo", function() self:info() end, { desc = "info about Adev distro" })
-    vim.api.nvim_create_user_command("ADUpdate", function()
-        require("adev.utils").update_adev(self.git)
-    end, {
-        desc = "Update Neovim config by git pulling ~/.config/nvim",
+local function setup_commands()
+    vim.api.nvim_create_autocmd("CmdlineEnter", {
+        desc = "Register Adev custom commands",
+        once = true,
+        callback = function()
+            vim.api.nvim_create_user_command("ADInfo", function()
+                M:info()
+            end, { desc = "info about Adev distro" })
+
+            vim.api.nvim_create_user_command("ADUpdate", function()
+                require("adev.utils").update_adev()
+            end, {
+                desc = "Update Neovim config by git pulling ~/.config/nvim",
+            })
+        end,
     })
 end
 
@@ -44,29 +63,10 @@ end
 ---
 ---This function enables Lua module caching, configures UI options,
 ---sets key mapping leaders, and initializes lazy.nvim plugin manager.
----@param opts? { clommands?: boolean, git: "git" | string }
-function M:setup(opts)
-    opts = opts or {
-        commands = true,
-        git = "git"
-    }
+function M.setup()
+    require("adev.utils").setup_lazy()
+    setup_commands()
 
-    if vim.fn.executable(self.git) == 0 then
-        vim.notify(self.git .. " executable not found in PATH!", vim.log.levels.ERROR)
-    end
-
-    vim.loader.enable(true)
-    vim.o.winbar = " "
-    vim.g.mapleader = " "
-    vim.g.maplocalleader = " "
-
-    require("adev.utils").setup_lazy(self.git)
-
-    vim.opt.termguicolors = true
-    if opts.commands == true then
-        self:setup_commands()
-    end
-    -- TODO: add other theme support
     vim.cmd [[ colorscheme catppuccin-mocha ]]
 end
 
