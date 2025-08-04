@@ -14,6 +14,7 @@ return {
             'rafamadriz/friendly-snippets',
             'neovim/nvim-lspconfig',
             'honza/vim-snippets',
+            'disrupted/blink-cmp-conventional-commits',
         },
         opts = {
             cmdline = {
@@ -55,16 +56,41 @@ return {
                     'cmdline',
                     'omni',
                 },
+
+                per_filetype = {
+                    gitcommit = { 'conventional_commits', 'path', 'buffer' }
+                },
+
                 providers = {
                     laravel = {
                         name = "laravel",
                         module = "blink.compat.source",
+                        should_show_items = function()
+                            return vim.tbl_contains({
+                                "php",
+                                "blade",
+                                "javascript",
+                                "javascriptreact",
+                                "typescript",
+                                "typescriptreact"
+                            }, vim.o.filetype)
+                        end
+                    },
+                    conventional_commits = {
+                        name = 'Conventional Commits',
+                        module = 'blink-cmp-conventional-commits',
+                        enabled = function()
+                            return vim.bo.filetype == 'gitcommit'
+                        end,
+                        opts = {}, -- none so far
                     },
                 }
             },
 
             snippets = { preset = 'luasnip' },
             signature = { enabled = true },
+            fuzzy = { implementation = "prefer_rust_with_warning" },
+
         }
     }
 }
