@@ -1,5 +1,4 @@
 local function setup()
-    -- DOCS: https://github.com/nvimtools/none-ls.nvim/blob/main/doc/BUILTINS.md
     local null_setup = require("null-ls").setup
     local builtins = require("null-ls.builtins")
     local h = require("null-ls.helpers")
