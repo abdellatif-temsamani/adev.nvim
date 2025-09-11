@@ -55,21 +55,6 @@ return {
                     'cmdline',
                     'omni',
                 },
-
-                per_filetype = {
-                    gitcommit = { 'conventional_commits', 'path', 'buffer' }
-                },
-
-                providers = {
-                    conventional_commits = {
-                        name = 'Conventional Commits',
-                        module = 'blink-cmp-conventional-commits',
-                        enabled = function()
-                            return vim.bo.filetype == 'gitcommit'
-                        end,
-                        opts = {}, -- none so far
-                    },
-                }
             },
 
             snippets = { preset = 'luasnip' },
