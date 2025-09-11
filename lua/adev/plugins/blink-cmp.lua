@@ -52,7 +52,6 @@ return {
                     'path',
                     'snippets',
                     'buffer',
-                    'laravel',
                     'cmdline',
                     'omni',
                 },
@@ -62,20 +61,6 @@ return {
                 },
 
                 providers = {
-                    laravel = {
-                        name = "laravel",
-                        module = "blink.compat.source",
-                        should_show_items = function()
-                            return vim.tbl_contains({
-                                "php",
-                                "blade",
-                                "javascript",
-                                "javascriptreact",
-                                "typescript",
-                                "typescriptreact"
-                            }, vim.o.filetype)
-                        end
-                    },
                     conventional_commits = {
                         name = 'Conventional Commits',
                         module = 'blink-cmp-conventional-commits',
