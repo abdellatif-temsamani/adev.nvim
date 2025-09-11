@@ -10,6 +10,7 @@ return {
         "MunifTanjim/nui.nvim",
         "kevinhwang91/promise-async",
         "nvim-treesitter/nvim-treesitter",
+        "nvim-neotest/nvim-nio",
     },
     keys = {
         { "<leader>la", ":Laravel artisan<cr>", desc = "artisan commands" },
