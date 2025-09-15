@@ -14,11 +14,12 @@ return {
             'rafamadriz/friendly-snippets',
             'neovim/nvim-lspconfig',
             'honza/vim-snippets',
+            'disrupted/blink-cmp-conventional-commits',
         },
         opts = {
             cmdline = {
                 keymap = { preset = 'inherit' },
-                completion = { menu = { auto_show = true } },
+                completion = { ghost_text = { enabled = true }, menu = { auto_show = true } },
             },
 
             keymap = {
@@ -51,20 +52,15 @@ return {
                     'path',
                     'snippets',
                     'buffer',
-                    'laravel',
                     'cmdline',
                     'omni',
                 },
-                providers = {
-                    laravel = {
-                        name = "laravel",
-                        module = "blink.compat.source",
-                    },
-                }
             },
 
             snippets = { preset = 'luasnip' },
             signature = { enabled = true },
+            fuzzy = { implementation = "prefer_rust_with_warning" },
+
         }
     }
 }

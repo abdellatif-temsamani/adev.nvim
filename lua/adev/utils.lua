@@ -70,8 +70,10 @@ end
 --- then displays the command output in a floating window using Snacks.nvim.
 ---
 local function update_adev()
-    local config_path = vim.fn.stdpath('config')
+    local config_path = vim.fn.stdpath("config")
     local git_cmd = { "git", "pull", "--ff-only" }
+
+    local stderr_lines = {}
 
     vim.fn.jobstart(git_cmd, {
         cwd = config_path,
@@ -86,28 +88,27 @@ local function update_adev()
                 if #lines > 0 then
                     local msg = table.concat(lines, "\n")
                     if msg:find("Already up to date") then
-                        vim.notify("Already up to date", vim.log.levels.INFO, { title = "Adev Update" })
+                        vim.notify("Already up to date", vim.log.levels.INFO, { title = "adev.nvim" })
                     else
-                        vim.notify("Updated successfully:\n", vim.log.levels.INFO, { title = "Adev Update" })
+                        vim.notify("Updated successfully:\n" .. msg, vim.log.levels.INFO, { title = "adev.nvim" })
                     end
                 end
             end
         end,
         on_stderr = function(_, data, _)
             if data then
-                local lines = vim.tbl_filter(function(line)
-                    return line and line ~= ""
-                end, data)
-
-                if #lines > 0 then
-                    local msg = table.concat(lines, "\n")
-                    vim.notify("Git error:\n" .. msg, vim.log.levels.ERROR, { title = "Adev Update" })
+                for _, line in ipairs(data) do
+                    if line and line ~= "" then
+                        table.insert(stderr_lines, line)
+                    end
                 end
             end
         end,
         on_exit = function(_, code, _)
             if code ~= 0 then
-                vim.notify("Git pull failed with exit code: " .. code, vim.log.levels.ERROR, { title = "Adev Update" })
+                local msg = table.concat(stderr_lines, "\n")
+                if msg == "" then msg = "Unknown error" end
+                vim.notify("Git pull failed:\n" .. msg, vim.log.levels.ERROR, { title = "adev.nvim" })
             end
         end,
     })

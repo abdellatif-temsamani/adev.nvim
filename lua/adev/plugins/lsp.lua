@@ -58,6 +58,22 @@ return {
             }
         })
 
+        vim.lsp.config('tailwindcss', {
+            settings = {
+                tailwindCSS = {
+                    experimental = {
+                        classRegex = {
+                            -- cva("…")
+                            { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
+                            -- cn("…")
+                            { "cn\\(([^)]*)\\)",  "[\"'`]([^\"'`]*)[\"'`]" },
+                        },
+                    },
+                },
+            },
+        })
+
+
         vim.lsp.config('vue_ls', {
             init_options = {
                 typescript = {
