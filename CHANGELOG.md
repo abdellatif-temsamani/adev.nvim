@@ -12,6 +12,41 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [1.3.1] - 2025-09-15
+
+### 🚀 Features
+
+- _(health)_ Healthcheck adev
+- _(blink-cmp)_ Conventional-commits
+- _(blink-cmp)_ Ghostline cmdline
+- _(noice)_ Override defaults
+- _(lsp)_ Tailwindcss config
+- _(blink.nvim)_ [**breaking**] Removing providers
+
+### 🐛 Bug Fixes
+
+- _(treesitter)_ Plugin event
+- _(telescope)_ Border style
+- _(laravel)_ Missing deps
+- Better notifications
+- _(laravel)_ [**breaking**] Fix commands
+
+### 🚜 Refactor
+
+- _(plugins)_ Structure
+
+### 📚 Documentation
+
+- _(adev)_ Vim docs
+
+### 🧪 Testing
+
+- _(checkhealth)_ Improve checkhealth
+
+### ⚙️ Miscellaneous Tasks
+
+- _(version)_ Minor update
+
 ## [1.2.0] - 2025-08-02
 
 ### 🚀 Features
