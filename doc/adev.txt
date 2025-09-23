@@ -533,7 +533,6 @@ Run comprehensive health checks: >
     :checkhealth mason
     :checkhealth nvim-treesitter
     :checkhealth telescope
-    :checkhealth blink
 <
 
 *adev-debugging*~
