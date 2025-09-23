@@ -12,6 +12,7 @@ o.writebackup = false
 o.undofile = true
 o.swapfile = false
 o.undodir = vim.fn.stdpath("state") .. "/undo"
+o.winborder = "single"
 
 o.textwidth = 100
 o.wrap = false

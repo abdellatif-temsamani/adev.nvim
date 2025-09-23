@@ -11,9 +11,10 @@ return {
             percentage = 0.15,
         },
         auto_integrations = true,
+        default_integrations = true,
         integrations = {
             blink_cmp = {
-                style = 'bordered',
+                style = 'single',
             },
             noice = true,
             gitsigns = true,

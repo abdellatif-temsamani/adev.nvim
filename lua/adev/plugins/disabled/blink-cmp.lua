@@ -1,12 +1,14 @@
 return {
     {
         'saghen/blink.compat',
+        enabled = false,
         after = 'saghen/blink.cmp',
         version = "2.*",
         opts = {},
     },
     {
         'saghen/blink.cmp',
+        enabled = false,
         event = require("adev.consts").events.insert,
         version = "v1.3.1",
         dependencies = {
@@ -34,12 +36,8 @@ return {
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 500,
-                    window = {
-                        border = 'single'
-                    }
                 },
                 menu = {
-                    border = 'single',
                     draw = {
                         columns = { { "kind_icon", gap = 1, "label" } },
                     }
@@ -60,7 +58,6 @@ return {
             snippets = { preset = 'luasnip' },
             signature = { enabled = true },
             fuzzy = { implementation = "prefer_rust_with_warning" },
-
         }
     }
 }
