@@ -25,6 +25,7 @@ local function setup()
             diagnostics.cfn_lint,
             diagnostics.checkmake,
             diagnostics.hadolint,
+            diagnostics.gdlint,
             diagnostics.yamllint,
             diagnostics.djlint,
             -- formatting  --------------
@@ -36,6 +37,7 @@ local function setup()
             formatting.bibclean,
             formatting.shellharden,
             formatting.pretty_php,
+            formatting.gdformat,
             formatting.asmfmt,
             formatting.rustywind,
             formatting.djlint,
