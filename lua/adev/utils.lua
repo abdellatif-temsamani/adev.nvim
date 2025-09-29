@@ -115,7 +115,56 @@ local function update_adev()
 end
 
 
+--- Checks if Adev's config directory has updates from its GitHub remote.
+--- Runs `git fetch` and compares `HEAD` against `origin/HEAD`.
+--- Sends a desktop notification if updates are available.
+---@return nil
+--- Check for updates in Neovim's config asynchronously
+---@return nil
+local function check_adev_update()
+    ---@type string
+    local config_path = vim.fn.stdpath("config")
+
+    -- Step 1: fetch remote refs
+    vim.system({ "git", "-C", config_path, "fetch", "origin" }, { text = true }, function(fetch_result)
+        if fetch_result.code ~= 0 then
+            vim.schedule(function()
+                vim.notify("Failed to fetch updates: " .. (fetch_result.stderr or ""), vim.log.levels.ERROR, {
+                    title = "adev.nvim",
+                })
+            end)
+            return
+        end
+
+        -- Step 2: check how many commits we're behind
+        vim.system({ "git", "-C", config_path, "rev-list", "HEAD..origin/HEAD", "--count" }, { text = true },
+            function(check_result)
+                if check_result.code ~= 0 then
+                    vim.schedule(function()
+                        vim.notify("Failed to check updates: " .. (check_result.stderr or ""), vim.log.levels.ERROR, {
+                            title = "adev.nvim",
+                        })
+                    end)
+                    return
+                end
+
+                local updates = tonumber((check_result.stdout or ""):match("%d+"))
+                if updates and updates > 0 then
+                    vim.schedule(function()
+                        vim.notify("There are " .. updates .. " new commits available in your config!",
+                            vim.log.levels.INFO, {
+                                title = "adev.nvim",
+                            })
+                    end)
+                end
+            end)
+    end)
+end
+
+
+
 return {
     setup_lazy = setup_lazy,
     update_adev = update_adev,
+    check_adev_update = check_adev_update,
 }
