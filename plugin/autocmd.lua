@@ -1,6 +1,13 @@
 local autocmd     = vim.api.nvim_create_autocmd
 local general_grp = vim.api.nvim_create_augroup("GENERAL", { clear = true })
 
+vim.api.nvim_create_autocmd("VimEnter", {
+    group    = general_grp,
+    callback = function()
+        require("adev.utils").check_adev_update()
+    end
+})
+
 autocmd("BufWritePre", {
     group    = general_grp,
     pattern  = "*",
