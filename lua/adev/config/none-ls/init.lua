@@ -16,6 +16,7 @@ local function setup()
 
     -- deno_fmt
     local deno_fmt = require('adev.config.none-ls.deno_fmt')
+    local gdformat = require('adev.config.none-ls.dgformat')
 
     null_setup({
         sources = {
@@ -37,7 +38,7 @@ local function setup()
             formatting.bibclean,
             formatting.shellharden,
             formatting.pretty_php,
-            formatting.gdformat,
+            gdformat,
             formatting.asmfmt,
             formatting.rustywind,
             formatting.djlint,
