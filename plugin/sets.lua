@@ -1,33 +1,40 @@
-local o = vim.o
+-- Modern Neovim options using vim.opt
+local opt = vim.opt
 
-o.syntax = "true"
-o.foldmethod = "marker"
-o.splitbelow = true
-o.splitright = true
-o.hlsearch = false
-o.history = 100
-o.scrolloff = 8
+-- Basics
+vim.cmd("syntax on") -- enable syntax highlighting
+opt.title = true
+opt.number = true
+opt.relativenumber = true
+opt.scrolloff = 8
+opt.hlsearch = false
+opt.smartcase = true
+opt.concealcursor = "vin"
+opt.linebreak = true
 
-o.writebackup = false
-o.undofile = true
-o.swapfile = false
-o.undodir = vim.fn.stdpath("state") .. "/undo"
-o.winborder = "single"
+-- Window behavior
+opt.splitbelow = true
+opt.splitright = true
 
-o.textwidth = 100
-o.wrap = false
-o.shiftwidth = 4
-o.softtabstop = 4
-o.tabstop = 4
-o.expandtab = true
-o.smartindent = true
-o.title = true
-o.number = true
-o.relativenumber = true
+-- Indentation
+opt.shiftwidth = 4
+opt.softtabstop = 4
+opt.tabstop = 4
+opt.expandtab = true
+opt.smartindent = true
 
-o.smartcase = true
-o.concealcursor = "vin"
-o.linebreak = true
+-- File handling
+opt.writebackup = false
+opt.undofile = true
+opt.swapfile = false
+opt.undodir = vim.fn.stdpath("state") .. "/undo"
 
-vim.cmd [[ set mouse= ]]
-vim.cmd [[ set nowrap ]]
+-- Folding
+opt.foldmethod = "marker"
+
+-- Text formatting
+opt.textwidth = 100
+opt.wrap = false
+
+-- Disable mouse
+vim.cmd("set mouse=")
