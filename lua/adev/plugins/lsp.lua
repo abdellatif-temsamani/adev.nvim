@@ -23,12 +23,10 @@ return {
     config = function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
         vim.diagnostic.config { virtual_lines = { current_line = true } }
-        vim.lsp.set_log_level("warn")
+        -- vim.lsp.set_log_level("warn")
 
-        local caps = vim.lsp.protocol.make_client_capabilities()
-
-        local capabilities = require("cmp_nvim_lsp").default_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
+        local vim_capabilities = vim.lsp.protocol.make_client_capabilities()
+        local capabilities = require('blink.cmp').get_lsp_capabilities(vim_capabilities)
 
         vim.lsp.config('*', {
             capabilities = capabilities,

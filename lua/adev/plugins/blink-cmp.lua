@@ -1,14 +1,12 @@
 return {
     {
         'saghen/blink.compat',
-        enabled = false,
         after = 'saghen/blink.cmp',
         version = "2.*",
         opts = {},
     },
     {
         'saghen/blink.cmp',
-        enabled = false,
         event = require("adev.consts").events.insert,
         version = "v1.3.1",
         dependencies = {
@@ -18,6 +16,8 @@ return {
             'honza/vim-snippets',
             'disrupted/blink-cmp-conventional-commits',
         },
+        ---@module 'blink.cmp'
+        ---@type blink.cmp.Config
         opts = {
             cmdline = {
                 keymap = { preset = 'inherit' },
@@ -36,11 +36,14 @@ return {
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 500,
+                    window = { border = 'single' }
                 },
                 menu = {
+                    border = "single",
                     draw = {
-                        columns = { { "kind_icon", gap = 1, "label" } },
-                    }
+                        columns = { { "kind_icon", gap = 1, "label", "kind" } },
+                    },
+
                 },
             },
 
@@ -53,11 +56,32 @@ return {
                     'cmdline',
                     'omni',
                 },
+
+                per_filetype = {
+                    php = { 'laravel', inherit_defaults = true, },
+                },
+
+                providers = {
+                    laravel = {
+                        name = "laravel",
+                        module = "blink.compat.source",
+                        score_offset = 95, -- show at a higher priority than lsp
+                    },
+
+                },
             },
 
+
             snippets = { preset = 'luasnip' },
-            signature = { enabled = true },
-            fuzzy = { implementation = "prefer_rust_with_warning" },
+            fuzzy = {
+                implementation = "rust",
+                sorts = {
+                    'exact',
+                    -- defaults
+                    'score',
+                    'sort_text',
+                },
+            },
         }
     }
 }

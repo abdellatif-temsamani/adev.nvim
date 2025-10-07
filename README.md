@@ -52,7 +52,7 @@ extensive functionality.
   - HTML/CSS (html, cssls, emmet_ls)
   - PHP (intelephense)
   - And many more...
-- **nvim-cmp**: Fast autocompletion with LSP integration
+- **blink.cmp**: Fast autocompletion with LSP integration
 - **Luasnip**: Snippet engine for code completion
 
 ### 🌳 **Code Analysis & Editing**
