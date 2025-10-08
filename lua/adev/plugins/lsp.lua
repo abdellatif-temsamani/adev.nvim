@@ -32,6 +32,7 @@ return {
             capabilities = capabilities,
         })
 
+
         vim.lsp.config('lua_ls', {
             on_init = function(client)
                 if client.workspace_folders then
@@ -54,8 +55,13 @@ return {
                 })
             end,
             settings = {
-                Lua = {}
-            }
+                Lua = {
+                    hint = {
+                        enable = true,
+                        setType = false,
+                    },
+                },
+            },
         })
 
         vim.lsp.config('tailwindcss', {
