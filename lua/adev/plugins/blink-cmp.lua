@@ -7,7 +7,7 @@ return {
     },
     {
         'saghen/blink.cmp',
-        event = require("adev.consts").events.insert,
+        event = require("abdellatifdev.consts").events:merge({ "file", "cmd", "lsp" }),
         version = "v1.4.0",
         dependencies = {
             'saghen/blink.compat',
