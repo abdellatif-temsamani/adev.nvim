@@ -60,7 +60,7 @@ curated plugins and settings.
 
 - _(theme)_ Align with telescope and snacks
 - _(lualine)_ Winbar now displays "Adev.nvim" instead of "abdellatif dev"
-- _(blink.cmp)_ Downgrade to "v1.3.1"
+- _(blink.cmp)_ Downgrade to "v1.4.0"
 - _(crates.nvim)_ Add event for lazy loading
 
 ### 🚜 Refactor

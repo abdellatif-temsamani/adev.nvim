@@ -8,7 +8,7 @@ return {
     {
         'saghen/blink.cmp',
         event = require("adev.consts").events.insert,
-        version = "v1.3.1",
+        version = "v1.4.0",
         dependencies = {
             'saghen/blink.compat',
             'rafamadriz/friendly-snippets',
