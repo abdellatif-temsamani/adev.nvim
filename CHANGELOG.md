@@ -12,6 +12,27 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [1.4.0] - 2025-10-08
+
+### 🚀 Features
+
+- _(cmp)_ [**breaking**] Blink-cmp -> nvim-cmp
+- Godot linting
+- Gdformat use spaces
+- Auto check for update
+- _(autocmd)_ Gdscript space
+- _(cmp)_ Back to blink.cmp v1.3.1
+- _(lua)_ Vim highlight as builtin
+- [**breaking**] Lua_ls hints
+
+### 🐛 Bug Fixes
+
+- Sets config
+
+### 📚 Documentation
+
+- Cleaning docs
+
 ## [1.3.1] - 2025-09-15
 
 ### 🚀 Features

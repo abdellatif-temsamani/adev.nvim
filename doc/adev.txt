@@ -35,7 +35,7 @@ Key Features:~
 - Comprehensive LSP support via Mason
 - Fuzzy finding with Telescope
 - Git integration with Gitsigns
-- Advanced completion with Blink.cmp
+- Advanced completion with blink.cmp
 - Treesitter syntax highlighting
 - Integrated terminal and file explorer
 - Custom commands and utilities
@@ -56,7 +56,9 @@ The configuration follows a modular Lua-based architecture: >
     │   ├── health.lua            -- Health checks
     │   ├── config/               -- Configuration files
     │   └── plugins/              -- Plugin specifications
-    │       ├── blink-cmp.lua     -- Completion engine
+    │       └── disabled/         -- Main module
+    │           └── blink-cmp.lua -- Alt completion engine
+    │       ├── cmp.lua           -- Completion engine
     │       ├── lsp.lua           -- LSP configuration
     │       ├── mason.lua         -- LSP/tool installer
     │       ├── telescope.lua     -- Fuzzy finder
@@ -421,7 +423,7 @@ Adev.nvim includes these formatting and linting tools via mason-null-ls:
 9.2 LSP Features:~
 - Inlay hints enabled by default
 - Virtual diagnostic lines for current line
-- Blink.cmp integration for completions
+- blink.cmp integration for completions
 - Snippet support enabled
 - Custom handlers for hover and signature help
 - Automatic server installation via Mason
@@ -517,7 +519,7 @@ Slow startup:~
 
 Completion not working:~
 - Verify LSP server is running (`:LspInfo`)
-- Check Blink.cmp configuration
+- Check cmp.lua configuration
 - Ensure completion sources are enabled
 - Verify capabilities are properly set
 
@@ -531,7 +533,6 @@ Run comprehensive health checks: >
     :checkhealth mason
     :checkhealth nvim-treesitter
     :checkhealth telescope
-    :checkhealth blink
 <
 
 *adev-debugging*~
@@ -610,7 +611,7 @@ A: Add `enabled = false` to the plugin specification or comment out/remove
 12.2 Customization Questions:~
 
 Q: Can I use a different completion engine?~
-A: Yes, but you'll need to disable Blink.cmp and configure your preferred
+A: Yes, but you'll need to disable blink.cmp and configure your preferred
    completion engine. This may require updating LSP capabilities.
 
 Q: How do I add custom snippets?~

@@ -1,7 +1,8 @@
 return {
     "neovim/nvim-lspconfig",
-    dependencies = { 'saghen/blink.cmp' },
-    module = false,
+    dependencies = {
+        'mason-org/mason.nvim',
+    },
     event = require("adev.consts").events.pre,
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
@@ -22,15 +23,15 @@ return {
     config = function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
         vim.diagnostic.config { virtual_lines = { current_line = true } }
+        -- vim.lsp.set_log_level("warn")
 
-        local caps = vim.lsp.protocol.make_client_capabilities()
-
-        local capabilities = require('blink.cmp').get_lsp_capabilities(caps)
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
+        local vim_capabilities = vim.lsp.protocol.make_client_capabilities()
+        local capabilities = require('blink.cmp').get_lsp_capabilities(vim_capabilities)
 
         vim.lsp.config('*', {
             capabilities = capabilities,
         })
+
 
         vim.lsp.config('lua_ls', {
             on_init = function(client)
@@ -54,8 +55,13 @@ return {
                 })
             end,
             settings = {
-                Lua = {}
-            }
+                Lua = {
+                    hint = {
+                        enable = true,
+                        setType = false,
+                    },
+                },
+            },
         })
 
         vim.lsp.config('tailwindcss', {
