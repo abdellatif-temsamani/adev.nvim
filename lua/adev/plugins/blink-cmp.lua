@@ -7,8 +7,8 @@ return {
     },
     {
         'saghen/blink.cmp',
-        event = require("adev.consts").events.insert,
-        version = "v1.4.0",
+        event = require("adev.consts").events:merge({ "file", "cmd", "lsp" }),
+        version = "v1.3.1",
         dependencies = {
             'saghen/blink.compat',
             'rafamadriz/friendly-snippets',
