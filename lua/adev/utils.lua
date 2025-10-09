@@ -122,7 +122,6 @@ end
 --- Check for updates in Neovim's config asynchronously
 ---@return nil
 local function check_adev_update()
-    ---@type string
     local config_path = vim.fn.stdpath("config")
 
     -- Step 1: fetch remote refs
@@ -136,30 +135,43 @@ local function check_adev_update()
             return
         end
 
-        -- Step 2: check how many commits we're behind
-        vim.system({ "git", "-C", config_path, "rev-list", "HEAD..origin/HEAD", "--count" }, { text = true },
-            function(check_result)
-                if check_result.code ~= 0 then
-                    vim.schedule(function()
-                        vim.notify("Failed to check updates: " .. (check_result.stderr or ""), vim.log.levels.ERROR, {
-                            title = "adev.nvim",
-                        })
-                    end)
-                    return
-                end
+        -- Step 2: get current branch
+        vim.system({ "git", "-C", config_path, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true },
+            function(branch_result)
+                if branch_result.code ~= 0 then return end
+                local branch = (branch_result.stdout or ""):gsub("%s+", "")
 
-                local updates = tonumber((check_result.stdout or ""):match("%d+"))
-                if updates and updates > 0 then
-                    vim.schedule(function()
-                        vim.notify("There are " .. updates .. " new commits available in your config!",
-                            vim.log.levels.INFO, {
-                                title = "adev.nvim",
-                            })
-                    end)
-                end
+                -- Step 3: check how many commits we're behind
+                vim.system({ "git", "-C", config_path, "rev-list", branch .. "..origin/" .. branch, "--count" },
+                    { text = true },
+                    function(check_result)
+                        if check_result.code ~= 0 then
+                            vim.schedule(function()
+                                vim.notify("Failed to check updates: " .. (check_result.stderr or ""),
+                                    vim.log.levels.ERROR, {
+                                    title = "adev.nvim",
+                                })
+                            end)
+                            return
+                        end
+
+                        local updates = tonumber((check_result.stdout or ""):match("%d+")) or 0
+                        vim.schedule(function()
+                            if updates > 0 then
+                                vim.notify("There are " .. updates .. " new commits available in your config!",
+                                    vim.log.levels.INFO, { title = "adev.nvim" })
+                            else
+                                vim.notify("Adev is up-to-date.", vim.log.levels.INFO, {
+                                    title = "adev.nvim",
+                                })
+                            end
+                        end)
+                    end
+                )
             end)
     end)
 end
+
 
 
 
