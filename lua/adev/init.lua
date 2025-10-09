@@ -2,7 +2,6 @@
 ---@field _NAME string
 ---@field _AUTHOR string
 ---@field _VERSION string
----@field git "git" | string
 local M = {
     _NAME = "Adev.nvim",
     _AUTHOR = "Abdellatif Dev",
@@ -18,12 +17,30 @@ function M:info()
         return string.format("%d.%d.%d", v.major, v.minor, v.patch)
     end
 
+    local function git_branch()
+        local config_dir = vim.fn.stdpath("config")
+
+        local handle = io.popen(string.format("git -C %s rev-parse --abbrev-ref HEAD 2>/dev/null", config_dir))
+        if handle then
+            local result = handle:read("*a")
+            handle:close()
+            result = result:gsub("%s+", "") -- remove any trailing newline
+            if result == "" then
+                return "N/A"
+            end
+            return result
+        else
+            return "N/A"
+        end
+    end
+
     local lines = {
         ("`Name`:    %s"):format(self._NAME),
         ("`Version`: %s"):format(self._VERSION),
         ("`Author`:  %s"):format(self._AUTHOR),
         ("`Neovim`:  %s"):format(nvim_version()),
         ("`LuaJIT`:  %s"):format(_VERSION),
+        ("`Git`:     %s"):format(git_branch()),
     }
 
     vim.notify(
