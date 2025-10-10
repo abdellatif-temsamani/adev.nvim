@@ -1,11 +1,12 @@
 ---@diagnostic disable: undefined-global
 return {
     "adalessa/laravel.nvim",
+    lazy= false,
     cond = function()
         return vim.fn.filereadable("artisan") ~= 0
     end,
-    event = require("adev.consts").events.file,
     dependencies = {
+        "neovim/nvim-lspconfig",
         "tpope/vim-dotenv",
         "nvim-telescope/telescope.nvim",
         "MunifTanjim/nui.nvim",
