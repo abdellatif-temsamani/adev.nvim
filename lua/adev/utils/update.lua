@@ -1,5 +1,5 @@
+local adev_notify = require "adev.utils".adev_notify
 local UdateManager = {}
-
 
 --- Update the Adev.nvim configuration by performing a git pull.
 ---
@@ -22,9 +22,9 @@ function UdateManager.update_adev()
                 if #lines > 0 then
                     local msg = table.concat(lines, "\n")
                     if msg:find("Already up to date") then
-                        vim.notify("Already up to date", vim.log.levels.INFO, { title = "adev.nvim" })
+                        adev_notify("Already up to date", vim.log.levels.INFO)
                     else
-                        vim.notify("Updated successfully:\n" .. msg, vim.log.levels.INFO, { title = "adev.nvim" })
+                        adev_notify("Updated successfully:\n" .. msg, vim.log.levels.INFO)
                     end
                 end
             end
@@ -42,7 +42,7 @@ function UdateManager.update_adev()
             if code ~= 0 then
                 local msg = table.concat(stderr_lines, "\n")
                 if msg == "" then msg = "Unknown error" end
-                vim.notify("Git pull failed:\n" .. msg, vim.log.levels.ERROR, { title = "adev.nvim" })
+                adev_notify("Git pull failed:\n" .. msg, vim.log.levels.ERROR)
             end
         end,
     })
@@ -57,9 +57,7 @@ function UdateManager.check_adev_update()
     vim.system({ "git", "-C", config_path, "fetch", "origin" }, { text = true }, function(fetch_result)
         if fetch_result.code ~= 0 then
             vim.schedule(function()
-                vim.notify("Failed to fetch updates: " .. (fetch_result.stderr or ""), vim.log.levels.ERROR, {
-                    title = "adev.nvim",
-                })
+                adev_notify("Failed to fetch updates: " .. (fetch_result.stderr or ""), vim.log.levels.ERROR)
             end)
             return
         end
@@ -76,10 +74,10 @@ function UdateManager.check_adev_update()
                     function(check_result)
                         if check_result.code ~= 0 then
                             vim.schedule(function()
-                                vim.notify("Failed to check updates: " .. (check_result.stderr or ""),
-                                    vim.log.levels.ERROR, {
-                                        title = "adev.nvim",
-                                    })
+                                adev_notify(
+                                    "Failed to check updates: " .. (check_result.stderr or ""),
+                                    vim.log.levels.ERROR
+                                )
                             end)
                             return
                         end
@@ -87,12 +85,12 @@ function UdateManager.check_adev_update()
                         local updates = tonumber((check_result.stdout or ""):match("%d+")) or 0
                         vim.schedule(function()
                             if updates > 0 then
-                                vim.notify("There are " .. updates .. " new commits available in your config!",
-                                    vim.log.levels.INFO, { title = "adev.nvim" })
+                                adev_notify(
+                                    "There are " .. updates .. " new commits available in your config!",
+                                    vim.log.levels.INFO
+                                )
                             else
-                                vim.notify("Adev is up-to-date.", vim.log.levels.INFO, {
-                                    title = "adev.nvim",
-                                })
+                                adev_notify("Adev is up-to-date.", vim.log.levels.INFO)
                             end
                         end)
                     end
@@ -136,10 +134,9 @@ function UdateManager.info()
         ("`Git`:     %s"):format(git_branch()),
     }
 
-    vim.notify(
+    adev_notify(
         table.concat(lines, "\n"),
-        vim.log.levels.INFO,
-        { title = info._NAME }
+        vim.log.levels.INFO
     )
 end
 
