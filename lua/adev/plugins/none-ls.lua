@@ -1,6 +1,7 @@
+local events = require "adev.utils.consts.events"
 return {
     'nvimtools/none-ls.nvim',
-    event = require("adev.utils.consts").events:merge({"lsp", "file"}),
+    event = { events.file.read_pre, events.lsp.attach, events.buffer.new },
     config = function()
         require('adev.config.none-ls').setup()
     end

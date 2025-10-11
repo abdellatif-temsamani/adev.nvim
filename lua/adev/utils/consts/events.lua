@@ -1,35 +1,185 @@
 local events = {
-    file = { "BufRead", "BufNewFile" },
-    pre = { "BufReadPre", "BufNewFile" },
-    lsp = { "LspAttach" },
-    insert = { "InsertEnter" },
-    cmd = { "CmdlineEnter" },
+    vim = {
+        lazy = "VeryLazy",
+        startup = "VimEnter",
+        leave = "VimLeave",
+        leave_pre = "VimLeavePre",
+        suspend = "VimSuspend",
+        resume = "VimResume",
+        resized = "VimResized",
+    },
+    buffer = {
+        add = "BufAdd",
+        delete = "BufDelete",
+        enter = "BufEnter",
+        leave = "BufLeave",
+        hidden = "BufHidden",
+        unload = "BufUnload",
+        wipeout = "BufWipeout",
+        win_enter = "BufWinEnter",
+        win_leave = "BufWinLeave",
+        file_pre = "BufFilePre",
+        file_post = "BufFilePost",
+        modified_set = "BufModifiedSet",
+        new = "BufNew",
+        new_file = "BufNewFile",
+        read_pre = "BufReadPre",
+        read = "BufRead",
+        read_post = "BufReadPost",
+        read_cmd = "BufReadCmd",
+        write = "BufWrite",
+        write_pre = "BufWritePre",
+        write_post = "BufWritePost",
+        write_cmd = "BufWriteCmd",
+
+        ---@param buffer_pattern string
+        ---@return string
+        _enter = function(buffer_pattern)
+            return string.format("BufEnter %s", buffer_pattern)
+        end,
+    },
+    file = {
+        type = "FileType",
+        append_pre = "FileAppendPre",
+        append_post = "FileAppendPost",
+        append_cmd = "FileAppendCmd",
+        changed_ro = "FileChangedRO",
+        changed_shell = "FileChangedShell",
+        changed_shell_post = "FileChangedShellPost",
+        read_pre = "FileReadPre",
+        read_post = "FileReadPost",
+        read_cmd = "FileReadCmd",
+        write_pre = "FileWritePre",
+        write_post = "FileWritePost",
+        write_cmd = "FileWriteCmd",
+    },
+    insert = {
+        enter = "InsertEnter",
+        leave = "InsertLeave",
+        leave_pre = "InsertLeavePre",
+        change = "InsertChange",
+        char_pre = "InsertCharPre",
+    },
+    cmd = {
+        enter = "CmdlineEnter",
+        leave = "CmdlineLeave",
+        changed = "CmdlineChanged",
+        undefined = "CmdUndefined",
+        win_enter = "CmdwinEnter",
+        win_leave = "CmdwinLeave",
+    },
+    lsp = {
+        attach = "LspAttach",
+        detach = "LspDetach",
+        notify = "LspNotify",
+        progress = "LspProgress",
+        request = "LspRequest",
+        token_update = "LspTokenUpdate",
+    },
+    completion = {
+        changed = "CompleteChanged",
+        done_pre = "CompleteDonePre",
+        done = "CompleteDone",
+    },
+    cursor = {
+        moved = "CursorMoved",
+        moved_i = "CursorMovedI",
+        moved_c = "CursorMovedC",
+        hold = "CursorHold",
+        hold_i = "CursorHoldI",
+    },
+    diff = { updated = "DiffUpdated" },
+    dir = {
+        changed = "DirChanged",
+        changed_pre = "DirChangedPre",
+    },
+    exit = { pre = "ExitPre", quit_pre = "QuitPre" },
+    chan = { info = "ChanInfo", open = "ChanOpen" },
+    colorscheme = {
+        pre = "ColorSchemePre",
+        post = "ColorScheme",
+    },
+    filter = {
+        read_pre = "FilterReadPre",
+        read_post = "FilterReadPost",
+        write_pre = "FilterWritePre",
+        write_post = "FilterWritePost",
+    },
+    focus = {
+        gained = "FocusGained",
+        lost = "FocusLost",
+    },
+    func = { undefined = "FuncUndefined" },
+    ui = {
+        enter = "UIEnter",
+        leave = "UILeave",
+    },
+    menu = { popup = "MenuPopup" },
+    mode = { changed = "ModeChanged" },
+    option = { set = "OptionSet" },
+    quickfix = {
+        cmd_pre = "QuickFixCmdPre",
+        cmd_post = "QuickFixCmdPost",
+    },
+    record = {
+        enter = "RecordingEnter",
+        leave = "RecordingLeave",
+    },
+    safe = { state = "SafeState" },
+    session = {
+        load_post = "SessionLoadPost",
+        write_post = "SessionWritePost",
+    },
+    shell = {
+        cmd_post = "ShellCmdPost",
+        filter_post = "ShellFilterPost",
+    },
+    signal = "Signal",
+    source = {
+        pre = "SourcePre",
+        post = "SourcePost",
+        cmd = "SourceCmd",
+    },
+    spell = { missing = "SpellFileMissing" },
+    stdin = {
+        read_pre = "StdinReadPre",
+        read_post = "StdinReadPost",
+    },
+    swap = { exists = "SwapExists" },
+    syntax = "Syntax",
+    search = { wrapped = "SearchWrapped" },
+    tab = {
+        enter = "TabEnter",
+        leave = "TabLeave",
+        new = "TabNew",
+        new_entered = "TabNewEntered",
+        closed = "TabClosed",
+    },
+    term = {
+        open = "TermOpen",
+        enter = "TermEnter",
+        leave = "TermLeave",
+        close = "TermClose",
+        request = "TermRequest",
+        response = "TermResponse",
+    },
+    text = {
+        changed = "TextChanged",
+        changed_i = "TextChangedI",
+        changed_p = "TextChangedP",
+        changed_t = "TextChangedT",
+        yank_post = "TextYankPost",
+    },
+    user = {
+        generic = "User",
+        bored = "UserGettingBored",
+    },
+    win = {
+        closed = "WinClosed",
+        enter = "WinEnter",
+        leave = "WinLeave",
+        new = "WinNew",
+        scrolled = "WinScrolled",
+    },
 }
-
----Merges selected event categories into one unique, flattened list of event names.
----
----@param selected_keys string[] List of keys from the `events` table to merge.
----@return string[] Unique list of all autocommand event names.
-function events:merge(selected_keys)
-    local result = {}
-    local seen = {}
-
-    for _, key in ipairs(selected_keys) do
-        if not events[key] then
-            error(("Invalid event key: %s"):format(key))
-        end
-        local list = self[key]
-        if list then
-            for _, event in ipairs(list) do
-                if not seen[event] then
-                    seen[event] = true
-                    table.insert(result, event)
-                end
-            end
-        end
-    end
-
-    return result
-end
-
 return events

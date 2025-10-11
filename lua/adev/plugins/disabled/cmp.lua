@@ -1,6 +1,9 @@
+local events = require "adev.utils.consts.events"
+
+
 return {
     "hrsh7th/nvim-cmp",
-    event = require("adev.utils.consts").events:merge({ "cmd", "pre" }),
+    event = { events.cmd.enter, events.lsp.attach, events.buffer.read_pre, events.buffer.new },
     dependencies = {
         { "saadparwaiz1/cmp_luasnip" },
         { "hrsh7th/cmp-path" },
@@ -9,7 +12,7 @@ return {
         { "hrsh7th/cmp-cmdline" },
         {
             "hrsh7th/cmp-nvim-lsp",
-            event = require("adev.utils.consts").events.lsp,
+            event = require("adev.utils.consts.events").lsp.attach,
         },
         {
             'davidsierradz/cmp-conventionalcommits',
@@ -55,8 +58,8 @@ return {
             ["<C-j>"] = cmp.mapping.scroll_docs(2),
             ["<C-Y>"] = cmp.mapping.confirm({ select = true })
         })
+        ---@diagnostic disable-next-line: redundant-parameter
         local sources = cmp.config.sources({
-            -- { name = "lazydev",  group_index = 0 },
             { name = "nvim_lsp" },
             { name = "luasnip" },
             { name = "path" },

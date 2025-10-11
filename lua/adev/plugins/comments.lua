@@ -1,5 +1,7 @@
+local events = require("adev.utils.consts.events")
+
 return {
     'numToStr/Comment.nvim',
-    event = require("adev.utils.consts").events.pre,
+    event = { events.buffer.read_pre, events.buffer.new },
     opts = {}
 }

@@ -1,3 +1,5 @@
+local events = require "adev.utils.consts.events"
+
 local alts = {
     FIX = { "FIXME", "BUG", "FIXIT", "ISSUE", "ERROR" },
     DONE = { "DONE", "DONE!", "DONE.", "FIXED", "WONTFIX" },
@@ -8,7 +10,7 @@ local alts = {
 
 return {
     "folke/todo-comments.nvim",
-    event = require("adev.utils.consts").events.file,
+    event = { events.file.read_pre, events.buffer.new, events.buffer.read_pre },
     opts = {
         signs = true,
         sign_priority = 0,

@@ -1,6 +1,8 @@
+local events = require "adev.utils.consts.events"
+
 return {
     "folke/lazydev.nvim",
-    event = require "adev.utils.consts".events:merge({ "lsp", "file" }),
+    event = { events.file.read_pre, events.lsp.attach, events.buffer.new, },
     cond = function()
         return vim.fn.filereadable("init.lua") ~= 0 or
             vim.fn.isdirectory("lua") ~= 0

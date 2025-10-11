@@ -1,3 +1,4 @@
+local events = require("adev.utils.consts.events")
 return {
     {
         'saghen/blink.compat',
@@ -7,7 +8,12 @@ return {
     },
     {
         'saghen/blink.cmp',
-        event = require("adev.utils.consts").events:merge({ "file", "cmd", "lsp" }),
+        event = {
+            events.file.read_pre,
+            events.buffer.new,
+            events.cmd.enter,
+            events.lsp.attach,
+        },
         -- BUG: any version above 1.3.1 don't work for some reason
         version = "v1.3.1",
         dependencies = {

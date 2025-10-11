@@ -1,9 +1,11 @@
+local events = require "adev.utils.consts.events"
+
 return {
     "neovim/nvim-lspconfig",
     dependencies = {
         'mason-org/mason.nvim',
     },
-    event = require("adev.utils.consts").events.pre,
+    event = { events.buffer.new, events.buffer.read_pre, events.file.read_pre },
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
         { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },

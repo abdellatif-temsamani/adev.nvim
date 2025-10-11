@@ -1,7 +1,7 @@
 return
 {
     "folke/noice.nvim",
-    event = "VeryLazy",
+    event = require "adev.utils.consts.events".vim.lazy,
     opts = {
         lsp = {
             override = {
