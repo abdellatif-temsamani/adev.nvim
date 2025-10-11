@@ -3,7 +3,7 @@ local events = require "adev.utils.consts.events"
 
 return {
     "hrsh7th/nvim-cmp",
-    event = { events.cmd.enter, events.lsp.attach, events.buffer.read_pre, events.buffer.new },
+    event = { events.cmd.enter, events.lsp.attach, events.buffer.read_pre, events.buffer.file_pre },
     dependencies = {
         { "saadparwaiz1/cmp_luasnip" },
         { "hrsh7th/cmp-path" },

@@ -5,7 +5,8 @@ return {
     dependencies = {
         'mason-org/mason.nvim',
     },
-    event = { events.buffer.new, events.buffer.read_pre, events.file.read_pre },
+    module = false,
+    event = {  events.file.read_pre },
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
         { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },

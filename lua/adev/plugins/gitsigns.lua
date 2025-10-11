@@ -5,7 +5,7 @@ return {
     cond = function()
         return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
     end,
-    event = { events.buffer.new, events.buffer.read_pre, events.file.read_pre },
+    event = { events.buffer.file_pre, events.buffer.read_pre, events.file.read_pre },
     keys = {
         { "<leader>tn",  function() require('gitsigns').nav_hunk("next") end,            desc = "next hunk", },
         { "<leader>tp",  function() require('gitsigns').nav_hunk("prev") end,            desc = "previous hunk", },

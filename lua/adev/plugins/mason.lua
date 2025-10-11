@@ -1,15 +1,8 @@
-local events = require "adev.utils.consts.events"
-
 return {
     {
         "mason-org/mason.nvim",
         build = ":MasonUpdate",
         cmd = "Mason",
-        event = {
-            events.buffer.new,
-            events.buffer.read_pre,
-            events.file.read_pre,
-        },
         keys = {
             { "<leader>mm", function() vim.cmd [[ Mason ]] end, desc = "go to declaration", },
         },

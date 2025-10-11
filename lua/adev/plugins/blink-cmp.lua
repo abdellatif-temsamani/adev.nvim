@@ -9,8 +9,7 @@ return {
     {
         'saghen/blink.cmp',
         event = {
-            events.file.read_pre,
-            events.buffer.new,
+            events.insert.enter,
             events.cmd.enter,
             events.lsp.attach,
         },
@@ -19,8 +18,8 @@ return {
         dependencies = {
             'saghen/blink.compat',
             'rafamadriz/friendly-snippets',
-            'neovim/nvim-lspconfig',
             'honza/vim-snippets',
+            'L3MON4D3/LuaSnip',
             'disrupted/blink-cmp-conventional-commits',
         },
         ---@module 'blink.cmp'
