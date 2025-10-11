@@ -83,7 +83,7 @@ The configuration follows a modular Lua-based architecture: >
 - Sets winbar to empty space: `vim.o.winbar = " "`
 - Configures leader keys: `vim.g.mapleader = " "` and `vim.g.maplocalleader = " "`
 - Enables true color support: `vim.opt.termguicolors = true`
-- Calls `require("adev").setup()` to bootstrap the configuration
+- Calls `require "adev".setup()` to bootstrap the configuration
 
 *adev-main-module*~
 3.2 Main Module (`lua/adev/init.lua`):~
@@ -272,14 +272,13 @@ Note: Commands are registered lazily on first `CmdlineEnter` event.
 
 Create a new file in `lua/adev/plugins/`: >
     -- lua/adev/plugins/my-plugin.lua
+    local events = require "adev.utils.consts.events"
+
     return {
       "author/plugin-name",
-      event = "VeryLazy",
-      config = function()
-        require("plugin-name").setup({
-          -- your configuration here
-        })
-      end,
+      -- all events are pre-defined
+      event = { events.file.read_pre, },
+      opt ={},
     }
 <
 
