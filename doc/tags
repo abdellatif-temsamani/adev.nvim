@@ -1,9 +1,12 @@
+:ADCheckUpdate	adev.txt	/*:ADCheckUpdate*
 :ADInfo	adev.txt	/*:ADInfo*
 :ADUpdate	adev.txt	/*:ADUpdate*
+ADCheckUpdate	adev.txt	/*ADCheckUpdate*
 ADInfo	adev.txt	/*ADInfo*
 ADUpdate	adev.txt	/*ADUpdate*
 adev	adev.txt	/*adev*
 adev-architecture	adev.txt	/*adev-architecture*
+adev-autocommands	adev.txt	/*adev-autocommands*
 adev-commands	adev.txt	/*adev-commands*
 adev-components	adev.txt	/*adev-components*
 adev-config-examples	adev.txt	/*adev-config-examples*
@@ -11,6 +14,7 @@ adev-contents	adev.txt	/*adev-contents*
 adev-customization	adev.txt	/*adev-customization*
 adev-end	adev.txt	/*adev-end*
 adev-faq	adev.txt	/*adev-faq*
+adev-health	adev.txt	/*adev-health*
 adev-installation	adev.txt	/*adev-installation*
 adev-lsp	adev.txt	/*adev-lsp*
 adev-mappings	adev.txt	/*adev-mappings*

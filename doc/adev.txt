@@ -18,9 +18,11 @@ CONTENTS                                                      *adev-contents*
 7.  Installation & Setup ............................. |adev-installation|
 8.  Configuration Examples ........................... |adev-config-examples|
 9.  LSP Configuration ................................ |adev-lsp|
-10. Customization .................................... |adev-customization|
-11. Troubleshooting .................................. |adev-troubleshooting|
-12. FAQ .............................................. |adev-faq|
+10. Autocommands & Events ............................ |adev-autocommands|
+11. Health Checks .................................... |adev-health|
+12. Customization .................................... |adev-customization|
+13. Troubleshooting .................................. |adev-troubleshooting|
+14. FAQ .............................................. |adev-faq|
 
 ==============================================================================
 1. OVERVIEW                                                  *adev-overview*
@@ -31,16 +33,20 @@ carefully selected plugins, it offers blazing-fast performance while maintaining
 extensive functionality.
 
 Key Features:~
-- Modern UI with Catppuccin Mocha theme
-- Comprehensive LSP support via Mason
-- Fuzzy finding with Telescope
-- Git integration with Gitsigns
-- Advanced completion with blink.cmp
-- Treesitter syntax highlighting
-- Integrated terminal and file explorer
-- Custom commands and utilities
-- Lazy loading for optimal performance
-- Modular plugin architecture
+- Modern UI with Catppuccin Mocha theme and transparent background support
+- Comprehensive LSP support via Mason with 40+ language servers
+- Advanced completion with blink.cmp (v1.3.1) and snippet support
+- Fuzzy finding with Telescope and smart ignore patterns
+- Git integration with Gitsigns, Git Conflict, and Lazygit
+- Treesitter syntax highlighting with context and auto-tags
+- Snacks.nvim for modern file explorer and terminal integration
+- Noice.nvim for enhanced UI (cmdline, popupmenu, notifications)
+- Status column with git signs and fold indicators
+- Custom commands and automatic update checking
+- Lazy loading for optimal performance (plugins load only when needed)
+- Modular plugin architecture with event-based loading
+- Health checks for system dependencies and configuration validation
+- Support for 25+ programming languages out of the box
 
 ==============================================================================
 2. ARCHITECTURE & STRUCTURE                           *adev-architecture*
@@ -48,30 +54,61 @@ Key Features:~
 The configuration follows a modular Lua-based architecture: >
 
     ~/.config/nvim/
-    ├── init.lua                  -- Entry point
+    ├── init.lua                  -- Entry point (8 lines)
     ├── lua/adev/
-    │   ├── init.lua              -- Main module
-    │   ├── utils.lua             -- Utility functions
-    │   ├── consts.lua            -- Constants and events
-    │   ├── health.lua            -- Health checks
+    │   ├── init.lua              -- Main module (81 lines)
+    │   ├── commands.lua          -- Custom commands (33 lines)
+    │   ├── health.lua            -- Health checks (280 lines)
+    │   ├── utils/
+    │   │   ├── init.lua          -- Utility functions (14 lines)
+    │   │   ├── update.lua        -- Update management (149 lines)
+    │   │   └── consts/
+    │   │       ├── init.lua      -- Constants (18 lines)
+    │   │       └── events.lua    -- Event definitions (186 lines)
     │   ├── config/               -- Configuration files
-    │   └── plugins/              -- Plugin specifications
-    │       └── disabled/         -- Main module
-    │           └── cmp.lua       -- Alt completion engine
-    │       ├── blink-cmp.lua     -- Completion engine
-    │       ├── lsp.lua           -- LSP configuration
-    │       ├── mason.lua         -- LSP/tool installer
-    │       ├── telescope.lua     -- Fuzzy finder
-    │       ├── theme.lua         -- Colorscheme
-    │       ├── treesitter.lua    -- Syntax highlighting
+    │   │   ├── mini.lua          -- Mini.nvim configuration
+    │   │   ├── treesitter.lua    -- Treesitter setup (21 lines)
+    │   │   └── none-ls/          -- None-ls configurations
+    │   │       ├── init.lua      -- Main none-ls setup
+    │   │       ├── deno_fmt.lua  -- Deno formatter
+    │   │       └── dgformat.lua  -- DG formatter
+    │   └── plugins/              -- Plugin specifications (22 files)
+    │       ├── disabled/         -- Disabled plugins
+    │       │   └── cmp.lua       -- Alternative completion engine
+    │       ├── blink-cmp.lua     -- Completion engine (91 lines)
+    │       ├── lsp.lua           -- LSP configuration (282 lines)
+    │       ├── mason.lua         -- LSP/tool installer (116 lines)
+    │       ├── telescope.lua     -- Fuzzy finder (135 lines)
+    │       ├── theme.lua         -- Catppuccin theme (30 lines)
+    │       ├── treesitter.lua    -- Syntax highlighting (41 lines)
+    │       ├── snacks.lua        -- Modern UI components (96 lines)
     │       ├── gitsigns.lua      -- Git integration
     │       ├── lualine.lua       -- Statusline
-    │       └── [other plugins]
+    │       ├── noice.lua         -- Enhanced UI
+    │       ├── git-conflict.lua  -- Merge conflict resolution
+    │       ├── octo.lua          -- GitHub integration
+    │       ├── todo-comments.lua -- TODO highlighting
+    │       ├── cloak.lua         -- Environment variable concealing
+    │       ├── highlight-colors.lua -- Color highlighting
+    │       ├── laravel.lua       -- Laravel development tools
+    │       ├── crates.lua        -- Rust crate management
+    │       ├── luasnip.lua       -- Snippet engine
+    │       ├── lazydev.lua       -- Lua development enhancements
+    │       ├── mini.lua          -- Various mini plugins
+    │       ├── none-ls.lua       -- Formatting and linting
+    │       └── nvim-jdtls.lua    -- Java development tools
+    ├── plugin/                   -- Core Neovim settings
+    │   ├── sets.lua              -- Vim options (41 lines)
+    │   ├── keymaps.lua           -- Key mappings (42 lines)
+    │   ├── autocmd.lua           -- Autocommands (42 lines)
+    │   └── queries/              -- Custom queries
+    │       └── lua/              -- Lua-specific queries
     ├── doc/
-    │   └── adev.txt              -- This documentation
-    ├── plugin/                   -- Vim plugin files
+    │   ├── adev.txt              -- This documentation
+    │   └── tags                  -- Help tags
     ├── lazy-lock.json            -- Plugin lockfile
-    └── .luarc.json               -- Lua language server config
+    └── images/
+        └── startuptime.png       -- Performance benchmark
 <
 
 ==============================================================================
@@ -83,88 +120,184 @@ The configuration follows a modular Lua-based architecture: >
 - Sets winbar to empty space: `vim.o.winbar = " "`
 - Configures leader keys: `vim.g.mapleader = " "` and `vim.g.maplocalleader = " "`
 - Enables true color support: `vim.opt.termguicolors = true`
-- Calls `require "adev".setup()` to bootstrap the configuration
+- Calls `require("adev").setup()` to bootstrap the configuration
 
 *adev-main-module*~
 3.2 Main Module (`lua/adev/init.lua`):~
-- Defines metadata: `_NAME`, `_AUTHOR`, `_VERSION`
-- Provides `info()` function to display configuration information
-- Registers custom commands via `setup_commands()`
-- Initializes Lazy.nvim plugin manager via `utils.setup_lazy()`
-- Sets default colorscheme to `catppuccin-mocha`
-
-*adev-utils*~
-3.3 Utilities (`lua/adev/utils.lua`):~
+- Defines global metadata in `vim.g.Adev`:
+  - `_NAME`: "Adev.nvim"
+  - `_AUTHOR`: "Abdellatif Dev"
+  - `_VERSION`: "1.4.0"
 - `setup_lazy()`: Bootstraps Lazy.nvim plugin manager
   - Auto-installs Lazy.nvim if not present
-  - Configures plugin loading with rocks support
-  - Sets up UI with single border and custom title
+  - Configures rocks support for Lua packages
+  - Sets up pkg support for package management
+  - Configures UI with single border and "Adev.nvim" title
+  - Enables performance caching and plugin checking
+  - Imports plugins from "adev.plugins" spec
+- `setup()`: Main setup function that:
+  - Calls `setup_lazy()` to initialize plugin manager
+  - Registers custom commands via `_commands.register()`
+  - Sets default colorscheme to `catppuccin-mocha`
+
+*adev-core-settings*~
+3.3 Core Settings (`plugin/sets.lua`):~
+- Syntax highlighting enabled
+- Line numbers: `number = true`, `relativenumber = true`
+- Scrolling: `scrolloff = 8` (keep 8 lines visible when scrolling)
+- Search: `hlsearch = false`, `smartcase = true`
+- Concealing: `concealcursor = "vin"`, `linebreak = true`
+- Window behavior: `splitbelow = true`, `splitright = true`
+- Indentation: 4 spaces, smart indent, expand tabs
+- File handling: no backup, undo file enabled, no swap files
+- Undo directory: `vim.fn.stdpath("state") .. "/undo"`
+- Folding: marker method
+- Text formatting: `textwidth = 100`, `wrap = false`
+- Mouse disabled for keyboard-focused workflow
+
+*adev-commands*~
+3.4 Commands (`lua/adev/commands.lua`):~
+- Registers commands lazily on first `CmdlineEnter` event
+- `ADInfo`: Display configuration information
+- `ADUpdate`: Update configuration via git pull
+- `ADCheckUpdate`: Check for available updates
+
+*adev-utils*~
+3.5 Utilities (`lua/adev/utils/`):~
+
+*adev-utils-init*~
+`lua/adev/utils/init.lua`:~
+- `adev_notify(msg, level)`: Displays notifications with Adev.nvim title
+
+*adev-utils-update*~
+`lua/adev/utils/update.lua`:~
 - `update_adev()`: Asynchronous git pull for configuration updates
   - Uses `git pull --ff-only` in config directory
-  - Provides notifications via Snacks.nvim
+  - Provides success/error notifications
+  - Handles stderr output gracefully
+- `check_adev_update()`: Checks for available updates
+  - Fetches remote refs asynchronously
+  - Compares local and remote commit counts
+  - Notifies user of available updates
+- `info()`: Displays system and configuration information
+  - Shows Adev version, author, Neovim version
+  - Displays LuaJIT version and current git branch
 
 *adev-constants*~
-3.4 Constants (`lua/adev/consts.lua`):~
-- `ignored_files`: List of patterns ignored by tools (node_modules, .git, etc.)
-- `events`: Categorized autocommand events for plugin loading
-  - `file`: BufRead, BufNewFile
-  - `pre`: BufReadPre, BufNewFile
-  - `lsp`: LspAttach
-  - `insert`: InsertEnter
-  - `cmd`: CmdlineEnter
-- `events:merge()`: Function to combine event categories
+3.6 Constants (`lua/adev/utils/consts/`):~
+
+*adev-constants-init*~
+`lua/adev/utils/consts/init.lua`:~
+- `ignored_files`: Patterns ignored by tools:
+  - "Cargo.lock", "__pycache__/", "node_modules/"
+  - ".git/", ".ccls-cache/", "build/", "target/"
+  - "dist/", "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
+
+*adev-constants-events*~
+`lua/adev/utils/consts/events.lua`:~
+Comprehensive event definitions organized by category:
+- `vim`: VeryLazy, VimEnter, VimLeave, VimResized
+- `buffer`: BufAdd, BufEnter, BufLeave, BufRead, BufWrite, etc.
+- `file`: FileType, FileReadPre, FileWritePre, etc.
+- `insert`: InsertEnter, InsertLeave, InsertChange
+- `cmd`: CmdlineEnter, CmdlineLeave, CmdlineChanged
+- `lsp`: LspAttach, LspDetach, LspProgress
+- `completion`: CompleteChanged, CompleteDone
+- `cursor`: CursorMoved, CursorHold
+- `text`: TextChanged, TextYankPost
+- And many more categories for precise event-based loading
 
 ==============================================================================
 4. PLUGIN CONFIGURATION                                 *adev-plugins*
 
-4.1 Plugin Manager~
-- Uses Lazy.nvim with lazy loading enabled by default
-- Rocks support for Lua packages
-- Performance optimizations with caching
-- UI customization with single border
-- Automatic plugin checking enabled
+4.1 Plugin Manager (Lazy.nvim)~
+- Lazy loading enabled by default for optimal performance
+- Rocks support for Lua packages with hererocks integration
+- Pkg support with multiple sources (lazy, rockspec, packspec)
+- Performance optimizations with caching enabled
+- UI customization with single border and "Adev.nvim" title
+- Automatic plugin checking and version management
+- Default colorscheme installation: catppuccin-mocha
 
 4.2 Core Plugins~
 
+*adev-completion*~
 LSP & Completion:~
-- nvim-lspconfig: LSP client configurations
-- mason.nvim: LSP/DAP/linter installer
-- mason-lspconfig.nvim: Mason-lspconfig integration
-- mason-null-ls.nvim: Mason-null-ls integration
-- blink.cmp: Modern completion engine
-- none-ls.nvim: Null-ls for formatting/diagnostics
-- nvim-jdtls: Java development tools
+- blink.cmp (v1.3.1): Modern completion engine with Rust implementation
+  - blink.compat: Compatibility layer for other completion sources
+  - Cmdline completion with ghost text and auto-show menu
+  - Documentation with auto-show (500ms delay) and single border
+  - Sources: LSP, path, snippets, buffer, cmdline, omni
+  - Laravel-specific completion support
+  - LuaSnip integration for snippets
+- nvim-lspconfig: LSP client configurations with 40+ servers
+- mason.nvim: LSP/DAP/linter installer with auto-update
+- mason-lspconfig.nvim: Automatic LSP server installation
+- mason-null-ls.nvim: Formatter/linter tool management
+- none-ls.nvim: Formatting and diagnostics integration
+- nvim-jdtls: Java development tools and language server
 
+*adev-ui-navigation*~
 UI & Navigation:~
-- telescope.nvim: Fuzzy finder and picker
-- catppuccin: Color scheme (mocha variant)
-- lualine.nvim: Statusline
-- noice.nvim: UI improvements
-- snacks.nvim: UI components and utilities
-- nvim-treesitter: Syntax highlighting
+- telescope.nvim: Fuzzy finder with extensive configuration
+  - Custom find_files with ripgrep and smart ignore patterns
+  - Live grep with advanced filtering
+  - Buffer, help tags, man pages, and command searching
+  - Treesitter symbol navigation
+  - Todo comments and Noice integration
+  - Horizontal layout with 99% width/height and 60% preview
+- catppuccin: Mocha theme with transparent background support
+  - Integrated with blink.cmp, noice, gitsigns, snacks, telescope
+  - Dim inactive windows (15% darker)
+- snacks.nvim: Modern UI components and utilities
+  - File explorer with netrw replacement
+  - Lazygit integration with terminal style
+  - Zen mode with zoom functionality
+  - Input, notifier, and image support
+  - Status column with git signs and fold indicators
+- noice.nvim: Enhanced cmdline, popupmenu, and notifications
+- lualine.nvim: Elegant statusline with git integration
 
+*adev-syntax*~
+Syntax & Editing:~
+- nvim-treesitter: Advanced syntax highlighting
+  - All parsers installed with auto-install
+  - Indent and context commentstring support
+  - Ignores "zimbu" parser (problematic)
+- nvim-treesitter-context: Show current function/class context
+  - Maximum 2 lines of context with zindex 20
+- nvim-ts-autotag: Automatic tag closing
+  - Special configuration for Blade and XML templates
+  - Close and rename support with slash handling
+
+*adev-git*~
 Git Integration:~
-- gitsigns.nvim: Git signs and hunks
-- git-conflict.nvim: Merge conflict resolution
-- octo.nvim: GitHub integration
+- gitsigns.nvim: Git signs and hunks in the gutter
+- git-conflict.nvim: Merge conflict resolution helpers
+- octo.nvim: GitHub integration for issues and PRs
 
+*adev-development*~
 Development Tools:~
-- todo-comments.nvim: TODO/FIXME highlighting
-- cloak.nvim: Environment variable concealing
-- highlight-colors.nvim: Color highlighting
-- lazydev.nvim: Lua development enhancements
-- mini.nvim: Various mini plugins
+- todo-comments.nvim: TODO/FIXME/NOTE highlighting and search
+- cloak.nvim: Environment variable concealing for security
+- highlight-colors.nvim: Color preview in code (hex, rgb, etc.)
+- lazydev.nvim: Lua development enhancements for Neovim
+- mini.nvim: Collection of various mini plugins
+- comments.nvim: Smart comment toggling
 
+*adev-language-specific*~
 Language Specific:~
-- laravel.nvim: Laravel development tools
-- crates.nvim: Rust crate management
-- luasnip: Snippet engine
+- laravel.nvim: Laravel development tools and Blade support
+- crates.nvim: Rust crate management and version checking
+- luasnip: Snippet engine with friendly-snippets and vim-snippets
 
 4.3 Loading Strategy~
-- Event-based loading using `adev.consts.events`
-- Key-based loading for interactive commands
+- Event-based loading using comprehensive `adev.utils.consts.events`
+- Key-based loading for interactive commands (lazy until first use)
 - Command-based loading for specific functionality
 - Filetype-based loading for language-specific plugins
+- Priority loading for essential UI components (theme, snacks)
+- Module-based loading with `module = false` for manual control
 
 ==============================================================================
 5. KEY MAPPINGS                                          *adev-mappings*
@@ -193,8 +326,8 @@ Language Specific:~
 *adev-telescope-mappings*~
 5.3 Telescope Mappings (`<leader>f` prefix):~
 
-    <leader>ff    Find files
-    <leader>fg    Live grep
+    <leader>ff    Find files (with smart ignore patterns)
+    <leader>fg    Live grep (ripgrep-powered search)
     <leader>fb    Find buffers
     <leader>fh    Help tags
     <leader>fm    Man pages
@@ -203,10 +336,80 @@ Language Specific:~
     <leader>ft    Todo comments (TodoTelescope)
     <leader>fn    Noice messages (NoiceTelescope)
 
+*adev-buffer-mappings*~
+5.4 Buffer Management (`<leader>b` prefix):~
+
+    <leader>bs    Save buffer (:write)
+    <leader>bp    Previous buffer
+    <leader>bn    Next buffer
+
+*adev-window-mappings*~
+5.5 Window Management (`<leader>w` prefix):~
+
+    <leader>wq    Close window
+    <leader>wd    Close buffer (wipeout)
+    <leader>wv    Vertical split
+    <leader>wh    Horizontal split
+    <leader>wp    Previous tab
+    <leader>wn    Next tab
+    <leader>wo    New tab
+    <leader>wa    Toggle zoom (Snacks zen mode)
+
+*adev-quickfix-mappings*~
+5.6 Quickfix (`<leader>q` prefix):~
+
+    <leader>qq    Close quickfix
+    <leader>qo    Open quickfix
+    <leader>qp    Previous quickfix item
+    <leader>qn    Next quickfix item
+
+*adev-fold-mappings*~
+5.7 Folding (`<leader>c` prefix):~
+
+    <leader>cc    Create fold (visual/normal mode)
+    <leader>co    Open fold
+    <leader>cq    Close fold
+
+*adev-snacks-mappings*~
+5.8 Snacks.nvim (`<leader>` prefix):~
+
+    <leader>n     File explorer (Snacks.explorer)
+    <leader>N     Neovim News (doc/news.txt)
+    <leader>to    Lazygit terminal
+    <leader>tq    GitHub dashboard (gh-dash)
+
 *adev-mason-mappings*~
-5.4 Mason Mappings:~
+5.9 Mason:~
 
     <leader>mm    Open Mason interface
+    <leader>ml    Open Lazy.nvim interface
+
+*adev-movement-mappings*~
+5.10 Movement & Navigation:~
+
+    <leader>u     Move line down
+    <leader>i     Move line up
+    <leader>Q     Quit all (:quitall)
+    \             Unnamed register ("+)
+    j             Visual line down (gj)
+    k             Visual line up (gk)
+
+*adev-split-navigation*~
+5.11 Split Navigation:~
+
+    <C-k>         Move to upper split
+    <C-j>         Move to lower split
+    <C-l>         Move to right split
+    <C-h>         Move to left split
+    <M-k>         Resize split up (+2)
+    <M-j>         Resize split down (-2)
+    <M-l>         Resize split left (-2)
+    <M-h>         Resize split right (+2)
+
+*adev-terminal-mappings*~
+5.12 Terminal:~
+
+    <C-t>         Exit terminal mode (in terminal)
 
 ==============================================================================
 6. COMMANDS                                              *adev-commands*
@@ -214,34 +417,50 @@ Language Specific:~
 *:ADInfo* *ADInfo*
 :ADInfo       Display Adev version, author, and runtime information.
               Shows:
-              - Configuration name and version
-              - Author information
-              - Neovim version
+              - Configuration name: "Adev.nvim"
+              - Version: "1.4.0"
+              - Author: "Abdellatif Dev"
+              - Neovim version (major.minor.patch)
               - LuaJIT version
+              - Current git branch
 
 *:ADUpdate* *ADUpdate*
 :ADUpdate     Update Adev configuration via git pull.
               - Runs `git pull --ff-only` in ~/.config/nvim
-              - Shows progress notifications
-              - Handles errors gracefully
+              - Shows progress notifications via Snacks.nvim
+              - Handles stdout and stderr output
+              - Provides success/error feedback
+              - Uses asynchronous job execution
 
-Note: Commands are registered lazily on first `CmdlineEnter` event.
+*:ADCheckUpdate* *ADCheckUpdate*
+:ADCheckUpdate Check for available updates without updating.
+              - Fetches remote refs asynchronously
+              - Compares local and remote commit counts
+              - Notifies user of available updates
+              - Shows "up-to-date" message if current
+
+Note: Commands are registered lazily on first `CmdlineEnter` event for
+      optimal startup performance.
 
 ==============================================================================
 7. INSTALLATION & SETUP                             *adev-installation*
 
 *adev-requirements*~
 7.1 Requirements:~
-- Neovim >= 0.10.0
-- Git
-- Nerd Font (for icons)
-- ripgrep (for telescope live_grep)
-- fd (for telescope find_files)
+- Neovim >= 0.11.0 (verified by health checks)
+- Git (for plugin management and updates)
+- make, unzip (required build tools)
+- Nerd Font (for icons and UI elements)
+- ripgrep (for telescope live_grep and file searching)
+- fd (optional, for faster file finding)
+- lazygit (for git terminal UI integration)
+- gh (GitHub CLI for GitHub integration)
+- gh-dash (for GitHub dashboard functionality)
 - Node.js and npm (for JavaScript/TypeScript LSP servers)
 - Rust and Cargo (for rust-analyzer and Rust-based tools)
 - Go (for gopls and Go development)
 - Python (for Python LSP servers and tools)
-- Optional: Various language-specific tools for additional LSP servers
+- Various language-specific tools for additional LSP servers
 
 7.2 Installation:~
 1. Backup existing Neovim configuration: >
@@ -460,42 +679,199 @@ Intelephense (PHP):~
 - Reads from ~/.secrets/intelephense
 
 ==============================================================================
-10. CUSTOMIZATION                                     *adev-customization*
+10. AUTOCOMMANDS & EVENTS                            *adev-autocommands*
+
+*adev-autocommands-general*~
+10.1 General Autocommands (`plugin/autocmd.lua`):~
+
+The configuration includes several autocommands in the "GENERAL" group:
+
+*adev-autocmd-gdscript*~
+GDScript Configuration:~
+- Triggered on `FileType gdscript`
+- Sets local options for Godot development:
+  - `expandtab = true` (use spaces)
+  - `shiftwidth = 4`
+  - `tabstop = 4`
+
+*adev-autocmd-startup*~
+Startup Check:~
+- Triggered on `VimEnter`
+- Calls `require("adev.utils.update").check_adev_update()`
+- Automatically checks for configuration updates on startup
+
+*adev-autocmd-whitespace*~
+Whitespace Cleanup:~
+- Triggered on `BufWritePre` for all files
+- Removes trailing whitespace: `%s/\s\+$//e`
+- Runs before every file save
+
+*adev-autocmd-formatoptions*~
+Format Options:~
+- Triggered on `FileType` for all files
+- Disables automatic comment continuation:
+  - Removes 'r' (continue comments on Enter)
+  - Removes 'c' (auto-wrap comments)
+  - Removes 'o' (continue comments on 'o'/'O')
+
+*adev-autocmd-yank*~
+Yank Highlighting:~
+- Triggered on `TextYankPost`
+- Highlights yanked text for 60ms
+- Provides visual feedback for copy operations
+
+*adev-autocommands-events*~
+10.2 Event System (`lua/adev/utils/consts/events.lua`):~
+
+Adev.nvim uses a comprehensive event system with 186 lines of event
+definitions organized by category. This allows for precise plugin loading
+and optimal performance.
+
+Event Categories:~
+- `vim`: Core Vim events (VimEnter, VimLeave, VeryLazy, etc.)
+- `buffer`: Buffer-related events (BufRead, BufWrite, BufEnter, etc.)
+- `file`: File operations (FileType, FileRead, FileWrite, etc.)
+- `insert`: Insert mode events (InsertEnter, InsertLeave, etc.)
+- `cmd`: Command line events (CmdlineEnter, CmdlineLeave, etc.)
+- `lsp`: LSP events (LspAttach, LspDetach, LspProgress, etc.)
+- `completion`: Completion events (CompleteChanged, CompleteDone, etc.)
+- `cursor`: Cursor movement (CursorMoved, CursorHold, etc.)
+- `text`: Text changes (TextChanged, TextYankPost, etc.)
+- `win`: Window events (WinEnter, WinLeave, WinNew, etc.)
+- `tab`: Tab events (TabEnter, TabLeave, TabNew, etc.)
+- `term`: Terminal events (TermOpen, TermEnter, etc.)
+
+Usage in Plugin Loading:~
+Plugins use these events for lazy loading: >
+    local events = require "adev.utils.consts.events"
+
+    return {
+        "plugin/name",
+        event = { events.buffer.new_file, events.insert.enter },
+        -- Plugin loads only when needed
+    }
+<
+
+==============================================================================
+11. HEALTH CHECKS                                     *adev-health*
+
+*adev-health-overview*~
+11.1 Health Check System (`lua/adev/health.lua`):~
+
+Adev.nvim includes a comprehensive health check system with 280 lines of
+diagnostic code. Run `:checkhealth adev` to verify your installation.
+
+*adev-health-version*~
+11.2 Neovim Version Check:~
+- Verifies Neovim >= 0.11.0 (minimum required)
+- Checks for `vim.version.ge` function availability
+- Displays current version with status indicator
+
+*adev-health-executables*~
+11.3 Required Executables:~
+- git: Version control system (REQUIRED)
+- make: Build automation tool (REQUIRED)
+- unzip: Archive extraction utility (REQUIRED)
+
+*adev-health-optional*~
+11.4 Optional Executables:~
+- rg (ripgrep): Fast text search for Telescope
+- lazygit: Terminal UI for git operations
+- gh: GitHub CLI for GitHub integration
+- gh-dash: GitHub dashboard for issue/PR management
+- fd: Fast file finder (alternative to find)
+- bat: Better cat with syntax highlighting
+
+Each optional tool includes installation instructions when missing.
+
+*adev-health-modules*~
+11.5 Lua Module Checks:~
+- adev.init: Main adev module (REQUIRED)
+- adev.consts: Constants and configuration (REQUIRED)
+- adev.utils: Utility functions (REQUIRED)
+
+Displays loaded count and critical module status.
+
+*adev-health-nerd-font*~
+11.6 Nerd Font Support:~
+- Tests various Nerd Font icons for proper display
+- Checks terminal capabilities and color support
+- Provides font recommendations:
+  - AnonymicePro Nerd Font Mono (recommended)
+  - JetBrains Mono Nerd Font
+  - Fira Code Nerd Font
+  - Hack Nerd Font
+- Detects GUI vs terminal environment
+
+*adev-health-system*~
+11.7 System Information:~
+- OS and architecture detection
+- Shell identification
+- Tmux/screen session detection
+- Terminal emulator information
+
+*adev-health-config*~
+11.8 Configuration Validation:~
+- Verifies adev module loading
+- Checks setup function availability
+- Validates config directory existence
+- Provides troubleshooting guidance
+
+*adev-health-usage*~
+11.9 Running Health Checks:~
+
+Check all components: >
+    :checkhealth
+<
+
+Check Adev specifically: >
+    :checkhealth adev
+<
+
+Check related components: >
+    :checkhealth lazy
+    :checkhealth mason
+    :checkhealth nvim-treesitter
+    :checkhealth telescope
+<
+
+==============================================================================
+12. CUSTOMIZATION                                     *adev-customization*
 
 *adev-custom-plugins*~
-10.1 Adding Plugins:~
+12.1 Adding Plugins:~
 Create files in `lua/adev/plugins/` following Lazy.nvim specification.
 Use event-based loading for optimal performance.
 
 *adev-custom-settings*~
-10.2 Core Settings:~
+12.2 Core Settings:~
 - Main configuration: `lua/adev/init.lua`
 - Plugin configurations: `lua/adev/plugins/*.lua`
-- Constants and events: `lua/adev/consts.lua`
-- Utility functions: `lua/adev/utils.lua`
+- Constants and events: `lua/adev/utils/consts/`
+- Utility functions: `lua/adev/utils/`
 
 *adev-custom-theme*~
-10.3 Theme Customization:~
+12.3 Theme Customization:~
 Edit `lua/adev/plugins/theme.lua` to change colorscheme.
 Default: `catppuccin-mocha`
 
 *adev-custom-mappings*~
-10.4 Key Mappings:~
+12.4 Key Mappings:~
 Mappings are defined per-plugin in their respective files.
 Use the `keys` table in plugin specifications for lazy loading.
 
 *adev-custom-lsp*~
-10.5 LSP Customization:~
+12.5 LSP Customization:~
 - Add servers to Mason configuration
 - Configure servers in `lsp.lua`
 - Use `vim.lsp.config()` for server-specific settings
 - Add servers to `vim.lsp.enable()` list
 
 ==============================================================================
-11. TROUBLESHOOTING                               *adev-troubleshooting*
+13. TROUBLESHOOTING                               *adev-troubleshooting*
 
 *adev-common-issues*~
-11.1 Common Issues:~
+13.1 Common Issues:~
 
 Plugin not loading:~
 - Check `:Lazy` for plugin status and errors
@@ -514,16 +890,16 @@ Slow startup:~
 - Run `:Lazy profile` to identify slow plugins
 - Check startup time with `nvim --startuptime startup.log`
 - Review plugin loading conditions
-- Consider deferring non-essential plugins
+- Consider deferring non-essential plugins with `event = "VeryLazy"`
 
 Completion not working:~
 - Verify LSP server is running (`:LspInfo`)
-- Check cmp.lua configuration
+- Check blink.cmp configuration (note: using v1.3.1)
 - Ensure completion sources are enabled
-- Verify capabilities are properly set
+- Verify LSP capabilities are properly set
 
 *adev-health-checks*~
-11.2 Health Checks:~
+13.2 Health Checks:~
 
 Run comprehensive health checks: >
     :checkhealth
@@ -535,7 +911,7 @@ Run comprehensive health checks: >
 <
 
 *adev-debugging*~
-11.3 Debugging Steps:~
+13.3 Debugging Steps:~
 
 1. Check Neovim version: >
     :version
@@ -558,11 +934,19 @@ Run comprehensive health checks: >
     nvim --clean
 <
 
+6. Check autocommands: >
+    :autocmd GENERAL
+<
+
 *adev-updates*~
-11.4 Updating Components:~
+13.4 Updating Components:~
 
 Update Adev configuration: >
     :ADUpdate
+<
+
+Check for updates: >
+    :ADCheckUpdate
 <
 
 Update plugins: >
@@ -580,14 +964,14 @@ Update Treesitter parsers: >
 <
 
 ==============================================================================
-12. FAQ                                                     *adev-faq*
+14. FAQ                                                     *adev-faq*
 
 *adev-faq-general*~
-12.1 General Questions:~
+14.1 General Questions:~
 
 Q: How do I change the colorscheme?~
 A: Edit `lua/adev/plugins/theme.lua` and modify the colorscheme setting.
-   The default is `catppuccin-mocha`.
+   The default is `catppuccin-mocha` with transparent background support.
 
 Q: Can I use Adev with my existing Neovim config?~
 A: It's recommended to backup and replace your existing config, as Adev
@@ -606,16 +990,21 @@ Q: How do I disable a plugin?~
 A: Add `enabled = false` to the plugin specification or comment out/remove
    the plugin file.
 
+Q: What's the difference between blink.cmp and nvim-cmp?~
+A: Adev uses blink.cmp (v1.3.1) for faster performance with Rust implementation.
+   It includes compatibility layer for nvim-cmp sources via blink.compat.
+
 *adev-faq-customization*~
-12.2 Customization Questions:~
+14.2 Customization Questions:~
 
 Q: Can I use a different completion engine?~
 A: Yes, but you'll need to disable blink.cmp and configure your preferred
    completion engine. This may require updating LSP capabilities.
 
 Q: How do I add custom snippets?~
-A: Adev uses LuaSnip. Add snippets to your configuration or configure
-   LuaSnip to load from your preferred location.
+A: Adev uses LuaSnip with friendly-snippets and vim-snippets. Add custom
+   snippets to your configuration or configure LuaSnip to load from your
+   preferred location.
 
 Q: How do I modify Telescope settings?~
 A: Edit `lua/adev/plugins/telescope.lua` and modify the `opts` table.
@@ -625,11 +1014,15 @@ Q: Can I change the leader key?~
 A: Yes, modify `vim.g.mapleader` in `init.lua`. Note that this may affect
    existing key mappings throughout the configuration.
 
+Q: How do I customize autocommands?~
+A: Edit `plugin/autocmd.lua` or add new autocommands in your plugin files.
+   Use the event constants from `adev.utils.consts.events` for consistency.
+
 *adev-faq-troubleshooting*~
-12.3 Troubleshooting Questions:~
+14.3 Troubleshooting Questions:~
 
 Q: Plugin X stopped working after update~
-A: Check `:Lazy log` for errors, run `:checkhealth`, and verify the plugin
+A: Check `:Lazy log` for errors, run `:checkhealth adev`, and verify the plugin
    configuration hasn't changed. Some plugins may have breaking changes.
 
 Q: LSP server keeps crashing~
@@ -644,17 +1037,38 @@ Q: Mason can't install servers~
 A: Ensure you have internet connectivity, required system dependencies
    (Node.js, Python, etc.), and sufficient disk space. Check `:Mason` logs.
 
+Q: Blink.cmp completion not working~
+A: Verify LSP servers are running, check blink.cmp version (should be v1.3.1),
+   and ensure sources are properly configured in the plugin specification.
+
 ==============================================================================
 NOTES                                                         *adev-notes*
 
-- Optimized for modern Neovim (0.10+)
-- Lazy loading ensures fast startup times
-- Modular architecture for easy customization
-- Built-in updater keeps configuration current
-- Comprehensive LSP support out of the box
-- Extensive plugin ecosystem with careful curation
-- Performance-focused with intelligent loading strategies
+- Optimized for modern Neovim (0.11.0+) with latest features
+- Lazy loading ensures fast startup times with event-based plugin loading
+- Modular architecture with 22 plugin files for easy customization
+- Built-in updater with automatic update checking on startup
+- Comprehensive LSP support with 40+ language servers out of the box
+- Advanced completion with blink.cmp (v1.3.1) and Rust implementation
+- Extensive plugin ecosystem with careful curation (25+ languages supported)
+- Performance-focused with intelligent loading strategies and caching
+- Health check system with 280 lines of diagnostic code
+- Comprehensive event system with 186 lines of event definitions
+- Status column with git signs and fold indicators
+- Modern UI with Snacks.nvim, Noice.nvim, and Catppuccin theme
+- Automatic whitespace cleanup and format options management
 - Regular updates and active maintenance
+
+Key Files and Line Counts:~
+- init.lua: 8 lines (minimal entry point)
+- lua/adev/init.lua: 81 lines (main module)
+- lua/adev/health.lua: 280 lines (comprehensive health checks)
+- lua/adev/utils/update.lua: 149 lines (update management)
+- lua/adev/utils/consts/events.lua: 186 lines (event definitions)
+- lua/adev/plugins/lsp.lua: 282 lines (LSP configuration)
+- lua/adev/plugins/telescope.lua: 135 lines (fuzzy finder)
+- lua/adev/plugins/mason.lua: 116 lines (tool management)
+- lua/adev/plugins/blink-cmp.lua: 91 lines (completion engine)
 
 For the latest updates and community discussions, visit the project repository.
 
