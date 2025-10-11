@@ -1,7 +1,7 @@
 local function setup()
-    local null_setup = require("null-ls").setup
-    local builtins = require("null-ls.builtins")
-    local h = require("null-ls.helpers")
+    local null_setup = require "null-ls".setup
+    local builtins = require "null-ls.builtins"
+    local h = require "null-ls.helpers"
 
     local code_actions = builtins.code_actions
 
@@ -15,8 +15,8 @@ local function setup()
     local completion = builtins.completion
 
     -- deno_fmt
-    local deno_fmt = require('adev.config.none-ls.deno_fmt')
-    local gdformat = require('adev.config.none-ls.dgformat')
+    local deno_fmt = require "adev.config.none-ls.deno_fmt"
+    local gdformat = require "adev.config.none-ls.dgformat"
 
     null_setup({
         sources = {

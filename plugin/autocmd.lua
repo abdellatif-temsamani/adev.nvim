@@ -15,7 +15,7 @@ autocmd(events.file.type, {
 autocmd(events.vim.startup, {
     group    = general_grp,
     callback = function()
-        require("adev.utils.update").check_adev_update()
+        require "adev.utils.update".check_adev_update()
     end
 })
 

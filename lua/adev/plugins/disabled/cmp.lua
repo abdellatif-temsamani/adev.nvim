@@ -12,17 +12,17 @@ return {
         { "hrsh7th/cmp-cmdline" },
         {
             "hrsh7th/cmp-nvim-lsp",
-            event = require("adev.utils.consts.events").lsp.attach,
+            event = require "adev.utils.consts.events".lsp.attach,
         },
         {
-            'davidsierradz/cmp-conventionalcommits',
+            "davidsierradz/cmp-conventionalcommits",
             ft = "gitcommit",
             cond = function()
                 return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
             end,
         },
         {
-            'aspeddro/cmp-pandoc.nvim',
+            "aspeddro/cmp-pandoc.nvim",
             ft = { "pandoc", "markdown", "rmd", "bib" },
             opts = {
                 filetypes = { "pandoc", "markdown", "bib" },
@@ -40,16 +40,16 @@ return {
         {
             "onsails/lspkind.nvim",
             opts = {
-                mode = 'symbol_text',
+                mode = "symbol_text",
             }
         }
     },
     opts = function(_, opts)
-        local cmp = require("cmp")
-        local lspkind = require('lspkind')
+        local cmp = require "cmp"
+        local lspkind = require "lspkind"
         local snippet = {
             expand = function(args)
-                require('luasnip').lsp_expand(args.body)
+                require "luasnip".lsp_expand(args.body)
             end
         }
 
@@ -67,7 +67,7 @@ return {
             { name = "buffer" },
             { name = "calc" },
             { name = "latex_symbols" },
-            { name = 'cmp_pandoc' },
+            { name = "cmp_pandoc" },
             { name = "pandoc_references" },
         })
 
@@ -78,12 +78,12 @@ return {
 
         local formatting = {
             format = lspkind.cmp_format({
-                mode = 'symbol',
+                mode = "symbol",
                 maxwidth = {
                     menu = 30,
                     abbr = 30,
                 },
-                ellipsis_char = '...',
+                ellipsis_char = "...",
                 show_labelDetails = true,
 
                 before = function(entry, vim_item)

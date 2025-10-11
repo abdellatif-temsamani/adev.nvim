@@ -11,7 +11,7 @@ return {
         }
     },
     {
-        'windwp/nvim-ts-autotag',
+        "windwp/nvim-ts-autotag",
 
         event = { events.file.read_pre, },
         opts = {
@@ -34,7 +34,7 @@ return {
         event = { events.file.read_pre, },
         build = ":TSUpdate",
         config = function()
-            require("adev.config.treesitter").setup()
+            require "adev.config.treesitter".setup()
         end,
     },
 }

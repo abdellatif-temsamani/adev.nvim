@@ -297,7 +297,7 @@ Add to the `ensure_installed` list in `lua/adev/plugins/mason.lua`: >
 <
 
 Then add configuration in `lua/adev/plugins/lsp.lua`: >
-    vim.lsp.config('your_custom_lsp', {
+    vim.lsp.config("your_custom_lsp", {
       settings = {
         -- LSP-specific settings
       },

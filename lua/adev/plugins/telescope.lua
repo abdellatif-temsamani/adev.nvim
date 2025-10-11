@@ -6,13 +6,13 @@ return {
         { "nvim-lua/plenary.nvim", },
     },
     keys = {
-        { "<leader>ff", function() require("telescope.builtin").find_files() end, desc = "find files", },
-        { "<leader>fg", function() require("telescope.builtin").live_grep() end,  desc = "grep files", },
-        { "<leader>fb", function() require("telescope.builtin").buffers() end,    desc = "find buffers", },
-        { "<leader>fh", function() require("telescope.builtin").help_tags() end,  desc = "help tags", },
-        { "<leader>fm", function() require("telescope.builtin").man_pages() end,  desc = "man pages", },
-        { "<leader>fs", function() require("telescope.builtin").commands() end,   desc = "commands", },
-        { "<leader>fa", function() require("telescope.builtin").treesitter() end, desc = "treesitter", },
+        { "<leader>ff", function() require "telescope.builtin".find_files() end, desc = "find files", },
+        { "<leader>fg", function() require "telescope.builtin".live_grep() end,  desc = "grep files", },
+        { "<leader>fb", function() require "telescope.builtin".buffers() end,    desc = "find buffers", },
+        { "<leader>fh", function() require "telescope.builtin".help_tags() end,  desc = "help tags", },
+        { "<leader>fm", function() require "telescope.builtin".man_pages() end,  desc = "man pages", },
+        { "<leader>fs", function() require "telescope.builtin".commands() end,   desc = "commands", },
+        { "<leader>fa", function() require "telescope.builtin".treesitter() end, desc = "treesitter", },
         { "<leader>ft", function() vim.cmd [[ TodoTelescope ]] end,               desc = "TodoTelescope", },
         { "<leader>fn", function() vim.cmd [[ NoiceTelescope ]] end,              desc = "NoiceTelescope", },
     },
@@ -46,10 +46,10 @@ return {
             noice     = {},
         },
         defaults = {
-            layout_strategy = 'horizontal',
+            layout_strategy = "horizontal",
             layout_config = {
                 horizontal = {
-                    prompt_position = 'bottom',
+                    prompt_position = "bottom",
                     height = .99,
                     width = .99,
                     preview_width = 0.60, -- Fraction of the layout width
@@ -58,7 +58,7 @@ return {
             prompt_prefix = " ",
             color_devicons = true,
             selection_strategy = "closest",
-            file_ignore_patterns = require("adev.utils.consts").inored_files,
+            file_ignore_patterns = require "adev.utils.consts".inored_files,
             mappings = {
                 i = {
                     ["<C-x>"] = false,

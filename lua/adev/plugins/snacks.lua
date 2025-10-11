@@ -11,7 +11,7 @@ return {
                 Snacks.lazygit({
                     win = {
                         style = "terminal",
-                        border = 'single',
+                        border = "single",
                     },
                 })
             end,
@@ -23,7 +23,7 @@ return {
                 local defaults = {
                     win = {
                         style = "terminal",
-                        border = 'single',
+                        border = "single",
                     },
                 }
 
@@ -38,7 +38,7 @@ return {
             function()
                 Snacks.win({
                     file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
-                    border = 'single',
+                    border = "single",
                     width = 0.9,
                     height = 0.9,
                     wo = {

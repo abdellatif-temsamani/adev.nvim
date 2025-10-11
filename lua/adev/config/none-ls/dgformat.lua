@@ -1,6 +1,6 @@
 ---@module "null-ls.helpers"
-local h = require("null-ls.helpers")
-local methods = require("null-ls.methods")
+local h = require "null-ls.helpers"
+local methods = require "null-ls.methods"
 
 local FORMATTING = methods.internal.FORMATTING
 -- local RANGE_FORMATTING = methods.internal.RANGE_FORMATTING

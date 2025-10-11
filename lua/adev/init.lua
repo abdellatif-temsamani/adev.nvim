@@ -22,7 +22,7 @@ function M.setup_lazy()
     vim.opt.rtp:prepend(lazypath)
 
 
-    require("lazy").setup({
+    require "lazy".setup({
         defaults = {
             lazy = true,
             version = "*",
@@ -48,7 +48,7 @@ function M.setup_lazy()
             { import = "adev.plugins" },
         },
         ui = {
-            border = 'single',
+            border = "single",
             title = "Adev.nvim",
 
         },

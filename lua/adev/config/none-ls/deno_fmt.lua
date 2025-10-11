@@ -1,8 +1,8 @@
 ---@module "null-ls.helpers"
-local h = require("null-ls.helpers")
+local h = require "null-ls.helpers"
 
 ---@module "null-ls.methods"
-local methods = require("null-ls.methods")
+local methods = require "null-ls.methods"
 
 local FORMATTING = methods.internal.FORMATTING
 

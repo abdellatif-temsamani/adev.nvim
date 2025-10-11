@@ -14,7 +14,7 @@ return {
         default_integrations = true,
         integrations = {
             blink_cmp = {
-                style = 'single',
+                style = "single",
             },
             noice = true,
             gitsigns = true,

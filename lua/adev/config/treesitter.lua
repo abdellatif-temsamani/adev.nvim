@@ -1,7 +1,7 @@
 
 local function setup()
     ---@diagnostic disable-next-line: missing-fields
-    require("nvim-treesitter.configs").setup({
+    require "nvim-treesitter.configs".setup({
         sync_install          = false,
         ensure_installed      = "all",
         auto_install          = true,

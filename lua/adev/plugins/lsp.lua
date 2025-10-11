@@ -3,7 +3,7 @@ local events = require "adev.utils.consts.events"
 return {
     "neovim/nvim-lspconfig",
     dependencies = {
-        'mason-org/mason.nvim',
+        "mason-org/mason.nvim",
     },
     module = false,
     event = {  events.file.read_pre },
@@ -29,24 +29,24 @@ return {
         -- vim.lsp.set_log_level("warn")
 
         local vim_capabilities = vim.lsp.protocol.make_client_capabilities()
-        local capabilities = require('blink.cmp').get_lsp_capabilities(vim_capabilities)
+        local capabilities = require "blink.cmp".get_lsp_capabilities(vim_capabilities)
 
-        vim.lsp.config('*', {
+        vim.lsp.config("*", {
             capabilities = capabilities,
         })
 
 
-        vim.lsp.config('lua_ls', {
+        vim.lsp.config("lua_ls", {
             on_init = function(client)
                 if client.workspace_folders then
                     local path = client.workspace_folders[1].name
                     ---@diagnostic disable-next-line: undefined-field
-                    if vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc') then
+                    if vim.loop.fs_stat(path .. "/.luarc.json") or vim.loop.fs_stat(path .. "/.luarc.jsonc") then
                         return
                     end
                 end
-                client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-                    runtime = { version = 'LuaJIT' },
+                client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
+                    runtime = { version = "LuaJIT" },
                     workspace = {
                         checkThirdParty = false,
                         library = {
@@ -67,7 +67,7 @@ return {
             },
         })
 
-        vim.lsp.config('tailwindcss', {
+        vim.lsp.config("tailwindcss", {
             settings = {
                 tailwindCSS = {
                     experimental = {
@@ -83,16 +83,16 @@ return {
         })
 
 
-        vim.lsp.config('vue_ls', {
+        vim.lsp.config("vue_ls", {
             init_options = {
                 typescript = {
                     tsdk =
-                    '/home/flagmate/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib'
+                    "/home/flagmate/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib"
                 },
             }
         })
 
-        vim.lsp.config('emmet_ls', {
+        vim.lsp.config("emmet_ls", {
             filetypes = {
                 "astro",
                 "css",
@@ -112,7 +112,7 @@ return {
             },
         })
 
-        vim.lsp.config('html', {
+        vim.lsp.config("html", {
             filetypes = {
                 "astro",
                 "eruby",
@@ -123,17 +123,17 @@ return {
             },
         })
 
-        vim.lsp.config('pylsp', {
+        vim.lsp.config("pylsp", {
             settings = {
                 pylsp = {
                     plugins = {
-                        pycodestyle = { ignore = { 'W391' }, maxLineLength = 100 }
+                        pycodestyle = { ignore = { "W391" }, maxLineLength = 100 }
                     }
                 }
             }
         })
 
-        vim.lsp.config('texlab', {
+        vim.lsp.config("texlab", {
             filetypes = { "tex", "bib", "markdown", "plaintex" },
             on_attach = function(client)
                 client.server_capabilities.documentFormattingProvider = false
@@ -142,7 +142,7 @@ return {
         })
 
         -- NOTE: a secure way to handle licence key
-        vim.lsp.config('intelephense', {
+        vim.lsp.config("intelephense", {
             init_options = {
                 licenceKey = vim.fn.system({ "cat", os.getenv("HOME") .. "/.secrets/intelephense" }):gsub("\n", "")
             },
