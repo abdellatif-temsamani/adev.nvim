@@ -4,4 +4,4 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.opt.termguicolors = true
 
-require "adev".setup()
+require("adev").setup()

@@ -6,22 +6,108 @@ return {
         "mason-org/mason.nvim",
     },
     module = false,
-    event = {  events.buffer.new_file, events.buffer.read_pre },
+    event = { events.buffer.new_file, events.buffer.read_pre },
     keys = {
-        { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
-        { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },
-        { "<leader>gD", function() vim.lsp.buf.declaration() end,                         desc = "go to declaration", },
-        { "<leader>gh", function() vim.lsp.buf.hover() end,                               desc = "lsp hover", },
-        { "<leader>gi", function() vim.lsp.buf.implementation() end,                      desc = "lsp implementation", },
-        { "<leader>gr", function() vim.lsp.buf.references() end,                          desc = "lsp implementation", },
-        { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
-        { "<leader>gc", function() vim.lsp.buf.code_action() end,                         desc = "lsp code action",     mode = { "n", "v" } },
-        { "<leader>gs", function() vim.lsp.buf.signature_help() end,                      desc = "lsp signature help", },
-        { "<leader>go", function() vim.diagnostic.open_float() end,                       desc = "line diagnostic", },
-        { "<leader>gp", function() vim.diagnostic.jump({ count = -1, float = true }) end, desc = "previous diagnostic", },
-        { "<leader>gn", function() vim.diagnostic.jump({ count = 1, float = true }) end,  desc = "next diagnostic", },
-        { "<leader>ga", function() vim.lsp.buf.rename() end,                              desc = "lsp rename", },
-        { "<leader>gt", function() vim.lsp.buf.type_definition() end,                     desc = "lsp type definition", },
+        {
+            "<leader>gl",
+            function()
+                vim.lsp.buf.format()
+            end,
+            desc = "lint buffer",
+            mode = { "v", "n" },
+        },
+        {
+            "<leader>gd",
+            function()
+                vim.lsp.buf.definition()
+            end,
+            desc = "go to definition",
+        },
+        {
+            "<leader>gD",
+            function()
+                vim.lsp.buf.declaration()
+            end,
+            desc = "go to declaration",
+        },
+        {
+            "<leader>gh",
+            function()
+                vim.lsp.buf.hover()
+            end,
+            desc = "lsp hover",
+        },
+        {
+            "<leader>gi",
+            function()
+                vim.lsp.buf.implementation()
+            end,
+            desc = "lsp implementation",
+        },
+        {
+            "<leader>gr",
+            function()
+                vim.lsp.buf.references()
+            end,
+            desc = "lsp implementation",
+        },
+        {
+            "<leader>gt",
+            function()
+                vim.lsp.buf.type_definition()
+            end,
+            desc = "lsp type definition",
+        },
+        {
+            "<leader>gc",
+            function()
+                vim.lsp.buf.code_action()
+            end,
+            desc = "lsp code action",
+            mode = { "n", "v" },
+        },
+        {
+            "<leader>gs",
+            function()
+                vim.lsp.buf.signature_help()
+            end,
+            desc = "lsp signature help",
+        },
+        {
+            "<leader>go",
+            function()
+                vim.diagnostic.open_float()
+            end,
+            desc = "line diagnostic",
+        },
+        {
+            "<leader>gp",
+            function()
+                vim.diagnostic.jump { count = -1, float = true }
+            end,
+            desc = "previous diagnostic",
+        },
+        {
+            "<leader>gn",
+            function()
+                vim.diagnostic.jump { count = 1, float = true }
+            end,
+            desc = "next diagnostic",
+        },
+        {
+            "<leader>ga",
+            function()
+                vim.lsp.buf.rename()
+            end,
+            desc = "lsp rename",
+        },
+        {
+            "<leader>gt",
+            function()
+                vim.lsp.buf.type_definition()
+            end,
+            desc = "lsp type definition",
+        },
     },
     config = function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
@@ -29,12 +115,11 @@ return {
         -- vim.lsp.set_log_level("warn")
 
         local vim_capabilities = vim.lsp.protocol.make_client_capabilities()
-        local capabilities = require "blink.cmp".get_lsp_capabilities(vim_capabilities)
+        local capabilities = require("blink.cmp").get_lsp_capabilities(vim_capabilities)
 
         vim.lsp.config("*", {
             capabilities = capabilities,
         })
-
 
         vim.lsp.config("lua_ls", {
             on_init = function(client)
@@ -53,8 +138,8 @@ return {
                             vim.env.VIMRUNTIME,
                             "${3rd}/luv/library",
                             "${3rd}/busted/library",
-                        }
-                    }
+                        },
+                    },
                 })
             end,
             settings = {
@@ -75,21 +160,19 @@ return {
                             -- cva("…")
                             { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
                             -- cn("…")
-                            { "cn\\(([^)]*)\\)",  "[\"'`]([^\"'`]*)[\"'`]" },
+                            { "cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
                         },
                     },
                 },
             },
         })
 
-
         vim.lsp.config("vue_ls", {
             init_options = {
                 typescript = {
-                    tsdk =
-                    "/home/flagmate/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib"
+                    tsdk = "/home/flagmate/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
                 },
-            }
+            },
         })
 
         vim.lsp.config("emmet_ls", {
@@ -108,7 +191,7 @@ return {
                 "typescriptreact",
                 "vue",
                 "htmlangular",
-                "blade"
+                "blade",
             },
         })
 
@@ -119,7 +202,7 @@ return {
                 "html",
                 "htmldjango",
                 "templ",
-                "blade"
+                "blade",
             },
         })
 
@@ -127,10 +210,10 @@ return {
             settings = {
                 pylsp = {
                     plugins = {
-                        pycodestyle = { ignore = { "W391" }, maxLineLength = 100 }
-                    }
-                }
-            }
+                        pycodestyle = { ignore = { "W391" }, maxLineLength = 100 },
+                    },
+                },
+            },
         })
 
         vim.lsp.config("texlab", {
@@ -138,17 +221,17 @@ return {
             on_attach = function(client)
                 client.server_capabilities.documentFormattingProvider = false
                 client.server_capabilities.documentRangeFormattingProvider = false
-            end
+            end,
         })
 
         -- NOTE: a secure way to handle licence key
         vim.lsp.config("intelephense", {
             init_options = {
-                licenceKey = vim.fn.system({ "cat", os.getenv("HOME") .. "/.secrets/intelephense" }):gsub("\n", "")
+                licenceKey = vim.fn.system({ "cat", os.getenv "HOME" .. "/.secrets/intelephense" }):gsub("\n", ""),
             },
         })
 
-        vim.lsp.enable({
+        vim.lsp.enable {
             "astro",
             "csharp_ls",
             "gopls",
@@ -193,6 +276,6 @@ return {
             "jdtls",
             "intelephense",
             "lua_ls",
-        })
-    end
+        }
+    end,
 }

@@ -42,14 +42,13 @@ return {
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 500,
-                    window = { border = "single" }
+                    window = { border = "single" },
                 },
                 menu = {
                     border = "single",
                     draw = {
                         columns = { { "kind_icon", gap = 1, "label", "kind" } },
                     },
-
                 },
             },
 
@@ -64,7 +63,7 @@ return {
                 },
 
                 per_filetype = {
-                    php = { "laravel", inherit_defaults = true, },
+                    php = { "laravel", inherit_defaults = true },
                 },
 
                 providers = {
@@ -73,10 +72,8 @@ return {
                         module = "blink.compat.source",
                         score_offset = 95, -- show at a higher priority than lsp
                     },
-
                 },
             },
-
 
             snippets = { preset = "luasnip" },
             fuzzy = {
@@ -88,6 +85,6 @@ return {
                     "sort_text",
                 },
             },
-        }
-    }
+        },
+    },
 }

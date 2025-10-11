@@ -1,10 +1,10 @@
-local adev_notify = require "adev.utils".adev_notify
+local adev_notify = require("adev.utils").adev_notify
 local UdateManager = {}
 
 --- Update the Adev.nvim configuration by performing a git pull.
 ---
 function UdateManager.update_adev()
-    local config_path = vim.fn.stdpath("config")
+    local config_path = vim.fn.stdpath "config"
     local git_cmd = { "git", "pull", "--ff-only" }
 
     local stderr_lines = {}
@@ -21,7 +21,7 @@ function UdateManager.update_adev()
 
                 if #lines > 0 then
                     local msg = table.concat(lines, "\n")
-                    if msg:find("Already up to date") then
+                    if msg:find "Already up to date" then
                         adev_notify("Already up to date", vim.log.levels.INFO)
                     else
                         adev_notify("Updated successfully:\n" .. msg, vim.log.levels.INFO)
@@ -41,7 +41,9 @@ function UdateManager.update_adev()
         on_exit = function(_, code, _)
             if code ~= 0 then
                 local msg = table.concat(stderr_lines, "\n")
-                if msg == "" then msg = "Unknown error" end
+                if msg == "" then
+                    msg = "Unknown error"
+                end
                 adev_notify("Git pull failed:\n" .. msg, vim.log.levels.ERROR)
             end
         end,
@@ -51,7 +53,7 @@ end
 --- Checks if Adev.nvim has updates from its GitHub remote.
 ---@return nil
 function UdateManager.check_adev_update()
-    local config_path = vim.fn.stdpath("config")
+    local config_path = vim.fn.stdpath "config"
 
     -- Step 1: fetch remote refs
     vim.system({ "git", "-C", config_path, "fetch", "origin" }, { text = true }, function(fetch_result)
@@ -63,13 +65,18 @@ function UdateManager.check_adev_update()
         end
 
         -- Step 2: get current branch
-        vim.system({ "git", "-C", config_path, "rev-parse", "--abbrev-ref", "HEAD" }, { text = true },
+        vim.system(
+            { "git", "-C", config_path, "rev-parse", "--abbrev-ref", "HEAD" },
+            { text = true },
             function(branch_result)
-                if branch_result.code ~= 0 then return end
+                if branch_result.code ~= 0 then
+                    return
+                end
                 local branch = (branch_result.stdout or ""):gsub("%s+", "")
 
                 -- Step 3: check how many commits we're behind
-                vim.system({ "git", "-C", config_path, "rev-list", branch .. "..origin/" .. branch, "--count" },
+                vim.system(
+                    { "git", "-C", config_path, "rev-list", branch .. "..origin/" .. branch, "--count" },
                     { text = true },
                     function(check_result)
                         if check_result.code ~= 0 then
@@ -82,7 +89,7 @@ function UdateManager.check_adev_update()
                             return
                         end
 
-                        local updates = tonumber((check_result.stdout or ""):match("%d+")) or 0
+                        local updates = tonumber((check_result.stdout or ""):match "%d+") or 0
                         vim.schedule(function()
                             if updates > 0 then
                                 adev_notify(
@@ -95,7 +102,8 @@ function UdateManager.check_adev_update()
                         end)
                     end
                 )
-            end)
+            end
+        )
     end)
 end
 
@@ -109,11 +117,11 @@ function UdateManager.info()
     end
 
     local function git_branch()
-        local config_dir = vim.fn.stdpath("config")
+        local config_dir = vim.fn.stdpath "config"
 
         local handle = io.popen(string.format("git -C %s rev-parse --abbrev-ref HEAD 2>/dev/null", config_dir))
         if handle then
-            local result = handle:read("*a")
+            local result = handle:read "*a"
             handle:close()
             result = result:gsub("%s+", "") -- remove any trailing newline
             if result == "" then
@@ -134,10 +142,7 @@ function UdateManager.info()
         ("`Git`:     %s"):format(git_branch()),
     }
 
-    adev_notify(
-        table.concat(lines, "\n"),
-        vim.log.levels.INFO
-    )
+    adev_notify(table.concat(lines, "\n"), vim.log.levels.INFO)
 end
 
 return UdateManager

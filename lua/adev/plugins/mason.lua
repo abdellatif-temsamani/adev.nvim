@@ -4,7 +4,13 @@ return {
         build = ":MasonUpdate",
         cmd = "Mason",
         keys = {
-            { "<leader>mm", function() vim.cmd [[ Mason ]] end, desc = "go to declaration", },
+            {
+                "<leader>mm",
+                function()
+                    vim.cmd [[ Mason ]]
+                end,
+                desc = "go to declaration",
+            },
         },
         opts = {
             ui = {
@@ -12,7 +18,6 @@ return {
                 border = "single",
             },
         },
-
     },
     {
         "jay-babu/mason-null-ls.nvim",
@@ -53,8 +58,8 @@ return {
                 "prettierd",
                 "pyre",
                 "alex",
-            }
-        }
+            },
+        },
     },
     {
         "williamboman/mason-lspconfig.nvim",
@@ -105,7 +110,6 @@ return {
                 "intelephense",
                 "lua_ls",
             },
-        }
-    }
-
+        },
+    },
 }

@@ -6,7 +6,7 @@ indent_width = 4
 column_width = 120
 line_endings = "Unix"
 quote_style = "AutoPreferDouble"
-call_parentheses = "NoSingleString"
+call_parentheses = "None"
 
 
 [sort_requires]

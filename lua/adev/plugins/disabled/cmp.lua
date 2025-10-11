@@ -1,6 +1,5 @@
 local events = require "adev.utils.consts.events"
 
-
 return {
     "hrsh7th/nvim-cmp",
     event = { events.cmd.enter, events.lsp.attach, events.buffer.read_pre, events.buffer.file_pre },
@@ -12,7 +11,7 @@ return {
         { "hrsh7th/cmp-cmdline" },
         {
             "hrsh7th/cmp-nvim-lsp",
-            event = require "adev.utils.consts.events".lsp.attach,
+            event = require("adev.utils.consts.events").lsp.attach,
         },
         {
             "davidsierradz/cmp-conventionalcommits",
@@ -28,10 +27,10 @@ return {
                 filetypes = { "pandoc", "markdown", "bib" },
                 bibliography = {
                     documentation = true,
-                    fields = { "type", "title", "author", "year" }
+                    fields = { "type", "title", "author", "year" },
                 },
-                crossref = { documentation = true, enable_nabla = false }
-            }
+                crossref = { documentation = true, enable_nabla = false },
+            },
         },
         {
             "jc-doyle/cmp-pandoc-references",
@@ -41,25 +40,25 @@ return {
             "onsails/lspkind.nvim",
             opts = {
                 mode = "symbol_text",
-            }
-        }
+            },
+        },
     },
     opts = function(_, opts)
         local cmp = require "cmp"
         local lspkind = require "lspkind"
         local snippet = {
             expand = function(args)
-                require "luasnip".lsp_expand(args.body)
-            end
+                require("luasnip").lsp_expand(args.body)
+            end,
         }
 
-        local mapping = cmp.mapping.preset.insert({
+        local mapping = cmp.mapping.preset.insert {
             ["<C-k>"] = cmp.mapping.scroll_docs(-2),
             ["<C-j>"] = cmp.mapping.scroll_docs(2),
-            ["<C-Y>"] = cmp.mapping.confirm({ select = true })
-        })
+            ["<C-Y>"] = cmp.mapping.confirm { select = true },
+        }
         ---@diagnostic disable-next-line: redundant-parameter
-        local sources = cmp.config.sources({
+        local sources = cmp.config.sources {
             { name = "nvim_lsp" },
             { name = "luasnip" },
             { name = "path" },
@@ -69,7 +68,7 @@ return {
             { name = "latex_symbols" },
             { name = "cmp_pandoc" },
             { name = "pandoc_references" },
-        })
+        }
 
         local window = {
             completion = cmp.config.window.bordered(),
@@ -77,7 +76,7 @@ return {
         }
 
         local formatting = {
-            format = lspkind.cmp_format({
+            format = lspkind.cmp_format {
                 mode = "symbol",
                 maxwidth = {
                     menu = 30,
@@ -89,8 +88,8 @@ return {
                 before = function(entry, vim_item)
                     -- ...
                     return vim_item
-                end
-            })
+                end,
+            },
         }
 
         opts.formatting = formatting
@@ -102,21 +101,20 @@ return {
         cmp.setup.filetype("gitcommit", {
             sources = cmp.config.sources({
                 { name = "cmp_git" },
-                { name = "conventionalcommits" }
-            }, { { name = "buffer" } })
+                { name = "conventionalcommits" },
+            }, { { name = "buffer" } }),
         })
         cmp.setup.cmdline({ "/", "?" }, {
             mapping = cmp.mapping.preset.cmdline(),
-            sources = { { name = "buffer" } }
+            sources = { { name = "buffer" } },
         })
 
         cmp.setup.cmdline(":", {
             mapping = cmp.mapping.preset.cmdline(),
-            sources = cmp.config.sources({
+            sources = cmp.config.sources {
                 { name = "path" },
                 { name = "cmdline" },
-            }
-            )
+            },
         })
     end,
 }

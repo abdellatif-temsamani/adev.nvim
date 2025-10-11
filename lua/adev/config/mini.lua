@@ -1,9 +1,9 @@
-require "mini.bufremove".setup()
+require("mini.bufremove").setup()
 
-require "mini.ai".setup()
+require("mini.ai").setup()
 
 local miniclue = require "mini.clue"
-require "mini.clue".setup({
+require("mini.clue").setup {
     triggers = {
         -- Leader triggers
         { mode = "n", keys = "<Leader>" },
@@ -17,14 +17,14 @@ require "mini.clue".setup({
         { mode = "x", keys = "g" },
 
         -- Marks
-        { mode = "n", keys = "\"" },
+        { mode = "n", keys = '"' },
         { mode = "n", keys = "`" },
-        { mode = "x", keys = "\"" },
+        { mode = "x", keys = '"' },
         { mode = "x", keys = "`" },
 
         -- Registers
-        { mode = "n", keys = "\"" },
-        { mode = "x", keys = "\"" },
+        { mode = "n", keys = '"' },
+        { mode = "x", keys = '"' },
         { mode = "i", keys = "<C-r>" },
         { mode = "c", keys = "<C-r>" },
 
@@ -44,10 +44,10 @@ require "mini.clue".setup({
         miniclue.gen_clues.windows(),
         miniclue.gen_clues.z(),
     },
-})
+}
 
-require "mini.icons".setup()
+require("mini.icons").setup()
 MiniIcons.mock_nvim_web_devicons()
 MiniIcons.tweak_lsp_kind()
 
-require "mini.pairs".setup()
+require("mini.pairs").setup()

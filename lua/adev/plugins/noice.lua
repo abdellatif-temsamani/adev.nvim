@@ -1,7 +1,6 @@
-return
-{
+return {
     "folke/noice.nvim",
-    event = require "adev.utils.consts.events".vim.lazy,
+    event = require("adev.utils.consts.events").vim.lazy,
     opts = {
         lsp = {
             override = {
@@ -22,5 +21,5 @@ return
     },
     dependencies = {
         "MunifTanjim/nui.nvim",
-    }
+    },
 }

@@ -3,7 +3,7 @@ local keymap_set = vim.keymap.set
 keymap_set("n", "<leader>u", "<cmd>m .+1<cr>==", { noremap = true, silent = true, desc = "move 1 line down" })
 keymap_set("n", "<leader>i", "<cmd>m .-2<cr>==", { noremap = true, silent = true, desc = "move 1 line up" })
 keymap_set("n", "<leader>Q", "<cmd>quitall<CR>", { noremap = true, silent = true, desc = "quit nvim" })
-keymap_set({ "n", "v" }, "\\", "\"+", { noremap = true, silent = true, desc = "unamed register" })
+keymap_set({ "n", "v" }, "\\", '"+', { noremap = true, silent = true, desc = "unamed register" })
 keymap_set("n", "j", "gj", { noremap = true, silent = true, desc = "great j" })
 keymap_set("n", "k", "gk", { noremap = true, silent = true, desc = "great k" })
 
@@ -33,7 +33,7 @@ keymap_set("n", "<m-j>", "<CMD>resize -2<CR>", { silent = true, desc = "resize s
 keymap_set("n", "<m-l>", "<CMD>vertical resize -2<CR>", { silent = true, desc = "resize split to left" })
 keymap_set("n", "<m-h>", "<CMD>vertical resize +2<CR>", { silent = true, desc = "resize split to right" })
 
-keymap_set({ "v", "n" }, "<leader>cc", ":\"<,\">fold<CR>", { noremap = true, silent = true, desc = "create fold" })
+keymap_set({ "v", "n" }, "<leader>cc", ':"<,">fold<CR>', { noremap = true, silent = true, desc = "create fold" })
 keymap_set("n", "<leader>co", "<cmd>foldopen<CR>", { noremap = true, silent = true, desc = "open fold" })
 keymap_set("n", "<leader>cq", "<cmd>foldclose<CR>", { noremap = true, silent = true, desc = "close fold" })
 keymap_set("t", "<c-t>", "<C-\\><C-n>", { noremap = true, silent = true })

@@ -2,7 +2,7 @@
 local opt = vim.opt
 
 -- Basics
-vim.cmd("syntax on") -- enable syntax highlighting
+vim.cmd "syntax on" -- enable syntax highlighting
 opt.title = true
 opt.number = true
 opt.relativenumber = true
@@ -27,7 +27,7 @@ opt.smartindent = true
 opt.writebackup = false
 opt.undofile = true
 opt.swapfile = false
-opt.undodir = vim.fn.stdpath("state") .. "/undo"
+opt.undodir = vim.fn.stdpath "state" .. "/undo"
 
 -- Folding
 opt.foldmethod = "marker"
@@ -37,4 +37,4 @@ opt.textwidth = 100
 opt.wrap = false
 
 -- Disable mouse
-vim.cmd("set mouse=")
+vim.cmd "set mouse="

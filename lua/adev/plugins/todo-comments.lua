@@ -5,12 +5,12 @@ local alts = {
     DONE = { "DONE", "DONE!", "DONE.", "FIXED", "WONTFIX" },
     TODO = { "PLAN", "TODO", "TASK", "START", "BEGIN" },
     WARN = { "WARNING", "WARN", "HACK" },
-    PREF = { "PERF", "OPTIM", "OPTIMIZE", "PERFORMANCE" }
+    PREF = { "PERF", "OPTIM", "OPTIMIZE", "PERFORMANCE" },
 }
 
 return {
     "folke/todo-comments.nvim",
-    event = { events.buffer.new_file, },
+    event = { events.buffer.new_file },
     opts = {
         signs = true,
         sign_priority = 0,
@@ -30,16 +30,18 @@ return {
             after = "fg",
             pattern = [[.*<(KEYWORDS)\s*:]],
             comments_only = true,
-            max_line_len = 400
+            max_line_len = 400,
         },
         search = {
             command = "rg",
             args = {
-                "--color=never", "--no-heading", "--with-filename",
-                "--line-number", "--column"
+                "--color=never",
+                "--no-heading",
+                "--with-filename",
+                "--line-number",
+                "--column",
             },
-            pattern = [[\b(KEYWORDS):]]
-        }
-
+            pattern = [[\b(KEYWORDS):]],
+        },
     },
 }

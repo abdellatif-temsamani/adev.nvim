@@ -11,9 +11,7 @@ local function macro_recording()
     end
 end
 
-
-return
-{
+return {
     "nvim-lualine/lualine.nvim",
     lazy = false,
     opts = {
@@ -31,12 +29,12 @@ return
             lualine_c = { "branch", "diff", "diagnostics" },
             lualine_x = { "selectioncount", "encoding", "filetype" },
             lualine_y = {},
-            lualine_z = { "filesize", "location", "progress" }
+            lualine_z = { "filesize", "location", "progress" },
         },
         winbar = {
             lualine_c = {
                 "filename",
-            }
+            },
         },
         tabline = {
             lualine_a = {
@@ -52,7 +50,6 @@ return
             lualine_y = {},
             lualine_z = { adev_nvim },
         },
-        extensions = {}
-
-    }
+        extensions = {},
+    },
 }

@@ -1,13 +1,13 @@
 local check_version = function()
-    vim.health.start("Neovim Version")
+    vim.health.start "Neovim Version"
 
     local version = vim.version()
     local verstr = tostring(version)
 
     -- Check if vim.version.ge exists (indicates newer Neovim)
     if not vim.version.ge then
-        vim.health.error(string.format("Neovim version too old: "%s". Missing vim.version.ge function.", verstr))
-        vim.health.info("Please upgrade to Neovim 0.11.0 or later")
+        vim.health.error(string.format('Neovim version too old: "%s". Missing vim.version.ge function.', verstr))
+        vim.health.info "Please upgrade to Neovim 0.11.0 or later"
         return false
     end
 
@@ -18,7 +18,7 @@ local check_version = function()
         return true
     else
         vim.health.error(string.format("Neovim version: %s (minimum required: 0.11.0)", verstr))
-        vim.health.info("Please upgrade to Neovim 0.11.0 or later for full compatibility")
+        vim.health.info "Please upgrade to Neovim 0.11.0 or later for full compatibility"
         return false
     end
 end
@@ -26,19 +26,21 @@ end
 local get_executable_version = function(exe, version_flag)
     version_flag = version_flag or "--version"
     local handle = io.popen(exe .. " " .. version_flag .. " 2>/dev/null")
-    if not handle then return nil end
+    if not handle then
+        return nil
+    end
 
-    local result = handle:read("*l")
+    local result = handle:read "*l"
     handle:close()
     return result
 end
 
 local check_required_executables = function()
-    vim.health.start("Required Executables")
+    vim.health.start "Required Executables"
 
     local required = {
-        { name = "git",   desc = "Version control system",     critical = true },
-        { name = "make",  desc = "Build automation tool",      critical = true },
+        { name = "git", desc = "Version control system", critical = true },
+        { name = "make", desc = "Build automation tool", critical = true },
         { name = "unzip", desc = "Archive extraction utility", critical = true },
     }
 
@@ -47,7 +49,7 @@ local check_required_executables = function()
         local is_executable = vim.fn.executable(exe.name) == 1
         if is_executable then
             local version = get_executable_version(exe.name)
-            local version_info = version and string.format(" (%s)", version:match("[%d%.]+[%w%-]*") or "unknown") or ""
+            local version_info = version and string.format(" (%s)", version:match "[%d%.]+[%w%-]*" or "unknown") or ""
             vim.health.ok(string.format("%s: found%s", exe.name, version_info))
         else
             if exe.critical then
@@ -63,22 +65,34 @@ local check_required_executables = function()
 end
 
 local check_optional_executables = function()
-    vim.health.start("Optional Executables")
+    vim.health.start "Optional Executables"
 
     local optional = {
-        { name = "rg",      desc = "Fast text search (ripgrep)",          install = "cargo install ripgrep" },
-        { name = "lazygit", desc = "Terminal UI for git",                 install = "go install github.com/jesseduffield/lazygit@latest" },
-        { name = "gh",      desc = "GitHub CLI",                          install = "https://cli.github.com/manual/installation" },
-        { name = "gh-dash", desc = "GitHub dashboard",                    install = "go install github.com/dlvhdr/gh-dash@latest" },
-        { name = "fd",      desc = "Fast file finder",                    install = "cargo install fd-find" },
-        { name = "bat",     desc = "Better cat with syntax highlighting", install = "cargo install bat" },
+        { name = "rg", desc = "Fast text search (ripgrep)", install = "cargo install ripgrep" },
+        {
+            name = "lazygit",
+            desc = "Terminal UI for git",
+            install = "go install github.com/jesseduffield/lazygit@latest",
+        },
+        {
+            name = "gh",
+            desc = "GitHub CLI",
+            install = "https://cli.github.com/manual/installation",
+        },
+        {
+            name = "gh-dash",
+            desc = "GitHub dashboard",
+            install = "go install github.com/dlvhdr/gh-dash@latest",
+        },
+        { name = "fd", desc = "Fast file finder", install = "cargo install fd-find" },
+        { name = "bat", desc = "Better cat with syntax highlighting", install = "cargo install bat" },
     }
 
     for _, exe in ipairs(optional) do
         local is_executable = vim.fn.executable(exe.name) == 1
         if is_executable then
             local version = get_executable_version(exe.name)
-            local version_info = version and string.format(" (%s)", version:match("[%d%.]+[%w%-]*") or "unknown") or ""
+            local version_info = version and string.format(" (%s)", version:match "[%d%.]+[%w%-]*" or "unknown") or ""
             vim.health.ok(string.format("%s: found%s", exe.name, version_info))
         else
             vim.health.warn(string.format("%s: not found - %s", exe.name, exe.desc))
@@ -90,12 +104,12 @@ local check_optional_executables = function()
 end
 
 local check_lua_modules = function()
-    vim.health.start("Local adev Modules")
+    vim.health.start "Local adev Modules"
 
     local modules = {
-        { name = "adev.init",   desc = "Main adev module",            critical = true },
+        { name = "adev.init", desc = "Main adev module", critical = true },
         { name = "adev.consts", desc = "Constants and configuration", critical = true },
-        { name = "adev.utils",  desc = "Utility functions",           critical = true },
+        { name = "adev.utils", desc = "Utility functions", critical = true },
     }
 
     local loaded_count = 0
@@ -133,18 +147,18 @@ local check_lua_modules = function()
 end
 
 local check_nerd_font = function()
-    vim.health.start("Nerd Font Support")
+    vim.health.start "Nerd Font Support"
 
     -- Test various Nerd Font icons
     local nerd_font_tests = {
-        { icon = "\u{f07c}", name = "Folder icon",    category = "File icons" },
-        { icon = "\u{f15b}", name = "File icon",      category = "File icons" },
-        { icon = "\u{e7a2}", name = "Git branch",     category = "Git icons" },
-        { icon = "\u{f126}", name = "Code icon",      category = "Development icons" },
+        { icon = "\u{f07c}", name = "Folder icon", category = "File icons" },
+        { icon = "\u{f15b}", name = "File icon", category = "File icons" },
+        { icon = "\u{e7a2}", name = "Git branch", category = "Git icons" },
+        { icon = "\u{f126}", name = "Code icon", category = "Development icons" },
         { icon = "\u{f0e7}", name = "Lightning bolt", category = "UI icons" },
-        { icon = "\u{f188}", name = "Bug icon",       category = "Development icons" },
-        { icon = "\u{f0c9}", name = "Menu icon",      category = "UI icons" },
-        { icon = "\u{f00c}", name = "Check mark",     category = "Status icons" },
+        { icon = "\u{f188}", name = "Bug icon", category = "Development icons" },
+        { icon = "\u{f0c9}", name = "Menu icon", category = "UI icons" },
+        { icon = "\u{f00c}", name = "Check mark", category = "Status icons" },
     }
 
     -- Check terminal capabilities
@@ -162,34 +176,34 @@ local check_nerd_font = function()
     if colorterm then
         vim.health.ok(string.format("Color support: %s ✓", colorterm))
     else
-        vim.health.warn("COLORTERM not set - may have limited color support")
+        vim.health.warn "COLORTERM not set - may have limited color support"
     end
 
     -- Display test icons with explanations
-    vim.health.info("Nerd Font icon test (check if these display correctly):")
+    vim.health.info "Nerd Font icon test (check if these display correctly):"
     for _, test in ipairs(nerd_font_tests) do
         vim.health.info(string.format("  %s  %s (%s)", test.icon, test.name, test.category))
     end
 
     -- Font recommendations
-    vim.health.info("")
-    vim.health.info("If icons don"t display correctly, install a Nerd Font:")
-    vim.health.info("  • AnonymicePro Nerd Font Mono (recommended)")
-    vim.health.info("  • JetBrains Mono Nerd Font")
-    vim.health.info("  • Fira Code Nerd Font")
-    vim.health.info("  • Hack Nerd Font")
-    vim.health.info("  • Download from: https://www.nerdfonts.com/")
+    vim.health.info ""
+    vim.health.info "If icons don't display correctly, install a Nerd Font:"
+    vim.health.info "  • AnonymicePro Nerd Font Mono (recommended)"
+    vim.health.info "  • JetBrains Mono Nerd Font"
+    vim.health.info "  • Fira Code Nerd Font"
+    vim.health.info "  • Hack Nerd Font"
+    vim.health.info "  • Download from: https://www.nerdfonts.com/"
 
-    -- Check if we"re in a GUI or terminal
-    if vim.fn.has("gui_running") == 1 then
-        vim.health.info("Running in GUI - font should be configurable in settings")
+    -- Check if we're in a GUI or terminal
+    if vim.fn.has "gui_running" == 1 then
+        vim.health.info "Running in GUI - font should be configurable in settings"
     else
-        vim.health.info("Running in terminal - configure font in terminal emulator")
+        vim.health.info "Running in terminal - configure font in terminal emulator"
     end
 end
 
 local check_system_info = function()
-    vim.health.start("System Information")
+    vim.health.start "System Information"
 
     local uv = vim.uv or vim.loop
     local sysinfo = uv.os_uname()
@@ -199,37 +213,37 @@ local check_system_info = function()
 
     -- Check shell
     local shell = vim.env.SHELL or "unknown"
-    vim.health.info(string.format("Shell: %s", shell:match("([^/]+)$") or shell))
+    vim.health.info(string.format("Shell: %s", shell:match "([^/]+)$" or shell))
 
     -- Check if running in tmux/screen
     if vim.env.TMUX then
-        vim.health.info("Running inside tmux ✓")
+        vim.health.info "Running inside tmux ✓"
     elseif vim.env.STY then
-        vim.health.info("Running inside screen ✓")
+        vim.health.info "Running inside screen ✓"
     end
 end
 
 local check_configuration = function()
-    vim.health.start("Configuration")
+    vim.health.start "Configuration"
 
     -- Check if adev module can be loaded
     local ok, adev = pcall(require, "adev")
     if ok then
-        vim.health.ok("adev module: loaded ✓")
+        vim.health.ok "adev module: loaded ✓"
 
         -- Check if setup was called
         if adev.setup then
-            vim.health.ok("adev.setup: available ✓")
+            vim.health.ok "adev.setup: available ✓"
         else
-            vim.health.warn("adev.setup: not found - make sure to call require "adev").setup()"
+            vim.health.warn 'adev.setup: not found - make sure to call require("adev").setup()'
         end
     else
-        vim.health.error("adev module: failed to load")
-        vim.health.info("Make sure adev.nvim is properly installed")
+        vim.health.error "adev module: failed to load"
+        vim.health.info "Make sure adev.nvim is properly installed"
     end
 
     -- Check config directory
-    local config_dir = vim.fn.stdpath("config")
+    local config_dir = vim.fn.stdpath "config"
     if vim.fn.isdirectory(config_dir) == 1 then
         vim.health.ok(string.format("Config directory: %s ✓", config_dir))
     else
@@ -239,9 +253,9 @@ end
 
 return {
     check = function()
-        vim.health.start("adev.nvim Health Check")
-        vim.health.info("Checking adev.nvim installation and dependencies...")
-        vim.health.info("NOTE: Not every warning requires immediate action")
+        vim.health.start "adev.nvim Health Check"
+        vim.health.info "Checking adev.nvim installation and dependencies..."
+        vim.health.info "NOTE: Not every warning requires immediate action"
 
         -- Run all checks
         local version_ok = check_version()
@@ -254,12 +268,12 @@ return {
         check_configuration()
 
         -- Summary
-        vim.health.start("Summary")
+        vim.health.start "Summary"
         if version_ok and executables_ok then
-            vim.health.ok("adev.nvim should work correctly ✓")
+            vim.health.ok "adev.nvim should work correctly ✓"
         else
-            vim.health.warn("Some issues found - check the details above")
-            vim.health.info("Fix critical errors first, warnings are optional")
+            vim.health.warn "Some issues found - check the details above"
+            vim.health.info "Fix critical errors first, warnings are optional"
         end
     end,
 }

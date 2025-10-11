@@ -1,10 +1,10 @@
 local events = require "adev.utils.consts.events"
 return {
-    'akinsho/git-conflict.nvim',
+    "akinsho/git-conflict.nvim",
     version = "*",
     cond = function()
         return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
     end,
     opts = {},
-    event = { events.buffer.new_file, events.buffer.read_pre, }
+    event = { events.buffer.new_file, events.buffer.read_pre },
 }
