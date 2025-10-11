@@ -1,3 +1,5 @@
+local Utils = {}
+
 ---Bootstraps and sets up the lazy.nvim plugin manager.
 ---
 ---This function ensures that `lazy.nvim` is installed in the standard data path.
@@ -5,7 +7,7 @@
 ---and initializes it with your plugin spec.
 ---
 ---If the clone fails, it notifies the user and exits Neovim.
-local function setup_lazy()
+function Utils.setup_lazy()
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
     ---@diagnostic disable-next-line: undefined-field
@@ -63,13 +65,12 @@ local function setup_lazy()
     })
 end
 
-
 --- Update the Adev Neovim configuration by performing a git pull.
 ---
 --- Runs `git pull --ff-only` asynchronously inside the Neovim config directory (`~/.config/nvim`),
 --- then displays the command output in a floating window using Snacks.nvim.
 ---
-local function update_adev()
+function Utils.update_adev()
     local config_path = vim.fn.stdpath("config")
     local git_cmd = { "git", "pull", "--ff-only" }
 
@@ -114,14 +115,13 @@ local function update_adev()
     })
 end
 
-
 --- Checks if Adev's config directory has updates from its GitHub remote.
 --- Runs `git fetch` and compares `HEAD` against `origin/HEAD`.
 --- Sends a desktop notification if updates are available.
 ---@return nil
 --- Check for updates in Neovim's config asynchronously
 ---@return nil
-local function check_adev_update()
+function Utils.check_adev_update()
     local config_path = vim.fn.stdpath("config")
 
     -- Step 1: fetch remote refs
@@ -149,8 +149,8 @@ local function check_adev_update()
                             vim.schedule(function()
                                 vim.notify("Failed to check updates: " .. (check_result.stderr or ""),
                                     vim.log.levels.ERROR, {
-                                    title = "adev.nvim",
-                                })
+                                        title = "adev.nvim",
+                                    })
                             end)
                             return
                         end
@@ -172,11 +172,47 @@ local function check_adev_update()
     end)
 end
 
+---Display author and version information using `vim.notify`.
+---
+---This is primarily for debugging or user reference.
+function Utils.info()
+    local info = vim.g.Adev
+    local function nvim_version()
+        local v = vim.version()
+        return string.format("%d.%d.%d", v.major, v.minor, v.patch)
+    end
 
+    local function git_branch()
+        local config_dir = vim.fn.stdpath("config")
 
+        local handle = io.popen(string.format("git -C %s rev-parse --abbrev-ref HEAD 2>/dev/null", config_dir))
+        if handle then
+            local result = handle:read("*a")
+            handle:close()
+            result = result:gsub("%s+", "") -- remove any trailing newline
+            if result == "" then
+                return "N/A"
+            end
+            return result
+        else
+            return "N/A"
+        end
+    end
 
-return {
-    setup_lazy = setup_lazy,
-    update_adev = update_adev,
-    check_adev_update = check_adev_update,
-}
+    local lines = {
+        ("`Name`:    %s"):format(info._NAME),
+        ("`Version`: %s"):format(info._VERSION),
+        ("`Author`:  %s"):format(info._AUTHOR),
+        ("`Neovim`:  %s"):format(nvim_version()),
+        ("`LuaJIT`:  %s"):format(_VERSION),
+        ("`Git`:     %s"):format(git_branch()),
+    }
+
+    vim.notify(
+        table.concat(lines, "\n"),
+        vim.log.levels.INFO,
+        { title = info._NAME }
+    )
+end
+
+return Utils
