@@ -59,16 +59,24 @@ function M.setup_lazy()
     }
 end
 
+--- Options for setup.
+--- @class SetupOpts
+--- @field git string? Path or command for Git (default: "git").
+--- @field colorscheme string? Colorscheme name (default: "catppuccin-mocha").
+
 ---Setup Neovim core settings and bootstrap plugins.
 ---
 ---This function enables Lua module caching, configures UI options,
 ---sets key mapping leaders, and initializes lazy.nvim plugin manager.
---- @param opts {
----        git?: string|"git"|nil,
----        }
+--- This function enables Lua module caching, configures UI options,
+--- sets key mapping leaders, and initializes lazy.nvim plugin manager.
+--- @param opts SetupOpts? Table of options.
 --- @return nil
 function M.setup(opts)
-    opts = opts or {}
+    opts = opts or {
+        colorscheme = "catppuccin-mocha",
+        git = "git",
+    }
     vim.g.Adev = {
         _NAME = "Adev.nvim",
         _AUTHOR = "Abdellatif Dev",
@@ -82,7 +90,7 @@ function M.setup(opts)
 
     _commands.register()
 
-    vim.cmd [[ colorscheme catppuccin-mocha ]]
+    vim.cmd("colorscheme " .. opts.colorscheme)
 end
 
 return M

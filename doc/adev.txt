@@ -128,6 +128,7 @@ The configuration follows a modular Lua-based architecture: >
   - `_NAME`: "Adev.nvim"
   - `_AUTHOR`: "Abdellatif Dev"
   - `_VERSION`: "1.4.0"
+  - `config.git`: Git command (defaults to "git")
 - `setup_lazy()`: Bootstraps Lazy.nvim plugin manager
   - Auto-installs Lazy.nvim if not present
   - Configures rocks support for Lua packages
@@ -135,10 +136,12 @@ The configuration follows a modular Lua-based architecture: >
   - Configures UI with single border and "Adev.nvim" title
   - Enables performance caching and plugin checking
   - Imports plugins from "adev.plugins" spec
-- `setup()`: Main setup function that:
+- `setup(opts)`: Main setup function with optional configuration
+  - Accepts optional `opts` table (defaults to empty table if nil)
   - Calls `setup_lazy()` to initialize plugin manager
   - Registers custom commands via `_commands.register()`
   - Sets default colorscheme to `catppuccin-mocha`
+  - Provides safe fallbacks for all configuration access
 
 *adev-core-settings*~
 3.3 Core Settings (`plugin/sets.lua`):~
@@ -157,31 +160,42 @@ The configuration follows a modular Lua-based architecture: >
 
 *adev-commands*~
 3.4 Commands (`lua/adev/commands.lua`):~
-- Registers commands lazily on first `CmdlineEnter` event
-- `ADInfo`: Display configuration information
-- `ADUpdate`: Update configuration via git pull
-- `ADCheckUpdate`: Check for available updates
+- Registers commands lazily on first `CmdlineEnter` event for performance
+- Safe name resolution with vim.g.Adev fallback to "Adev.nvim"
+- `ADInfo`: Display configuration information via utils.info()
+- `ADUpdate`: Update configuration via updateManager.update_adev()
+- `ADCheckUpdate`: Check for available updates via updateManager.check_adev_update()
+- All commands include descriptive help text with dynamic naming
 
 *adev-utils*~
 3.5 Utilities (`lua/adev/utils/`):~
 
 *adev-utils-init*~
 `lua/adev/utils/init.lua`:~
-- `adev_notify(msg, level)`: Displays notifications with Adev.nvim title
+- `adev_notify(msg, level)`: Displays notifications with safe title resolution
+  - Uses vim.g.Adev._NAME with fallback to "Adev.nvim"
+  - Integrates with vim.notify for consistent notifications
+- `info()`: Displays system and configuration information
+  - Safe vim.g.Adev access with default fallback values
+  - Shows Adev version, author, Neovim version
+  - Displays LuaJIT version and current git branch
+  - Uses io.popen for git branch detection with error handling
 
 *adev-utils-update*~
 `lua/adev/utils/update.lua`:~
 - `update_adev()`: Asynchronous git pull for configuration updates
   - Uses `git pull --ff-only` in config directory
-  - Provides success/error notifications
-  - Handles stderr output gracefully
+  - Safe git command resolution with fallback to "git"
+  - Provides success/error notifications via jobstart
+  - Handles stdout and stderr output gracefully
+  - Shows "Already up to date" or success messages
 - `check_adev_update()`: Checks for available updates
-  - Fetches remote refs asynchronously
+  - Safe git command resolution with vim.g.Adev fallback
+  - Fetches remote refs asynchronously via vim.system
+  - Gets current branch and compares with origin
   - Compares local and remote commit counts
-  - Notifies user of available updates
-- `info()`: Displays system and configuration information
-  - Shows Adev version, author, Neovim version
-  - Displays LuaJIT version and current git branch
+  - Notifies user of available updates or up-to-date status
+  - Handles all git operations with proper error handling
 
 *adev-constants*~
 3.6 Constants (`lua/adev/utils/consts/`):~
@@ -206,6 +220,21 @@ Comprehensive event definitions organized by category:
 - `cursor`: CursorMoved, CursorHold
 - `text`: TextChanged, TextYankPost
 - And many more categories for precise event-based loading
+
+*adev-error-handling*~
+3.7 Error Handling & Safety Features:~
+Adev.nvim includes comprehensive error handling throughout the codebase:
+
+- **Nil-safe configuration access**: All functions check for vim.g.Adev existence
+- **Graceful fallbacks**: Default values provided when configuration is unavailable
+- **Safe git command resolution**: Fallback to "git" when custom git path unavailable
+- **Defensive programming**: Optional parameters handled with `opts = opts or {}`
+- **Async error handling**: Proper error handling in vim.system and jobstart calls
+- **Notification safety**: Safe title resolution for all notification functions
+- **Command registration safety**: Commands work even if vim.g.Adev not initialized
+
+This ensures the configuration remains stable even during initialization or
+when components are accessed before full setup completion.
 
 ==============================================================================
 4. PLUGIN CONFIGURATION                                 *adev-plugins*
@@ -422,25 +451,33 @@ Language Specific:~
               - Author: "Abdellatif Dev"
               - Neovim version (major.minor.patch)
               - LuaJIT version
-              - Current git branch
+              - Current git branch (with error handling)
+
+              Uses safe configuration access with fallback values if
+              vim.g.Adev is not available.
 
 *:ADUpdate* *ADUpdate*
 :ADUpdate     Update Adev configuration via git pull.
+              - Uses safe git command resolution (fallback to "git")
               - Runs `git pull --ff-only` in ~/.config/nvim
-              - Shows progress notifications via Snacks.nvim
-              - Handles stdout and stderr output
-              - Provides success/error feedback
-              - Uses asynchronous job execution
+              - Shows progress notifications via adev_notify
+              - Handles stdout and stderr output gracefully
+              - Provides success/error feedback with detailed messages
+              - Uses asynchronous jobstart execution for non-blocking operation
 
 *:ADCheckUpdate* *ADCheckUpdate*
 :ADCheckUpdate Check for available updates without updating.
-              - Fetches remote refs asynchronously
+              - Uses safe git command resolution with fallbacks
+              - Fetches remote refs asynchronously via vim.system
+              - Gets current branch and compares with origin
               - Compares local and remote commit counts
-              - Notifies user of available updates
+              - Notifies user of available updates with count
               - Shows "up-to-date" message if current
+              - Includes comprehensive error handling for all git operations
 
 Note: Commands are registered lazily on first `CmdlineEnter` event for
-      optimal startup performance.
+      optimal startup performance. All commands include safe configuration
+      access and graceful error handling.
 
 ==============================================================================
 7. INSTALLATION & SETUP                             *adev-installation*
@@ -897,6 +934,14 @@ Completion not working:~
 - Check blink.cmp configuration (note: using v1.3.1)
 - Ensure completion sources are enabled
 - Verify LSP capabilities are properly set
+- Check for nil configuration errors in completion setup
+
+Configuration errors on startup:~
+- Run `:checkhealth adev` to verify all components
+- Check for syntax errors in Lua files
+- Verify all required dependencies are installed
+- Look for nil access errors in `:messages`
+- Ensure vim.g.Adev is properly initialized
 
 *adev-health-checks*~
 13.2 Health Checks:~
@@ -1041,6 +1086,19 @@ Q: Blink.cmp completion not working~
 A: Verify LSP servers are running, check blink.cmp version (should be v1.3.1),
    and ensure sources are properly configured in the plugin specification.
 
+Q: Getting nil access errors on startup~
+A: This usually indicates vim.g.Adev is accessed before setup() completes.
+   All functions now include safe fallbacks, but ensure you're calling
+   require("adev").setup() in init.lua before other operations.
+
+Q: Commands not working (ADInfo, ADUpdate, etc.)~
+A: Commands are registered lazily on CmdlineEnter. Try entering command mode
+   first, or call the underlying functions directly for testing.
+
+Q: Git operations failing in update functions~
+A: Check that git is installed and accessible. The configuration now safely
+   falls back to "git" command if custom git path is unavailable.
+
 ==============================================================================
 NOTES                                                         *adev-notes*
 
@@ -1061,9 +1119,11 @@ NOTES                                                         *adev-notes*
 
 Key Files and Line Counts:~
 - init.lua: 8 lines (minimal entry point)
-- lua/adev/init.lua: 81 lines (main module)
+- lua/adev/init.lua: 97 lines (main module with error handling)
 - lua/adev/health.lua: 280 lines (comprehensive health checks)
-- lua/adev/utils/update.lua: 149 lines (update management)
+- lua/adev/utils/init.lua: 52 lines (utilities with safe access)
+- lua/adev/utils/update.lua: 112 lines (update management with safety)
+- lua/adev/commands.lua: 34 lines (command registration with fallbacks)
 - lua/adev/utils/consts/events.lua: 186 lines (event definitions)
 - lua/adev/plugins/lsp.lua: 282 lines (LSP configuration)
 - lua/adev/plugins/telescope.lua: 135 lines (fuzzy finder)
