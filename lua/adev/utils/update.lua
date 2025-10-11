@@ -5,7 +5,7 @@ local UdateManager = {}
 ---
 function UdateManager.update_adev()
     local config_path = vim.fn.stdpath "config"
-    local git_cmd = { "git", "pull", "--ff-only" }
+    local git_cmd = { (vim.g.Adev and vim.g.Adev.config and vim.g.Adev.config.git) or "git", "pull", "--ff-only" }
 
     local stderr_lines = {}
 
@@ -54,9 +54,10 @@ end
 ---@return nil
 function UdateManager.check_adev_update()
     local config_path = vim.fn.stdpath "config"
+    local git_cmd = (vim.g.Adev and vim.g.Adev.config and vim.g.Adev.config.git) or "git"
 
     -- Step 1: fetch remote refs
-    vim.system({ "git", "-C", config_path, "fetch", "origin" }, { text = true }, function(fetch_result)
+    vim.system({ git_cmd, "-C", config_path, "fetch", "origin" }, { text = true }, function(fetch_result)
         if fetch_result.code ~= 0 then
             vim.schedule(function()
                 adev_notify("Failed to fetch updates: " .. (fetch_result.stderr or ""), vim.log.levels.ERROR)
@@ -66,7 +67,7 @@ function UdateManager.check_adev_update()
 
         -- Step 2: get current branch
         vim.system(
-            { "git", "-C", config_path, "rev-parse", "--abbrev-ref", "HEAD" },
+            { git_cmd, "-C", config_path, "rev-parse", "--abbrev-ref", "HEAD" },
             { text = true },
             function(branch_result)
                 if branch_result.code ~= 0 then
@@ -76,7 +77,7 @@ function UdateManager.check_adev_update()
 
                 -- Step 3: check how many commits we're behind
                 vim.system(
-                    { "git", "-C", config_path, "rev-list", branch .. "..origin/" .. branch, "--count" },
+                    { git_cmd, "-C", config_path, "rev-list", branch .. "..origin/" .. branch, "--count" },
                     { text = true },
                     function(check_result)
                         if check_result.code ~= 0 then
@@ -105,44 +106,6 @@ function UdateManager.check_adev_update()
             end
         )
     end)
-end
-
----Display author and version information.
----This is primarily for debugging or user reference.
-function UdateManager.info()
-    local info = vim.g.Adev
-    local function nvim_version()
-        local v = vim.version()
-        return string.format("%d.%d.%d", v.major, v.minor, v.patch)
-    end
-
-    local function git_branch()
-        local config_dir = vim.fn.stdpath "config"
-
-        local handle = io.popen(string.format("git -C %s rev-parse --abbrev-ref HEAD 2>/dev/null", config_dir))
-        if handle then
-            local result = handle:read "*a"
-            handle:close()
-            result = result:gsub("%s+", "") -- remove any trailing newline
-            if result == "" then
-                return "N/A"
-            end
-            return result
-        else
-            return "N/A"
-        end
-    end
-
-    local lines = {
-        ("`Name`:    %s"):format(info._NAME),
-        ("`Version`: %s"):format(info._VERSION),
-        ("`Author`:  %s"):format(info._AUTHOR),
-        ("`Neovim`:  %s"):format(nvim_version()),
-        ("`LuaJIT`:  %s"):format(_VERSION),
-        ("`Git`:     %s"):format(git_branch()),
-    }
-
-    adev_notify(table.concat(lines, "\n"), vim.log.levels.INFO)
 end
 
 return UdateManager

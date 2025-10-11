@@ -7,11 +7,11 @@ function M.setup_lazy()
 
     if not (vim.uv or vim.loop).fs_stat(lazypath) then
         local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-        local out = vim.fn.system { "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath }
+        local out = vim.fn.system { vim.g.Adev.config.git, "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath }
         if vim.v.shell_error ~= 0 then
             vim.api.nvim_echo({
                 { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-                { out, "WarningMsg" },
+                { out,                            "WarningMsg" },
                 { "\nPress any key to exit..." },
             }, true, {})
             vim.fn.getchar()
@@ -63,11 +63,19 @@ end
 ---
 ---This function enables Lua module caching, configures UI options,
 ---sets key mapping leaders, and initializes lazy.nvim plugin manager.
-function M.setup()
+--- @param opts {
+---        git?: string|"git"|nil,
+---        }
+--- @return nil
+function M.setup(opts)
+    opts = opts or {}
     vim.g.Adev = {
         _NAME = "Adev.nvim",
         _AUTHOR = "Abdellatif Dev",
         _VERSION = "1.4.0",
+        config = {
+            git = opts.git or "git"
+        }
     }
 
     M.setup_lazy()
