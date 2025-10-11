@@ -6,7 +6,7 @@ return {
         "mason-org/mason.nvim",
     },
     module = false,
-    event = {  events.file.read_pre },
+    event = {  events.buffer.new_file, events.buffer.read_pre },
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
         { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },

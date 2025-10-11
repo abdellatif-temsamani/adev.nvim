@@ -2,7 +2,7 @@ local events = require "adev.utils.consts.events"
 
 return {
     "brenoprata10/nvim-highlight-colors",
-    event = { events.file.read_pre, },
+    event = { events.buffer.new_file, },
     opts = {
         render = "virtual",
         virtual_symbol = "■",

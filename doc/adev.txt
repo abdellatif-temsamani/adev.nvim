@@ -277,7 +277,7 @@ Create a new file in `lua/adev/plugins/`: >
     return {
       "author/plugin-name",
       -- all events are pre-defined
-      event = { events.file.read_pre, },
+      event = { events.buffer.new_file },
       opt ={},
     }
 <
