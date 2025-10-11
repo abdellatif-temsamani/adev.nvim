@@ -3,7 +3,7 @@ return {
     dependencies = {
         'mason-org/mason.nvim',
     },
-    event = require("adev.consts").events.pre,
+    event = require("adev.utils.consts").events.pre,
     keys = {
         { "<leader>gl", function() vim.lsp.buf.format() end,                              desc = "lint buffer",         mode = { "v", "n" } },
         { "<leader>gd", function() vim.lsp.buf.definition() end,                          desc = "go to definition", },

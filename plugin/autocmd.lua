@@ -14,7 +14,7 @@ autocmd("FileType", {
 autocmd("VimEnter", {
     group    = general_grp,
     callback = function()
-        require("adev.utils").check_adev_update()
+        require("adev.utils.update").check_adev_update()
     end
 })
 

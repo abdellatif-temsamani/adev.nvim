@@ -7,7 +7,7 @@ return {
     },
     {
         'saghen/blink.cmp',
-        event = require("adev.consts").events:merge({ "file", "cmd", "lsp" }),
+        event = require("adev.utils.consts").events:merge({ "file", "cmd", "lsp" }),
         -- BUG: any version above 1.3.1 don't work for some reason
         version = "v1.3.1",
         dependencies = {

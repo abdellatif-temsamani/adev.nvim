@@ -3,7 +3,7 @@ return {
         "mason-org/mason.nvim",
         build = ":MasonUpdate",
         cmd = "Mason",
-        event = require("adev.consts").events.pre,
+        event = require("adev.utils.consts").events.pre,
         keys = {
             { "<leader>mm", function() vim.cmd [[ Mason ]] end, desc = "go to declaration", },
         },
@@ -17,7 +17,7 @@ return {
     },
     {
         "jay-babu/mason-null-ls.nvim",
-        event = require("adev.consts").events.pre,
+        event = require("adev.utils.consts").events.pre,
         after = "williamboman/mason.nvim",
         dependencies = {
             "williamboman/mason.nvim",
@@ -60,7 +60,7 @@ return {
     },
     {
         "williamboman/mason-lspconfig.nvim",
-        event = require("adev.consts").events.pre,
+        event = require("adev.utils.consts").events.pre,
         dependencies = { 'mason-org/mason.nvim', 'neovim/nvim-lspconfig' },
         after = "williamboman/mason.nvim",
         opts = {

@@ -1,6 +1,6 @@
 return {
     'L3MON4D3/LuaSnip',
-    event = require("adev.consts").events.file,
+    event = require("adev.utils.consts").events.file,
     priority = 10,
     build = "make install_jsregexp",
     config = function()

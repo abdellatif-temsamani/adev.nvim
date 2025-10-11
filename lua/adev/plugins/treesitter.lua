@@ -1,7 +1,7 @@
 return {
     {
         "nvim-treesitter/nvim-treesitter-context",
-        event = require("adev.consts").events.file,
+        event = require("adev.utils.consts").events.file,
         opts = {
             enable = true,
             max_lines = 2,
@@ -11,7 +11,7 @@ return {
     {
         'windwp/nvim-ts-autotag',
 
-        event = require("adev.consts").events.file,
+        event = require("adev.utils.consts").events.file,
         opts = {
             per_filetype = {
                 ["blade"] = {
@@ -29,7 +29,7 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter",
-        event = require("adev.consts").events.pre,
+        event = require("adev.utils.consts").events.pre,
         build = ":TSUpdate",
         config = function()
             require("adev.config.treesitter").setup()

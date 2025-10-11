@@ -1,6 +1,6 @@
 return {
     "hrsh7th/nvim-cmp",
-    event = require("adev.consts").events:merge({ "cmd", "pre" }),
+    event = require("adev.utils.consts").events:merge({ "cmd", "pre" }),
     dependencies = {
         { "saadparwaiz1/cmp_luasnip" },
         { "hrsh7th/cmp-path" },
@@ -9,7 +9,7 @@ return {
         { "hrsh7th/cmp-cmdline" },
         {
             "hrsh7th/cmp-nvim-lsp",
-            event = require("adev.consts").events.lsp,
+            event = require("adev.utils.consts").events.lsp,
         },
         {
             'davidsierradz/cmp-conventionalcommits',

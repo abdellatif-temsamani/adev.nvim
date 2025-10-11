@@ -1,76 +1,9 @@
-local Utils = {}
+local UdateManager = {}
 
----Bootstraps and sets up the lazy.nvim plugin manager.
+
+--- Update the Adev.nvim configuration by performing a git pull.
 ---
----This function ensures that `lazy.nvim` is installed in the standard data path.
----If not, it clones the stable branch from GitHub. It then prepends it to the runtime path
----and initializes it with your plugin spec.
----
----If the clone fails, it notifies the user and exits Neovim.
-function Utils.setup_lazy()
-    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-
-    ---@diagnostic disable-next-line: undefined-field
-    if not (vim.uv or vim.loop).fs_stat(lazypath) then
-        local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-        local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-        if vim.v.shell_error ~= 0 then
-            vim.api.nvim_echo({
-                { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-                { out,                            "WarningMsg" },
-                { "\nPress any key to exit..." },
-            }, true, {})
-            vim.fn.getchar()
-            os.exit(1)
-        end
-    end
-    vim.opt.rtp:prepend(lazypath)
-
-
-    -- Setup lazy.nvim
-    require("lazy").setup({
-        defaults = {
-            lazy = true,
-        },
-
-        rocks = {
-            enabled = true,
-            root = vim.fn.stdpath("data") .. "/lazy-rocks",
-            server = "https://nvim-neorocks.github.io/rocks-binaries/",
-            hererocks = false,
-        },
-        pkg = {
-            enabled = true,
-            sources = {
-                "lazy",
-                "rockspec",
-                "packspec",
-            },
-        },
-        spec = {
-            { import = "adev.plugins" },
-        },
-        ui = {
-            border = 'single',
-            title = "Adev.nvim",
-
-        },
-        performance = {
-            cache = {
-                enabled = true,
-            },
-        },
-        install = { colorscheme = { "tokyonight" } },
-        checker = { enabled = true },
-    })
-end
-
---- Update the Adev Neovim configuration by performing a git pull.
----
---- Runs `git pull --ff-only` asynchronously inside the Neovim config directory (`~/.config/nvim`),
---- then displays the command output in a floating window using Snacks.nvim.
----
-function Utils.update_adev()
+function UdateManager.update_adev()
     local config_path = vim.fn.stdpath("config")
     local git_cmd = { "git", "pull", "--ff-only" }
 
@@ -115,13 +48,9 @@ function Utils.update_adev()
     })
 end
 
---- Checks if Adev's config directory has updates from its GitHub remote.
---- Runs `git fetch` and compares `HEAD` against `origin/HEAD`.
---- Sends a desktop notification if updates are available.
+--- Checks if Adev.nvim has updates from its GitHub remote.
 ---@return nil
---- Check for updates in Neovim's config asynchronously
----@return nil
-function Utils.check_adev_update()
+function UdateManager.check_adev_update()
     local config_path = vim.fn.stdpath("config")
 
     -- Step 1: fetch remote refs
@@ -172,10 +101,9 @@ function Utils.check_adev_update()
     end)
 end
 
----Display author and version information using `vim.notify`.
----
+---Display author and version information.
 ---This is primarily for debugging or user reference.
-function Utils.info()
+function UdateManager.info()
     local info = vim.g.Adev
     local function nvim_version()
         local v = vim.version()
@@ -215,4 +143,4 @@ function Utils.info()
     )
 end
 
-return Utils
+return UdateManager

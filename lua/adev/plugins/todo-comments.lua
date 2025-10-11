@@ -8,7 +8,7 @@ local alts = {
 
 return {
     "folke/todo-comments.nvim",
-    event = require("adev.consts").events.file,
+    event = require("adev.utils.consts").events.file,
     opts = {
         signs = true,
         sign_priority = 0,

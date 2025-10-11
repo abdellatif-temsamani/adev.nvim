@@ -1,12 +1,7 @@
-local utils = require "adev.utils"
+local utils = require "adev.utils.update"
+
 --- Sets up custom user commands for the Adev module.
----
---- Creates the following Neovim user commands:
---- - `:ADInfo` — Calls `self:info()` to show information about the Adev distro.
---- - `:ADUpdate` — Runs the asynchronous update function `update_adev` from `abdellatifdev.utils`
----   to pull updates from the git repository located in `~/.config/nvim`.
----
---- Both commands include descriptive `desc` fields for `:help` and completion.
+---@return nil
 local function register()
     local create_command = vim.api.nvim_create_user_command
     local name = vim.g.Adev._NAME
