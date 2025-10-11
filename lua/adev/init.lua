@@ -64,12 +64,7 @@ end
 --- @field git string? Path or command for Git (default: "git").
 --- @field colorscheme string? Colorscheme name (default: "catppuccin-mocha").
 
----Setup Neovim core settings and bootstrap plugins.
----
----This function enables Lua module caching, configures UI options,
----sets key mapping leaders, and initializes lazy.nvim plugin manager.
---- This function enables Lua module caching, configures UI options,
---- sets key mapping leaders, and initializes lazy.nvim plugin manager.
+---Setup Adev.nvim core settings and bootstrap plugins.
 --- @param opts SetupOpts? Table of options.
 --- @return nil
 function M.setup(opts)
