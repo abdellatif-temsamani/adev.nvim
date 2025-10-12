@@ -3,6 +3,7 @@
 ## 🔧 Setup Options to Add
 
 ### Core Configuration
+
 - [ ] `leader` - Custom leader key (default: " ")
 - [ ] `localleader` - Custom local leader key (default: " ")
 - [ ] `auto_update_check` - Enable/disable startup update checks (default: true)
@@ -10,6 +11,7 @@
 - [ ] `performance_mode` - Optimize for performance vs features (default: false)
 
 ### UI & Theme Options
+
 - [ ] `transparent_bg` - Enable transparent background (default: false)
 - [ ] `icons` - Enable/disable nerd font icons (default: true)
 - [ ] `borders` - Border style for UI elements ("single", "rounded", "none")
@@ -18,6 +20,7 @@
 - [ ] `dim_inactive` - Dim inactive windows percentage (default: 0.15)
 
 ### LSP & Completion
+
 - [ ] `lsp_servers` - Custom list of LSP servers to install
 - [ ] `diagnostics` - LSP diagnostics configuration
   - [ ] `virtual_text` - Enable virtual diagnostic text
@@ -30,6 +33,7 @@
   - [ ] `ghost_text` - Enable completion ghost text
 
 ### File Management
+
 - [ ] `file_explorer` - Choose file explorer ("snacks", "oil", "nvim-tree")
 - [ ] `auto_save` - Enable auto-save functionality
 - [ ] `backup` - Enable backup files
@@ -37,11 +41,13 @@
 - [ ] `undo_levels` - Number of undo levels (default: 1000)
 
 ### Git Integration
+
 - [ ] `git_signs` - Enable/disable git signs in gutter
 - [ ] `git_blame` - Enable git blame integration
 - [ ] `lazygit_config` - Custom lazygit configuration
 
 ### Terminal & Tasks
+
 - [ ] `terminal` - Terminal integration settings
 - [ ] `shell` - Default shell for terminal
 - [ ] `task_runner` - Enable task runner integration
@@ -49,6 +55,7 @@
 ## 🚀 Feature Enhancements
 
 ### Plugin Additions
+
 - [ ] **Debugging Support**
   - [ ] nvim-dap for debugging
   - [ ] nvim-dap-ui for debug interface
@@ -71,6 +78,7 @@
   - [ ] GitHub integration improvements
 
 ### UI Improvements
+
 - [ ] **Which-key Integration**
   - [ ] Key binding discovery
   - [ ] Contextual help
@@ -85,6 +93,7 @@
   - [ ] Multiple terminal management
 
 ### Performance Optimizations
+
 - [ ] **Startup Time**
   - [ ] Profile and optimize slow plugins
   - [ ] Better lazy loading strategies
@@ -98,6 +107,7 @@
 ## 🔨 Code Quality Improvements
 
 ### Documentation
+
 - [ ] **Enhanced Luadocs**
   - [ ] Complete function documentation
   - [ ] Type annotations for all parameters
@@ -111,6 +121,7 @@
   - [ ] Plugin development guide
 
 ### Testing
+
 - [ ] **Unit Tests**
   - [ ] Test core functionality
   - [ ] Test utility functions
@@ -122,6 +133,7 @@
   - [ ] Performance health checks
 
 ### Error Handling
+
 - [ ] **Graceful Degradation**
   - [ ] Handle missing dependencies
   - [ ] Fallback configurations
@@ -132,6 +144,7 @@
 ## 🎯 Configuration Examples
 
 ### Minimal Setup
+
 ```lua
 require("adev").setup({
     performance_mode = true,
@@ -141,6 +154,7 @@ require("adev").setup({
 ```
 
 ### Power User Setup
+
 ```lua
 require("adev").setup({
     transparent_bg = true,
@@ -158,6 +172,7 @@ require("adev").setup({
 ```
 
 ### Development Setup
+
 ```lua
 require("adev").setup({
     git_blame = true,
@@ -170,18 +185,21 @@ require("adev").setup({
 ## 📋 Implementation Priority
 
 ### High Priority
+
 1. Core setup options (leader, auto_update_check, transparent_bg)
 2. LSP and completion configuration
 3. UI customization options
 4. Better error handling
 
 ### Medium Priority
+
 1. Plugin additions (debugging, testing)
 2. Performance optimizations
 3. Enhanced documentation
 4. Session management
 
 ### Low Priority
+
 1. Advanced integrations
 2. Experimental features
 3. Alternative plugin options
@@ -190,15 +208,18 @@ require("adev").setup({
 ## 🔄 Migration Strategy
 
 ### Backward Compatibility
+
 - [ ] Ensure existing configurations continue to work
 - [ ] Provide migration guide for breaking changes
 - [ ] Deprecation warnings for old options
 
 ### Gradual Implementation
+
 - [ ] Implement options incrementally
 - [ ] Test each addition thoroughly
 - [ ] Update documentation with each change
 
 ---
 
-**Note**: This TODO list should be implemented gradually to maintain stability and ensure each feature is properly tested and documented.
+**Note**: This TODO list should be implemented gradually to maintain stability
+and ensure each feature is properly tested and documented.
