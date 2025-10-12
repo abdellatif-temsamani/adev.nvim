@@ -21,6 +21,7 @@ adev-mappings	adev.txt	/*adev-mappings*
 adev-notes	adev.txt	/*adev-notes*
 adev-overview	adev.txt	/*adev-overview*
 adev-plugins	adev.txt	/*adev-plugins*
+adev-setup-options	adev.txt	/*adev-setup-options*
 adev-troubleshooting	adev.txt	/*adev-troubleshooting*
 adev.nvim	adev.txt	/*adev.nvim*
 adev.txt	adev.txt	/*adev.txt*

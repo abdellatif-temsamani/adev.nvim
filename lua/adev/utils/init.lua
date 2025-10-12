@@ -15,7 +15,7 @@ end
 function Utils.info()
     local info = vim.g.Adev or {
         _NAME = "Adev.nvim",
-        _VERSION = "1.4.0",
+        _VERSION = "1.5.0",
         _AUTHOR = "Abdellatif Dev"
     }
     local function nvim_version()

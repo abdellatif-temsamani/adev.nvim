@@ -3,7 +3,7 @@
                               ADEV.NVIM DOCUMENTATION
 
 Author:       Abdellatif Dev
-Version:      1.4.0
+Version:      1.5.0
 License:      MIT
 
 ==============================================================================
@@ -16,13 +16,14 @@ CONTENTS                                                      *adev-contents*
 5.  Key Mappings ..................................... |adev-mappings|
 6.  Commands ......................................... |adev-commands|
 7.  Installation & Setup ............................. |adev-installation|
-8.  Configuration Examples ........................... |adev-config-examples|
-9.  LSP Configuration ................................ |adev-lsp|
-10. Autocommands & Events ............................ |adev-autocommands|
-11. Health Checks .................................... |adev-health|
-12. Customization .................................... |adev-customization|
-13. Troubleshooting .................................. |adev-troubleshooting|
-14. FAQ .............................................. |adev-faq|
+8.  Setup Options .................................... |adev-setup-options|
+9.  Configuration Examples ........................... |adev-config-examples|
+10. LSP Configuration ................................ |adev-lsp|
+11. Autocommands & Events ............................ |adev-autocommands|
+12. Health Checks .................................... |adev-health|
+13. Customization .................................... |adev-customization|
+14. Troubleshooting .................................. |adev-troubleshooting|
+15. FAQ .............................................. |adev-faq|
 
 ==============================================================================
 1. OVERVIEW                                                  *adev-overview*
@@ -127,7 +128,7 @@ The configuration follows a modular Lua-based architecture: >
 - Defines global metadata in `vim.g.Adev`:
   - `_NAME`: "Adev.nvim"
   - `_AUTHOR`: "Abdellatif Dev"
-  - `_VERSION`: "1.4.0"
+  - `_VERSION`: "1.5.0"
   - `config.git`: Git command (defaults to "git")
 - `setup_lazy()`: Bootstraps Lazy.nvim plugin manager
   - Auto-installs Lazy.nvim if not present
@@ -447,7 +448,7 @@ Language Specific:~
 :ADInfo       Display Adev version, author, and runtime information.
               Shows:
               - Configuration name: "Adev.nvim"
-              - Version: "1.4.0"
+              - Version: "1.5.0"
               - Author: "Abdellatif Dev"
               - Neovim version (major.minor.patch)
               - LuaJIT version
@@ -521,10 +522,146 @@ Note: Commands are registered lazily on first `CmdlineEnter` event for
 - Default colorscheme (catppuccin-mocha) will be applied
 
 ==============================================================================
-8. CONFIGURATION EXAMPLES                            *adev-config-examples*
+8. SETUP OPTIONS                                        *adev-setup-options*
+
+*adev-setup-overview*~
+8.1 Setup Function Overview:~
+
+Adev.nvim provides a flexible setup function that accepts an optional configuration
+table. The setup function initializes the entire distribution with sensible defaults
+while allowing customization of key components.
+
+Basic usage: >
+    require("adev").setup()
+<
+
+With custom options: >
+    require("adev").setup({
+        git = "/usr/local/bin/git",
+        colorscheme = "catppuccin-latte"
+    })
+<
+
+*adev-setup-opts*~
+8.2 Available Setup Options:~
+
+The `SetupOpts` table supports the following configuration options:
+
+*adev-setup-git*~
+`git` (string, optional)~
+- **Purpose**: Specifies the Git executable path or command
+- **Default**: `"git"`
+- **Usage**: Used for plugin management, configuration updates, and git operations
+- **Examples**: >
+    git = "git"                    -- Use system git
+    git = "/usr/local/bin/git"     -- Custom git path
+    git = "/opt/homebrew/bin/git"  -- Homebrew git on macOS
+<
+- **Notes**:
+  - Must be a valid git executable accessible from the command line
+  - Used by Lazy.nvim for plugin installation and updates
+  - Used by `:ADUpdate` and `:ADCheckUpdate` commands
+  - Fallback to "git" if custom path is unavailable
+
+*adev-setup-colorscheme*~
+`colorscheme` (string, optional)~
+- **Purpose**: Sets the colorscheme to apply on startup
+- **Default**: `"catppuccin-mocha"`
+- **Usage**: Applied after plugin initialization via `vim.cmd("colorscheme " .. opts.colorscheme)`
+- **Examples**: >
+    colorscheme = "catppuccin-mocha"    -- Default dark theme
+    colorscheme = "catppuccin-latte"    -- Light variant
+    colorscheme = "catppuccin-frappe"   -- Alternative dark variant
+    colorscheme = "catppuccin-macchiato" -- Warmer dark variant
+<
+- **Notes**:
+  - Must be a valid colorscheme name that will be available after plugin installation
+  - Catppuccin variants are pre-configured and recommended (no additional setup required)
+  - **Custom colorschemes must be installed first** by adding them to `lua/adev/plugins/theme.lua`
+  - Applied synchronously after plugin setup completion
+  - Using an unavailable colorscheme will result in an error
+
+*adev-setup-examples*~
+8.3 Setup Examples:~
+
+*adev-setup-minimal*~
+Minimal Setup (uses all defaults): >
+    require("adev").setup()
+<
+
+*adev-setup-custom-git*~
+Custom Git Path: >
+    require("adev").setup({
+        git = "/opt/homebrew/bin/git"
+    })
+<
+
+*adev-setup-light-theme*~
+Light Theme Configuration: >
+    require("adev").setup({
+        colorscheme = "catppuccin-latte"
+    })
+<
+
+*adev-setup-full-custom*~
+Full Custom Configuration: >
+    require("adev").setup({
+        git = "/usr/local/bin/git",
+        colorscheme = "catppuccin-frappe"
+    })
+<
+
+*adev-setup-custom-colorscheme*~
+Custom Colorscheme Setup:~
+
+1. First, add the colorscheme plugin to `lua/adev/plugins/theme.lua`: >
+    return {
+        {
+            "catppuccin/nvim",
+            name = "catppuccin",
+            priority = 1000,
+            opts = { ... }
+        },
+        {
+            "folke/tokyonight.nvim",  -- Add your custom colorscheme
+            priority = 1000,
+            opts = {}
+        }
+    }
+<
+
+2. Then use it in your setup: >
+    require("adev").setup({
+        colorscheme = "tokyonight"
+    })
+<
+
+*adev-setup-validation*~
+8.4 Option Validation & Safety:~
+
+- **Nil Safety**: All options are optional with safe defaults
+- **Fallback Handling**: Invalid options fall back to defaults gracefully
+- **Error Prevention**: Setup function includes comprehensive error handling
+- **Type Safety**: Options are validated for correct types where possible
+
+*adev-setup-future*~
+8.5 Future Options (Planned):~
+
+The following options are planned for future releases:
+- `leader`: Custom leader key configuration
+- `auto_update_check`: Control automatic update checking
+- `performance_mode`: Optimize for performance vs features
+- `transparent_bg`: Enable transparent background support
+- `diagnostics`: LSP diagnostics configuration
+- `completion`: Completion engine settings
+
+See `TODO.md` for the complete roadmap of planned setup options.
+
+==============================================================================
+9. CONFIGURATION EXAMPLES                            *adev-config-examples*
 
 *adev-custom-plugin*~
-8.1 Adding a Custom Plugin:~
+9.1 Adding a Custom Plugin:~
 
 Create a new file in `lua/adev/plugins/`: >
     -- lua/adev/plugins/my-plugin.lua
@@ -539,7 +676,7 @@ Create a new file in `lua/adev/plugins/`: >
 <
 
 *adev-custom-lsp*~
-8.2 Adding Custom LSP Server:~
+9.2 Adding Custom LSP Server:~
 
 Add to the `ensure_installed` list in `lua/adev/plugins/mason.lua`: >
     opts = {
@@ -568,7 +705,7 @@ Then add configuration in `lua/adev/plugins/lsp.lua`: >
 <
 
 *adev-custom-keymaps*~
-8.3 Custom Key Mappings:~
+9.3 Custom Key Mappings:~
 
 Add to any plugin file or create a new one: >
     return {
@@ -586,10 +723,10 @@ Add to any plugin file or create a new one: >
 <
 
 ==============================================================================
-9. LSP CONFIGURATION                                        *adev-lsp*
+10. LSP CONFIGURATION                                        *adev-lsp*
 
 *adev-lsp-servers*~
-9.1 Enabled LSP Servers:~
+10.1 Enabled LSP Servers:~
 
 Adev.nvim has the following LSP servers enabled via `vim.lsp.enable()`:
 
@@ -675,7 +812,7 @@ Adev.nvim includes these formatting and linting tools via mason-null-ls:
     yamllint            -- YAML linter
 
 *adev-lsp-features*~
-9.2 LSP Features:~
+10.2 LSP Features:~
 - Inlay hints enabled by default
 - Virtual diagnostic lines for current line
 - blink.cmp integration for completions
@@ -684,7 +821,7 @@ Adev.nvim includes these formatting and linting tools via mason-null-ls:
 - Automatic server installation via Mason
 
 *adev-lsp-special-configs*~
-9.3 Special Configurations:~
+10.3 Special Configurations:~
 
 Lua Language Server:~
 - Auto-detects .luarc.json/.luarc.jsonc
@@ -716,10 +853,10 @@ Intelephense (PHP):~
 - Reads from ~/.secrets/intelephense
 
 ==============================================================================
-10. AUTOCOMMANDS & EVENTS                            *adev-autocommands*
+11. AUTOCOMMANDS & EVENTS                            *adev-autocommands*
 
 *adev-autocommands-general*~
-10.1 General Autocommands (`plugin/autocmd.lua`):~
+11.1 General Autocommands (`plugin/autocmd.lua`):~
 
 The configuration includes several autocommands in the "GENERAL" group:
 
@@ -758,7 +895,7 @@ Yank Highlighting:~
 - Provides visual feedback for copy operations
 
 *adev-autocommands-events*~
-10.2 Event System (`lua/adev/utils/consts/events.lua`):~
+11.2 Event System (`lua/adev/utils/consts/events.lua`):~
 
 Adev.nvim uses a comprehensive event system with 186 lines of event
 definitions organized by category. This allows for precise plugin loading
@@ -790,28 +927,28 @@ Plugins use these events for lazy loading: >
 <
 
 ==============================================================================
-11. HEALTH CHECKS                                     *adev-health*
+12. HEALTH CHECKS                                     *adev-health*
 
 *adev-health-overview*~
-11.1 Health Check System (`lua/adev/health.lua`):~
+12.1 Health Check System (`lua/adev/health.lua`):~
 
 Adev.nvim includes a comprehensive health check system with 280 lines of
 diagnostic code. Run `:checkhealth adev` to verify your installation.
 
 *adev-health-version*~
-11.2 Neovim Version Check:~
+12.2 Neovim Version Check:~
 - Verifies Neovim >= 0.11.0 (minimum required)
 - Checks for `vim.version.ge` function availability
 - Displays current version with status indicator
 
 *adev-health-executables*~
-11.3 Required Executables:~
+12.3 Required Executables:~
 - git: Version control system (REQUIRED)
 - make: Build automation tool (REQUIRED)
 - unzip: Archive extraction utility (REQUIRED)
 
 *adev-health-optional*~
-11.4 Optional Executables:~
+12.4 Optional Executables:~
 - rg (ripgrep): Fast text search for Telescope
 - lazygit: Terminal UI for git operations
 - gh: GitHub CLI for GitHub integration
@@ -822,7 +959,7 @@ diagnostic code. Run `:checkhealth adev` to verify your installation.
 Each optional tool includes installation instructions when missing.
 
 *adev-health-modules*~
-11.5 Lua Module Checks:~
+12.5 Lua Module Checks:~
 - adev.init: Main adev module (REQUIRED)
 - adev.consts: Constants and configuration (REQUIRED)
 - adev.utils: Utility functions (REQUIRED)
@@ -830,7 +967,7 @@ Each optional tool includes installation instructions when missing.
 Displays loaded count and critical module status.
 
 *adev-health-nerd-font*~
-11.6 Nerd Font Support:~
+12.6 Nerd Font Support:~
 - Tests various Nerd Font icons for proper display
 - Checks terminal capabilities and color support
 - Provides font recommendations:
@@ -841,21 +978,21 @@ Displays loaded count and critical module status.
 - Detects GUI vs terminal environment
 
 *adev-health-system*~
-11.7 System Information:~
+12.7 System Information:~
 - OS and architecture detection
 - Shell identification
 - Tmux/screen session detection
 - Terminal emulator information
 
 *adev-health-config*~
-11.8 Configuration Validation:~
+12.8 Configuration Validation:~
 - Verifies adev module loading
 - Checks setup function availability
 - Validates config directory existence
 - Provides troubleshooting guidance
 
 *adev-health-usage*~
-11.9 Running Health Checks:~
+12.9 Running Health Checks:~
 
 Check all components: >
     :checkhealth
@@ -873,42 +1010,42 @@ Check related components: >
 <
 
 ==============================================================================
-12. CUSTOMIZATION                                     *adev-customization*
+13. CUSTOMIZATION                                     *adev-customization*
 
 *adev-custom-plugins*~
-12.1 Adding Plugins:~
+13.1 Adding Plugins:~
 Create files in `lua/adev/plugins/` following Lazy.nvim specification.
 Use event-based loading for optimal performance.
 
 *adev-custom-settings*~
-12.2 Core Settings:~
+13.2 Core Settings:~
 - Main configuration: `lua/adev/init.lua`
 - Plugin configurations: `lua/adev/plugins/*.lua`
 - Constants and events: `lua/adev/utils/consts/`
 - Utility functions: `lua/adev/utils/`
 
 *adev-custom-theme*~
-12.3 Theme Customization:~
+13.3 Theme Customization:~
 Edit `lua/adev/plugins/theme.lua` to change colorscheme.
 Default: `catppuccin-mocha`
 
 *adev-custom-mappings*~
-12.4 Key Mappings:~
+13.4 Key Mappings:~
 Mappings are defined per-plugin in their respective files.
 Use the `keys` table in plugin specifications for lazy loading.
 
 *adev-custom-lsp*~
-12.5 LSP Customization:~
+13.5 LSP Customization:~
 - Add servers to Mason configuration
 - Configure servers in `lsp.lua`
 - Use `vim.lsp.config()` for server-specific settings
 - Add servers to `vim.lsp.enable()` list
 
 ==============================================================================
-13. TROUBLESHOOTING                               *adev-troubleshooting*
+14. TROUBLESHOOTING                               *adev-troubleshooting*
 
 *adev-common-issues*~
-13.1 Common Issues:~
+14.1 Common Issues:~
 
 Plugin not loading:~
 - Check `:Lazy` for plugin status and errors
@@ -944,7 +1081,7 @@ Configuration errors on startup:~
 - Ensure vim.g.Adev is properly initialized
 
 *adev-health-checks*~
-13.2 Health Checks:~
+14.2 Health Checks:~
 
 Run comprehensive health checks: >
     :checkhealth
@@ -956,7 +1093,7 @@ Run comprehensive health checks: >
 <
 
 *adev-debugging*~
-13.3 Debugging Steps:~
+14.3 Debugging Steps:~
 
 1. Check Neovim version: >
     :version
@@ -984,7 +1121,7 @@ Run comprehensive health checks: >
 <
 
 *adev-updates*~
-13.4 Updating Components:~
+14.4 Updating Components:~
 
 Update Adev configuration: >
     :ADUpdate
@@ -1009,10 +1146,10 @@ Update Treesitter parsers: >
 <
 
 ==============================================================================
-14. FAQ                                                     *adev-faq*
+15. FAQ                                                     *adev-faq*
 
 *adev-faq-general*~
-14.1 General Questions:~
+15.1 General Questions:~
 
 Q: How do I change the colorscheme?~
 A: Edit `lua/adev/plugins/theme.lua` and modify the colorscheme setting.
@@ -1040,7 +1177,7 @@ A: Adev uses blink.cmp (v1.3.1) for faster performance with Rust implementation.
    It includes compatibility layer for nvim-cmp sources via blink.compat.
 
 *adev-faq-customization*~
-14.2 Customization Questions:~
+15.2 Customization Questions:~
 
 Q: Can I use a different completion engine?~
 A: Yes, but you'll need to disable blink.cmp and configure your preferred
@@ -1064,7 +1201,7 @@ A: Edit `plugin/autocmd.lua` or add new autocommands in your plugin files.
    Use the event constants from `adev.utils.consts.events` for consistency.
 
 *adev-faq-troubleshooting*~
-14.3 Troubleshooting Questions:~
+15.3 Troubleshooting Questions:~
 
 Q: Plugin X stopped working after update~
 A: Check `:Lazy log` for errors, run `:checkhealth adev`, and verify the plugin

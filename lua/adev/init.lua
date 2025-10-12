@@ -59,10 +59,10 @@ function M.setup_lazy()
     }
 end
 
---- Options for setup.
+--- Configuration options for Adev.nvim setup.
 --- @class SetupOpts
---- @field git string? Path or command for Git (default: "git").
---- @field colorscheme string? Colorscheme name (default: "catppuccin-mocha").
+--- @field git string? Path or command for Git executable (default: "git"). Used for plugin management, updates, and git operations throughout Adev.nvim.
+--- @field colorscheme string? Colorscheme name to apply on startup (default: "catppuccin-mocha"). Must be a valid colorscheme that will be installed by Lazy.nvim.
 
 ---Setup Adev.nvim core settings and bootstrap plugins.
 --- @param opts SetupOpts? Table of options.
@@ -75,7 +75,7 @@ function M.setup(opts)
     vim.g.Adev = {
         _NAME = "Adev.nvim",
         _AUTHOR = "Abdellatif Dev",
-        _VERSION = "1.4.0",
+        _VERSION = "1.5.0",
         config = {
             git = opts.git or "git"
         }

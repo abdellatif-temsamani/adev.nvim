@@ -114,7 +114,8 @@ extensive functionality.
 - **Terminal Integration**: Seamless terminal mode with escape key mapping
 - **Cross-Platform**: Optimized for Linux, macOS, and Windows
 - **Safe Configuration**: Nil-safe access patterns prevent startup errors
-- **Defensive Programming**: All functions handle missing configuration gracefully
+- **Defensive Programming**: All functions handle missing configuration
+  gracefully
 
 ## 🚀 Quick Start
 
@@ -179,6 +180,95 @@ extensive functionality.
    ```bash
    :checkhealth adev
    ```
+
+## ⚙️ Setup Options
+
+Adev.nvim provides flexible setup options for customization:
+
+### **Basic Setup**
+
+```lua
+-- Default setup (recommended for most users)
+require("adev").setup()
+```
+
+### **Custom Configuration**
+
+```lua
+-- Custom setup with options
+require("adev").setup({
+    git = "/usr/local/bin/git",        -- Custom git path
+    colorscheme = "catppuccin-latte"   -- Light theme variant
+})
+```
+
+### **Available Options**
+
+| Option        | Type   | Default             | Description                                    |
+| ------------- | ------ | ------------------- | ---------------------------------------------- |
+| `git`         | string | `"git"`             | Git executable path for plugin management     |
+| `colorscheme` | string | `"catppuccin-mocha"` | Colorscheme to apply on startup (must be installed first) |
+
+### **Setup Examples**
+
+**Homebrew Git on macOS:**
+```lua
+require("adev").setup({
+    git = "/opt/homebrew/bin/git"
+})
+```
+
+**Light Theme:**
+```lua
+require("adev").setup({
+    colorscheme = "catppuccin-latte"
+})
+```
+
+**Full Custom:**
+```lua
+require("adev").setup({
+    git = "/usr/local/bin/git",
+    colorscheme = "catppuccin-frappe"
+})
+```
+
+### **Custom Colorscheme Example**
+
+To use a custom colorscheme, you must first install it:
+
+1. **Add the colorscheme plugin** to `lua/adev/plugins/theme.lua`:
+   ```lua
+   return {
+       {
+           "catppuccin/nvim",
+           name = "catppuccin",
+           priority = 1000,
+           opts = { ... }
+       },
+       {
+           "folke/tokyonight.nvim",  -- Your custom colorscheme
+           priority = 1000,
+           opts = {}
+       }
+   }
+   ```
+
+2. **Then use it in setup**:
+   ```lua
+   require("adev").setup({
+       colorscheme = "tokyonight"
+   })
+   ```
+
+### **Notes**
+
+- All options are **optional** with safe defaults
+- Invalid options fall back to defaults gracefully
+- Git path is used for plugin management and updates
+- **Custom colorschemes must be installed in plugin specifications before use**
+- Catppuccin variants work out-of-the-box (no additional setup required)
+- Using an unavailable colorscheme will cause an error
 
 ## ⌨️ Key Mappings
 
