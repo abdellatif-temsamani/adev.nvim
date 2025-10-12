@@ -13,9 +13,10 @@ return {
             events.cmd.enter,
             events.lsp.attach,
         },
-        -- BUG: any version above 1.3.1 don't work for some reason
+        -- BUG: any version above 1.3.1 don"t work for some reason
         version = "v1.3.1",
         dependencies = {
+            "joelazar/blink-calc",
             "saghen/blink.compat",
             "rafamadriz/friendly-snippets",
             "honza/vim-snippets",
@@ -59,7 +60,7 @@ return {
                     "snippets",
                     "buffer",
                     "cmdline",
-                    "omni",
+                    "calc"
                 },
 
                 per_filetype = {
@@ -71,6 +72,10 @@ return {
                         name = "laravel",
                         module = "blink.compat.source",
                         score_offset = 95, -- show at a higher priority than lsp
+                    },
+                    calc = {
+                        name = "Calc",
+                        module = "blink-calc",
                     },
                 },
             },
