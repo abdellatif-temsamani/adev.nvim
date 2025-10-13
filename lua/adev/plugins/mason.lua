@@ -1,11 +1,9 @@
+local events = require "adev.utils.consts.events"
+
 return {
     {
         "mason-org/mason.nvim",
         build = ":MasonUpdate",
-        dependencies = {
-            "nvimtools/none-ls.nvim",
-            "williamboman/mason-lspconfig.nvim",
-        },
         cmd = "Mason",
         keys = {
             {
@@ -25,9 +23,8 @@ return {
     },
     {
         "jay-babu/mason-null-ls.nvim",
-        dependencies = {
-            "nvimtools/none-ls.nvim",
-        },
+        after = "williamboman/mason.nvim",
+        event = { events.buffer.new_file, events.buffer.read_pre },
         opts = {
             ensure_installed = {
                 "gitlint",
@@ -66,7 +63,8 @@ return {
     },
     {
         "williamboman/mason-lspconfig.nvim",
-        dependencies = { "neovim/nvim-lspconfig" },
+        event = { events.lsp.attach, events.buffer.read_pre },
+        after = "williamboman/mason.nvim",
         opts = {
             automatic_enable = false,
             ensure_installed = {

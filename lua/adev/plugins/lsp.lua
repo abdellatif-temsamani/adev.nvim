@@ -4,6 +4,7 @@ return {
     "neovim/nvim-lspconfig",
     dependencies = {
         "mason-org/mason.nvim",
+        "williamboman/mason-lspconfig.nvim",
     },
     module = false,
     event = { events.buffer.new_file, events.buffer.read_pre },
@@ -160,7 +161,7 @@ return {
                             -- cva("…")
                             { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
                             -- cn("…")
-                            { "cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
+                            { "cn\\(([^)]*)\\)",  "[\"'`]([^\"'`]*)[\"'`]" },
                         },
                     },
                 },
@@ -170,7 +171,8 @@ return {
         vim.lsp.config("vue_ls", {
             init_options = {
                 typescript = {
-                    tsdk = "/home/flagmate/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
+                    tsdk =
+                    "/home/flagmate/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
                 },
             },
         })
