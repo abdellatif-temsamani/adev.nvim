@@ -60,7 +60,7 @@ return {
                     "snippets",
                     "buffer",
                     "cmdline",
-                    "calc"
+                    "calc",
                 },
 
                 per_filetype = {

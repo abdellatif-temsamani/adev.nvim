@@ -7,11 +7,18 @@ function M.setup_lazy()
 
     if not (vim.uv or vim.loop).fs_stat(lazypath) then
         local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-        local out = vim.fn.system { vim.g.Adev.config.git, "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath }
+        local out = vim.fn.system {
+            vim.g.Adev.config.git,
+            "clone",
+            "--filter=blob:none",
+            "--branch=stable",
+            lazyrepo,
+            lazypath,
+        }
         if vim.v.shell_error ~= 0 then
             vim.api.nvim_echo({
                 { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-                { out,                            "WarningMsg" },
+                { out, "WarningMsg" },
                 { "\nPress any key to exit..." },
             }, true, {})
             vim.fn.getchar()
@@ -23,7 +30,8 @@ function M.setup_lazy()
     require("lazy").setup {
         defaults = {
             lazy = true,
-            version = "*",
+            -- TODO: add as opts
+            -- version = "*",
         },
 
         rocks = {
@@ -61,24 +69,25 @@ end
 
 --- Configuration options for Adev.nvim setup.
 --- @class SetupOpts
---- @field git string? Path or command for Git executable (default: "git"). Used for plugin management, updates, and git operations throughout Adev.nvim.
---- @field colorscheme string? Colorscheme name to apply on startup (default: "catppuccin-mocha"). Must be a valid colorscheme that will be installed by Lazy.nvim.
+--- @field git string | "git" | nil Path or command for Git executable (default: "git").
+--- @field colorscheme string? Must be a valid colorscheme that will be installed by Lazy.nvim.
 
 ---Setup Adev.nvim core settings and bootstrap plugins.
 --- @param opts SetupOpts? Table of options.
 --- @return nil
 function M.setup(opts)
-    opts = opts or {
-        colorscheme = "catppuccin-mocha",
-        git = "git",
-    }
+    opts = opts or {}
+
+    opts.git = opts.git or "git"
+    opts.colorscheme = opts.colorscheme or "catppuccin-mocha"
+
     vim.g.Adev = {
         _NAME = "Adev.nvim",
         _AUTHOR = "Abdellatif Dev",
         _VERSION = "1.5.0",
         config = {
-            git = opts.git or "git"
-        }
+            git = opts.git,
+        },
     }
 
     M.setup_lazy()

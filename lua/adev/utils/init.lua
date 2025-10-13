@@ -13,11 +13,12 @@ end
 ---Display author and version information.
 ---This is primarily for debugging or user reference.
 function Utils.info()
-    local info = vim.g.Adev or {
-        _NAME = "Adev.nvim",
-        _VERSION = "1.5.0",
-        _AUTHOR = "Abdellatif Dev"
-    }
+    local info = vim.g.Adev
+        or {
+            _NAME = "Adev.nvim",
+            _VERSION = "1.5.0",
+            _AUTHOR = "Abdellatif Dev",
+        }
     local function nvim_version()
         local v = vim.version()
         return string.format("%d.%d.%d", v.major, v.minor, v.patch)

@@ -1,5 +1,5 @@
 local updateManager = require "adev.utils.update"
-local utils         = require "adev.utils"
+local utils = require "adev.utils"
 
 --- Sets up custom user commands for the Adev module.
 ---@return nil
