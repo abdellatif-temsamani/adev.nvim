@@ -2,6 +2,10 @@ return {
     {
         "mason-org/mason.nvim",
         build = ":MasonUpdate",
+        dependencies = {
+            "nvimtools/none-ls.nvim",
+            "williamboman/mason-lspconfig.nvim",
+        },
         cmd = "Mason",
         keys = {
             {
@@ -21,9 +25,7 @@ return {
     },
     {
         "jay-babu/mason-null-ls.nvim",
-        after = "williamboman/mason.nvim",
         dependencies = {
-            "williamboman/mason.nvim",
             "nvimtools/none-ls.nvim",
         },
         opts = {
@@ -64,8 +66,7 @@ return {
     },
     {
         "williamboman/mason-lspconfig.nvim",
-        dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
-        after = "williamboman/mason.nvim",
+        dependencies = { "neovim/nvim-lspconfig" },
         opts = {
             automatic_enable = false,
             ensure_installed = {
