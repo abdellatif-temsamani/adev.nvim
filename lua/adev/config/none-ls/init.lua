@@ -35,6 +35,7 @@ local function setup()
             formatting.cmake_format,
             formatting.isort,
             formatting.blade_formatter,
+            formatting.stylua,
             formatting.bibclean,
             formatting.shellharden,
             formatting.pretty_php,

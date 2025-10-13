@@ -58,6 +58,7 @@ return {
                 "prettierd",
                 "pyre",
                 "alex",
+                "stylua",
             },
         },
     },
