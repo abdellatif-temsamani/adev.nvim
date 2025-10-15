@@ -69,8 +69,10 @@ end
 
 --- Configuration options for Adev.nvim setup.
 --- @class SetupOpts
---- @field git string | "git" Path or command for Git executable (default: "git").
---- @field colorscheme string | "catppuccin" Must be a valid colorscheme that will be installed by Lazy.nvim.
+--- @field core CoreOpts Core configuration options.
+
+--- @class CoreOpts
+--- @field git string | "git" | nil Path or command for Git executable (default: "git").
 
 ---Setup Adev.nvim core settings and bootstrap plugins.
 --- @param opts SetupOpts? Table of options.
@@ -82,30 +84,28 @@ function M.setup(opts)
     vim.g.maplocalleader = " "
     vim.opt.termguicolors = true
 
-    opts = opts or {}
+    opts = opts or {
+        core = {},
+    }
 
-    opts.git = opts.git or "git"
-    opts.colorscheme = opts.colorscheme or "catppuccin"
+    opts.core.git = opts.core.git or "git"
 
     vim.g.Adev = {
         _NAME = "Adev.nvim",
         _AUTHOR = "Abdellatif Dev",
         _VERSION = "1.5.0",
         config = {
-            core = {
-                git = opts.git,
-            },
-            theme = {
-                colorscheme = opts.colorscheme,
-            },
+            core = opts.core,
         },
     }
+
+    require("adev.utils.update").check_adev_update()
 
     M.setup_lazy()
 
     _commands.register()
 
-    vim.cmd("colorscheme " .. opts.colorscheme)
+    vim.cmd "colorscheme catppuccin"
 end
 
 return M

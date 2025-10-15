@@ -5,7 +5,7 @@ local UdateManager = {}
 ---
 function UdateManager.update_adev()
     local config_path = vim.fn.stdpath "config"
-    local git_cmd = vim.g.Adev.config.core.git
+    local git_cmd = { vim.g.Adev.config.core.git, "pull", "--ff-only" }
 
     local stderr_lines = {}
 

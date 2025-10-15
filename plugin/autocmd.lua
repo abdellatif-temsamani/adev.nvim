@@ -12,13 +12,6 @@ autocmd(events.file.type, {
     end,
 })
 
-autocmd(events.vim.startup, {
-    group = general_grp,
-    callback = function()
-        require("adev.utils.update").check_adev_update()
-    end,
-})
-
 autocmd(events.buffer.write_pre, {
     group = general_grp,
     pattern = "*",
