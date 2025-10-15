@@ -5,7 +5,7 @@ local utils = require "adev.utils"
 ---@return nil
 local function register()
     local create_command = vim.api.nvim_create_user_command
-    local name = (vim.g.Adev and vim.g.Adev._NAME) or "Adev.nvim"
+    local name = vim.g.Adev._NAME
 
     vim.api.nvim_create_autocmd("CmdlineEnter", {
         desc = "Register Adev custom commands",

@@ -5,7 +5,7 @@ local UdateManager = {}
 ---
 function UdateManager.update_adev()
     local config_path = vim.fn.stdpath "config"
-    local git_cmd = { (vim.g.Adev and vim.g.Adev.config and vim.g.Adev.config.git) or "git", "pull", "--ff-only" }
+    local git_cmd = vim.g.Adev.config.core.git
 
     local stderr_lines = {}
 
@@ -54,7 +54,7 @@ end
 ---@return nil
 function UdateManager.check_adev_update()
     local config_path = vim.fn.stdpath "config"
-    local git_cmd = (vim.g.Adev and vim.g.Adev.config and vim.g.Adev.config.git) or "git"
+    local git_cmd = vim.g.Adev.config.core.git
 
     -- Step 1: fetch remote refs
     vim.system({ git_cmd, "-C", config_path, "fetch", "origin" }, { text = true }, function(fetch_result)

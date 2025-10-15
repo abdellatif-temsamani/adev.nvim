@@ -6,7 +6,7 @@ local Utils = {}
 ---@diagnostic disable-next-line: unused-local
 function Utils.adev_notify(msg, level)
     vim.notify(msg, level, {
-        title = (vim.g.Adev and vim.g.Adev._NAME) or "Adev.nvim",
+        title = vim.g.Adev._NAME,
     })
 end
 
@@ -14,11 +14,6 @@ end
 ---This is primarily for debugging or user reference.
 function Utils.info()
     local info = vim.g.Adev
-        or {
-            _NAME = "Adev.nvim",
-            _VERSION = "1.5.0",
-            _AUTHOR = "Abdellatif Dev",
-        }
     local function nvim_version()
         local v = vim.version()
         return string.format("%d.%d.%d", v.major, v.minor, v.patch)
@@ -47,7 +42,7 @@ function Utils.info()
         ("`Author`:  %s"):format(info._AUTHOR),
         ("`Neovim`:  %s"):format(nvim_version()),
         ("`LuaJIT`:  %s"):format(_VERSION),
-        ("`Branch`:     %s"):format(git_branch()),
+        ("`Branch`:  %s"):format(git_branch()),
     }
 
     Utils.adev_notify(table.concat(lines, "\n"), vim.log.levels.INFO)
