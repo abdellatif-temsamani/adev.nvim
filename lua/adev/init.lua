@@ -73,22 +73,26 @@ end
 
 --- @class CoreOpts
 --- @field git string | "git" | nil Path or command for Git executable (default: "git").
+--- @field mapleader string | " " | nil Leader key (default: " ").
+--- @field check_update boolean | true | nil Check for Adev.nvim updates on startup (default: true).
 
 ---Setup Adev.nvim core settings and bootstrap plugins.
 --- @param opts SetupOpts? Table of options.
 --- @return nil
 function M.setup(opts)
-    vim.loader.enable(true)
-    vim.o.winbar = " "
-    vim.g.mapleader = " "
-    vim.g.maplocalleader = " "
-    vim.opt.termguicolors = true
-
     opts = opts or {
         core = {},
     }
 
     opts.core.git = opts.core.git or "git"
+    opts.core.mapleader = opts.core.mapleader or " "
+    opts.core.check_update = opts.core.check_update or true
+
+    vim.loader.enable(true)
+    vim.o.winbar = opts.core.mapleader
+    vim.g.mapleader = opts.core.mapleader
+    vim.g.maplocalleader = opts.core.mapleader
+    vim.opt.termguicolors = true
 
     vim.g.Adev = {
         _NAME = "Adev.nvim",
@@ -99,7 +103,9 @@ function M.setup(opts)
         },
     }
 
-    require("adev.utils.update").check_adev_update()
+    if opts.core.check_update then
+        require("adev.utils.update").check_adev_update()
+    end
 
     M.setup_lazy()
 

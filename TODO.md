@@ -4,6 +4,7 @@
 
 ### Core Configuration
 
+- [ ] `plugin_mode` install it as a plugin (default: false)
 - [ ] `leader` - Custom leader key (default: " ")
 - [ ] `localleader` - Custom local leader key (default: " ")
 - [ ] `auto_update_check` - Enable/disable startup update checks (default: true)
