@@ -62,7 +62,7 @@ return {
         },
     },
     {
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason-lspconfig.nvim",
         event = { events.lsp.attach, events.buffer.read_pre },
         after = "williamboman/mason.nvim",
         opts = {
