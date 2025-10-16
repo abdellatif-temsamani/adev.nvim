@@ -37,7 +37,7 @@ opt.splitright = true
 o.equalalways = false
 o.inccommand = "split"
 o.splitkeep = "screen"
-o.winborder = "none"
+o.winborder = 'single'
 
 -- Indentation
 opt.shiftwidth = 4
