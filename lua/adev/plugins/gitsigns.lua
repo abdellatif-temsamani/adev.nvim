@@ -5,7 +5,7 @@ return {
     cond = function()
         return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
     end,
-    event = { events.buffer.new_file, events.buffer.file_pre },
+    event = { events.buffer.new_file, events.file.read_pre },
     keys = {
         {
             "<leader>tn",

@@ -5,7 +5,7 @@ return {
         "williamboman/mason.nvim",
         "nvimtools/none-ls.nvim",
     },
-    event = { events.buffer.file_pre, events.buffer.new_file, events.lsp.attach },
+    event = { events.file.read_pre, events.buffer.new_file, events.lsp.attach },
     config = function()
         require("adev.config.none-ls").setup()
     end,
