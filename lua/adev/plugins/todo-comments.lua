@@ -10,7 +10,7 @@ local alts = {
 
 return {
     "folke/todo-comments.nvim",
-    event = { events.buffer.new_file, events.file.read_pre },
+    event = { events.buffer.new_file, events.buffer.enter },
     opts = {
         signs = true,
         sign_priority = 0,

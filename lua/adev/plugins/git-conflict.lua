@@ -6,5 +6,6 @@ return {
         return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
     end,
     opts = {},
-    event = { events.buffer.new_file, events.buffer.read_pre },
+    ft= "gitcommit",
+    event = { events.file.type },
 }
