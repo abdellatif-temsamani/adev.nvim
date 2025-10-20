@@ -1,6 +1,8 @@
+local events = require "adev.utils.consts.events"
+
 return {
-    'L3MON4D3/LuaSnip',
-    event = require("adev.consts").events.file,
+    "L3MON4D3/LuaSnip",
+    event = { events.insert.enter },
     priority = 10,
     build = "make install_jsregexp",
     config = function()
@@ -8,7 +10,7 @@ return {
         require("luasnip.loaders.from_snipmate").lazy_load()
     end,
     dependencies = {
-        'rafamadriz/friendly-snippets',
-        'honza/vim-snippets',
-    }
+        "rafamadriz/friendly-snippets",
+        "honza/vim-snippets",
+    },
 }

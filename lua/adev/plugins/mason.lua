@@ -1,28 +1,30 @@
+local events = require "adev.utils.consts.events"
+
 return {
     {
         "mason-org/mason.nvim",
         build = ":MasonUpdate",
         cmd = "Mason",
-        event = require("adev.consts").events.pre,
         keys = {
-            { "<leader>mm", function() vim.cmd [[ Mason ]] end, desc = "go to declaration", },
+            {
+                "<leader>mm",
+                function()
+                    vim.cmd [[ Mason ]]
+                end,
+                desc = "go to declaration",
+            },
         },
         opts = {
             ui = {
                 check_outdated_packages_on_open = true,
-                border = 'single',
+                border = "single",
             },
         },
-
     },
     {
         "jay-babu/mason-null-ls.nvim",
-        event = require("adev.consts").events.pre,
         after = "williamboman/mason.nvim",
-        dependencies = {
-            "williamboman/mason.nvim",
-            "nvimtools/none-ls.nvim",
-        },
+        event = { events.buffer.new_file, events.buffer.read_pre },
         opts = {
             ensure_installed = {
                 "gitlint",
@@ -55,13 +57,13 @@ return {
                 "prettierd",
                 "pyre",
                 "alex",
-            }
-        }
+                "stylua",
+            },
+        },
     },
     {
-        "williamboman/mason-lspconfig.nvim",
-        event = require("adev.consts").events.pre,
-        dependencies = { 'mason-org/mason.nvim', 'neovim/nvim-lspconfig' },
+        "mason-org/mason-lspconfig.nvim",
+        event = { events.lsp.attach, events.buffer.read_pre },
         after = "williamboman/mason.nvim",
         opts = {
             automatic_enable = false,
@@ -108,7 +110,6 @@ return {
                 "intelephense",
                 "lua_ls",
             },
-        }
-    }
-
+        },
+    },
 }

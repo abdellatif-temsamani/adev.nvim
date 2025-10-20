@@ -1,12 +1,13 @@
+local events = require "adev.utils.consts.events"
+
 return {
-    'brenoprata10/nvim-highlight-colors',
-    event = require("adev.consts").events.file,
+    "brenoprata10/nvim-highlight-colors",
+    event = { events.buffer.new_file, events.buffer.enter },
     opts = {
-        render = 'virtual',
-        virtual_symbol = '■',
-        virtual_symbol_prefix = '',
+        render = "virtual",
+        virtual_symbol = "■",
+        virtual_symbol_prefix = "",
         enable_named_colors = true,
         enable_tailwind = true,
-    }
+    },
 }
-

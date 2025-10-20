@@ -1,9 +1,10 @@
-local autocmd     = vim.api.nvim_create_autocmd
+local events = require "adev.utils.consts.events"
+local autocmd = vim.api.nvim_create_autocmd
 local general_grp = vim.api.nvim_create_augroup("GENERAL", { clear = true })
 
-autocmd("FileType", {
-    group    = general_grp,
-    pattern  = "gdscript",
+autocmd(events.file.type, {
+    group = general_grp,
+    pattern = "gdscript",
     callback = function()
         vim.opt_local.expandtab = true -- use spaces
         vim.opt_local.shiftwidth = 4
@@ -11,30 +12,23 @@ autocmd("FileType", {
     end,
 })
 
-autocmd("VimEnter", {
-    group    = general_grp,
+autocmd(events.buffer.write_pre, {
+    group = general_grp,
+    pattern = "*",
     callback = function()
-        require("adev.utils").check_adev_update()
-    end
-})
-
-autocmd("BufWritePre", {
-    group    = general_grp,
-    pattern  = "*",
-    callback = function()
-        vim.cmd([[%s/\s\+$//e]])
+        vim.cmd [[%s/\s\+$//e]]
     end,
 })
 
-autocmd("FileType", {
-    group   = general_grp,
+autocmd(events.file.type, {
+    group = general_grp,
     pattern = "*",
     command = "setlocal formatoptions-=r formatoptions-=c formatoptions-=o",
 })
 
-autocmd("TextYankPost", {
-    group    = general_grp,
+autocmd(events.text.yank_post, {
+    group = general_grp,
     callback = function()
-        vim.highlight.on_yank({ timeout = 60 })
+        vim.highlight.on_yank { timeout = 60 }
     end,
 })

@@ -1,73 +1,117 @@
----@class M
----@field _NAME string
----@field _AUTHOR string
----@field _VERSION string
----@field git "git" | string
-local M = {
-    _NAME = "Adev.nvim",
-    _AUTHOR = "Abdellatif Dev",
-    _VERSION = "1.4.0",
-}
+local _commands = require "adev.commands"
 
----Display author and version information using `vim.notify`.
----
----This is primarily for debugging or user reference.
-function M:info()
-    local function nvim_version()
-        local v = vim.version()
-        return string.format("%d.%d.%d", v.major, v.minor, v.patch)
+local M = {}
+
+function M.setup_lazy()
+    local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
+
+    if not (vim.uv or vim.loop).fs_stat(lazypath) then
+        local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+        local out = vim.fn.system {
+            vim.g.Adev.config.core.git,
+            "clone",
+            "--filter=blob:none",
+            "--branch=stable",
+            lazyrepo,
+            lazypath,
+        }
+        if vim.v.shell_error ~= 0 then
+            vim.api.nvim_echo({
+                { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+                { out,                            "WarningMsg" },
+                { "\nPress any key to exit..." },
+            }, true, {})
+            vim.fn.getchar()
+            os.exit(1)
+        end
     end
+    vim.opt.rtp:prepend(lazypath)
 
-    local lines = {
-        ("`Name`:    %s"):format(self._NAME),
-        ("`Version`: %s"):format(self._VERSION),
-        ("`Author`:  %s"):format(self._AUTHOR),
-        ("`Neovim`:  %s"):format(nvim_version()),
-        ("`LuaJIT`:  %s"):format(_VERSION),
+    require("lazy").setup {
+        defaults = {
+            lazy = true,
+            -- TODO: add as opts
+            -- version = "*",
+        },
+
+        rocks = {
+            enabled = true,
+            root = vim.fn.stdpath "data" .. "/lazy-rocks",
+            server = "https://nvim-neorocks.github.io/rocks-binaries/",
+
+            hererocks = true,
+        },
+        pkg = {
+            enabled = true,
+            cache = vim.fn.stdpath "state" .. "/lazy/pkg-cache.lua",
+            sources = {
+                "lazy",
+                "rockspec",
+                "packspec",
+            },
+        },
+        spec = {
+            { import = "adev.plugins" },
+        },
+        ui = {
+            border = "single",
+            title = "Adev.nvim",
+        },
+        performance = {
+            cache = {
+                enabled = true,
+            },
+        },
+        install = { colorscheme = { "catppuccin-mocha" } },
+        checker = { enabled = true },
+    }
+end
+
+--- Configuration options for Adev.nvim setup.
+--- @class SetupOpts
+--- @field core CoreOpts Core configuration options.
+
+--- @class CoreOpts
+--- @field git string | "git" | nil Path or command for Git executable (default: "git").
+--- @field mapleader string | " " | nil Leader key (default: " ").
+--- @field check_update boolean | true | nil Check for Adev.nvim updates on startup (default: true).
+
+---Setup Adev.nvim core settings and bootstrap plugins.
+--- @param opts SetupOpts? Table of options.
+--- @return nil
+function M.setup(opts)
+    opts = opts or {
+        core = {},
     }
 
-    vim.notify(
-        table.concat(lines, "\n"),
-        vim.log.levels.INFO,
-        { title = self._NAME or "Adev info" }
-    )
-end
+    opts.core.git = opts.core.git or "git"
+    opts.core.mapleader = opts.core.mapleader or " "
+    opts.core.check_update = opts.core.check_update or true
 
---- Sets up custom user commands for the Adev module.
----
---- Creates the following Neovim user commands:
---- - `:ADInfo` — Calls `self:info()` to show information about the Adev distro.
---- - `:ADUpdate` — Runs the asynchronous update function `update_adev` from `abdellatifdev.utils`
----   to pull updates from the git repository located in `~/.config/nvim`.
----
---- Both commands include descriptive `desc` fields for `:help` and completion.
-local function setup_commands()
-    vim.api.nvim_create_autocmd("CmdlineEnter", {
-        desc = "Register Adev custom commands",
-        once = true,
-        callback = function()
-            vim.api.nvim_create_user_command("ADInfo", function()
-                M:info()
-            end, { desc = "info about Adev distro" })
+    vim.loader.enable(true)
+    vim.o.winbar = opts.core.mapleader
+    vim.g.mapleader = opts.core.mapleader
+    vim.g.maplocalleader = opts.core.mapleader
+    vim.opt.termguicolors = true
 
-            vim.api.nvim_create_user_command("ADUpdate", function()
-                require("adev.utils").update_adev()
-            end, {
-                desc = "Update Neovim config by git pulling ~/.config/nvim",
-            })
-        end,
-    })
-end
+    vim.g.Adev = {
+        _NAME = "Adev.nvim",
+        _AUTHOR = "Abdellatif Dev",
+        _VERSION = "1.5.0",
+        config = {
+            core = opts.core,
+        },
+    }
 
----Setup Neovim core settings and bootstrap plugins.
----
----This function enables Lua module caching, configures UI options,
----sets key mapping leaders, and initializes lazy.nvim plugin manager.
-function M.setup()
-    require("adev.utils").setup_lazy()
-    setup_commands()
+    if opts.core.check_update then
+        require("adev.utils.update").check_adev_update()
+    end
 
-    vim.cmd [[ colorscheme catppuccin-mocha ]]
+    M.setup_lazy()
+
+    _commands.register()
+
+    vim.cmd "colorscheme catppuccin"
 end
 
 return M

@@ -3,19 +3,31 @@ return {
     priority = 1000,
     lazy = false,
     keys = {
-        { "<leader>n",  function() Snacks.explorer() end, desc = "Files" },
-        { "<leader>wa", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
+        {
+            "<leader>n",
+            function()
+                Snacks.explorer()
+            end,
+            desc = "Files",
+        },
+        {
+            "<leader>wa",
+            function()
+                Snacks.zen.zoom()
+            end,
+            desc = "Toggle Zoom",
+        },
         {
             "<leader>to",
             function()
-                Snacks.lazygit({
+                Snacks.lazygit {
                     win = {
                         style = "terminal",
-                        border = 'single',
+                        border = "single",
                     },
-                })
+                }
             end,
-            desc = "lazygit"
+            desc = "lazygit",
         },
         {
             "<leader>tq",
@@ -23,22 +35,22 @@ return {
                 local defaults = {
                     win = {
                         style = "terminal",
-                        border = 'single',
+                        border = "single",
                     },
                 }
 
                 local opts = Snacks.config.get("lazygit", defaults)
                 Snacks.terminal({ "gh-dash" }, opts)
             end,
-            desc = "lazygit"
+            desc = "lazygit",
         },
         {
             "<leader>N",
             desc = "Neovim News",
             function()
-                Snacks.win({
+                Snacks.win {
                     file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
-                    border = 'single',
+                    border = "single",
                     width = 0.9,
                     height = 0.9,
                     wo = {
@@ -48,25 +60,24 @@ return {
                         statuscolumn = " ",
                         conceallevel = 3,
                     },
-                })
+                }
             end,
-        }
+        },
     },
     opts = {
-        explorer     = {
+        explorer = {
             enabled = true,
             replace_netrw = true,
         },
-        picker       = {
+        picker = {
             sources = {
-                explorer = {
-                }
-            }
+                explorer = {},
+            },
         },
-        input        = { enabled = true },
-        lazygit      = { enabled = true },
-        notifier     = { enabled = true },
-        image        = { enabled = true },
+        input = { enabled = true },
+        lazygit = { enabled = true },
+        notifier = { enabled = true },
+        image = { enabled = true },
         statuscolumn = {
             enabled = true,
             left = { "mark", "sign" },

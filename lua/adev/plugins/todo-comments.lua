@@ -1,14 +1,16 @@
+local events = require "adev.utils.consts.events"
+
 local alts = {
     FIX = { "FIXME", "BUG", "FIXIT", "ISSUE", "ERROR" },
     DONE = { "DONE", "DONE!", "DONE.", "FIXED", "WONTFIX" },
     TODO = { "PLAN", "TODO", "TASK", "START", "BEGIN" },
     WARN = { "WARNING", "WARN", "HACK" },
-    PREF = { "PERF", "OPTIM", "OPTIMIZE", "PERFORMANCE" }
+    PREF = { "PERF", "OPTIM", "OPTIMIZE", "PERFORMANCE" },
 }
 
 return {
     "folke/todo-comments.nvim",
-    event = require("adev.consts").events.file,
+    event = { events.buffer.new_file, events.buffer.enter },
     opts = {
         signs = true,
         sign_priority = 0,
@@ -28,16 +30,18 @@ return {
             after = "fg",
             pattern = [[.*<(KEYWORDS)\s*:]],
             comments_only = true,
-            max_line_len = 400
+            max_line_len = 400,
         },
         search = {
             command = "rg",
             args = {
-                "--color=never", "--no-heading", "--with-filename",
-                "--line-number", "--column"
+                "--color=never",
+                "--no-heading",
+                "--with-filename",
+                "--line-number",
+                "--column",
             },
-            pattern = [[\b(KEYWORDS):]]
-        }
-
+            pattern = [[\b(KEYWORDS):]],
+        },
     },
 }

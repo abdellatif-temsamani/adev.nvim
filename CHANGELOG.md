@@ -12,6 +12,66 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [1.5.0] - 2025-10-19
+
+### 🚀 Features
+
+- More info
+- New utils function
+- Opts "git"
+- Opts "colorscheme"
+- _(blink-cmp)_ Calc source
+- _(null-ls)_ Added stylua
+- _(new-plugin)_ [**breaking**] Augment
+- _(set)_ More options
+
+### 🐛 Bug Fixes
+
+- _(blink.cmp)_ Config
+- Version
+- Check update
+- _(laravel)_ Fix lazyloading
+- Lazy loading
+- Lazyloading
+- Luadocs
+- Queries
+- _(comments)_ Lazyloading conditions
+- _(mason)_ Lazyloading
+- _(mason)_ Plugin not loading
+- [**breaking**] Lazy loading condition
+- _(mason-lspconfig)_ Origin
+- Config
+- _(options)_ Border = 'single'
+- _(plugins)_ Event loading
+- _(treesitter)_ Not loading
+- _(plugins)_ Lazy loading conditions
+
+### 🚜 Refactor
+
+- _(core)_ Changing code structure
+- [**breaking**] Internal structure
+- _(events)_ Rewrite Event handler
+- _(core)_ Refactoring vim.g.adev
+- _(core)_ Refactoring vim.g.adev
+
+### 📚 Documentation
+
+- Fix plugin struture
+- Update adev.txt
+- _(adev.txt)_ Update
+- Update README
+
+### 🎨 Styling
+
+- Unify code formatting
+- Stylua toml
+- _(stylua)_ Formatting
+- Linting
+
+### ⚙️ Miscellaneous Tasks
+
+- Todo.md
+
 ## [1.4.0] - 2025-10-08
 
 ### 🚀 Features

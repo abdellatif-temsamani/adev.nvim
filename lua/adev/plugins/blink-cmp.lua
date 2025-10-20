@@ -1,31 +1,38 @@
+local events = require "adev.utils.consts.events"
 return {
     {
-        'saghen/blink.compat',
-        after = 'saghen/blink.cmp',
+        "saghen/blink.compat",
+        after = "saghen/blink.cmp",
         version = "2.*",
         opts = {},
     },
     {
-        'saghen/blink.cmp',
-        event = require("adev.consts").events:merge({ "file", "cmd", "lsp" }),
+        "saghen/blink.cmp",
+        event = {
+            events.insert.enter,
+            events.cmd.enter,
+            events.lsp.attach,
+        },
+        -- BUG: any version above 1.3.1 don"t work for some reason
         version = "v1.3.1",
         dependencies = {
-            'saghen/blink.compat',
-            'rafamadriz/friendly-snippets',
-            'neovim/nvim-lspconfig',
-            'honza/vim-snippets',
-            'disrupted/blink-cmp-conventional-commits',
+            "joelazar/blink-calc",
+            "saghen/blink.compat",
+            "rafamadriz/friendly-snippets",
+            "honza/vim-snippets",
+            "L3MON4D3/LuaSnip",
+            "disrupted/blink-cmp-conventional-commits",
         },
-        ---@module 'blink.cmp'
+        ---@module "blink.cmp"
         ---@type blink.cmp.Config
         opts = {
             cmdline = {
-                keymap = { preset = 'inherit' },
+                keymap = { preset = "inherit" },
                 completion = { ghost_text = { enabled = true }, menu = { auto_show = true } },
             },
 
             keymap = {
-                preset = 'default',
+                preset = "default",
                 ["<C-k>"] = { "scroll_documentation_up", "fallback" },
                 ["<C-j>"] = { "scroll_documentation_down", "fallback" },
             },
@@ -36,29 +43,28 @@ return {
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 500,
-                    window = { border = 'single' }
+                    window = { border = "single" },
                 },
                 menu = {
                     border = "single",
                     draw = {
                         columns = { { "kind_icon", gap = 1, "label", "kind" } },
                     },
-
                 },
             },
 
             sources = {
                 default = {
-                    'lsp',
-                    'path',
-                    'snippets',
-                    'buffer',
-                    'cmdline',
-                    'omni',
+                    "lsp",
+                    "path",
+                    "snippets",
+                    "buffer",
+                    "cmdline",
+                    "calc",
                 },
 
                 per_filetype = {
-                    php = { 'laravel', inherit_defaults = true, },
+                    php = { "laravel", inherit_defaults = true },
                 },
 
                 providers = {
@@ -67,21 +73,23 @@ return {
                         module = "blink.compat.source",
                         score_offset = 95, -- show at a higher priority than lsp
                     },
-
+                    calc = {
+                        name = "Calc",
+                        module = "blink-calc",
+                    },
                 },
             },
 
-
-            snippets = { preset = 'luasnip' },
+            snippets = { preset = "luasnip" },
             fuzzy = {
                 implementation = "rust",
                 sorts = {
-                    'exact',
+                    "exact",
                     -- defaults
-                    'score',
-                    'sort_text',
+                    "score",
+                    "sort_text",
                 },
             },
-        }
-    }
+        },
+    },
 }
