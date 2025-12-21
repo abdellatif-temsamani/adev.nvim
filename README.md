@@ -219,16 +219,17 @@ For detailed documentation on all setup options and advanced configuration, see
 
 ## 🛠️ Commands
 
-Adev.nvim provides several custom commands to enhance your workflow:
+ Adev.nvim provides several custom commands to enhance your workflow:
 
-- **`:ADUpdate`** - Update Adev configuration via git pull
-- **`:ADUpdateCheck`** - Check for available updates without updating
-- **`:ADChangelog`** - View the changelog for current or specified version
-- **`:ADVersions`** - List available versions from git tags
-- **`:Lazy profile`** - Analyze plugin loading times
-- **`:Lazy sync`** - Update all plugins
-- **`:Mason`** - Manage LSP servers and tools
-- **`:Telescope`** - Fuzzy find files, buffers, and more
+ - **`:ADUpdate`** - Update Adev configuration via git pull
+ - **`:ADConfig`** - Edit Adev configuration file
+ - **`:ADUpdateCheck`** - Check for available updates without updating
+ - **`:ADChangelog`** - View the changelog for current or specified version
+ - **`:ADVersions`** - List available versions from git tags
+ - **`:Lazy profile`** - Analyze plugin loading times
+ - **`:Lazy sync`** - Update all plugins
+ - **`:Mason`** - Manage LSP servers and tools
+ - **`:Telescope`** - Fuzzy find files, buffers, and more
 
  ## 📁 Project Structure
 

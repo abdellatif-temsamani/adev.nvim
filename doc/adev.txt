@@ -224,10 +224,11 @@ The configuration follows a modular Lua-based architecture: >
 3.4 Commands (`lua/adev/commands.lua`):~
 - Registers commands lazily on first `CmdlineEnter` event for performance
 - Safe name resolution with vim.g.Adev fallback to "Adev.nvim"
-- `ADUpdate`: Update configuration via update_manager.update()
-- `ADUpdateCheck`: Check for available updates via update_manager.check_update()
-- `ADChangelog`: Display changelog via changelog.show_changelog()
-- `ADVersions`: List available versions via changelog.list_versions()
+ - `ADUpdate`: Update configuration via update_manager.update()
+ - `ADConfig`: Edit configuration file via onboarding.edit_config()
+ - `ADUpdateCheck`: Check for updates via update_manager.check_update()
+ - `ADChangelog`: Display changelog via changelog.show_changelog()
+ - `ADVersions`: List available versions via changelog.list_versions()
 - All commands include descriptive help text with dynamic naming
 
 *adev-utils*~
@@ -614,16 +615,23 @@ Language Specific:~
 ==============================================================================
 6. COMMANDS                                              *adev-commands*
 
-*:ADUpdate* *ADUpdate*
-:ADUpdate     Update Adev configuration via git pull.
-              - Uses safe git command resolution (fallback to "git")
-              - Runs `git pull --ff-only` in ~/.config/nvim
-              - Shows progress notifications via adev_notify
-              - Handles stdout and stderr output gracefully
-              - Provides success/error feedback with detailed messages
-              - Uses asynchronous jobstart execution for non-blocking operation
+ *:ADUpdate* *ADUpdate*
+ :ADUpdate     Update Adev configuration via git pull.
+               - Uses safe git command resolution (fallback to "git")
+               - Runs `git pull --ff-only` in ~/.config/nvim
+               - Shows progress notifications via adev_notify
+               - Handles stdout and stderr output gracefully
+               - Provides success/error feedback with detailed messages
+               - Uses asynchronous jobstart execution for non-blocking operation
 
-*:ADUpdateCheck* *ADUpdateCheck*
+ *:ADConfig* *ADConfig*
+ :ADConfig     Edit Adev configuration file.
+               - Opens `lua/adev/init-opts.lua` in the current buffer
+               - Allows customization of setup options without editing core files
+               - Part of the onboarding system for user configuration
+               - Provides access to all configurable options in one file
+
+ *:ADUpdateCheck* *ADUpdateCheck*
 :ADUpdateCheck Check for available updates without updating.
                - Uses safe git command resolution with fallbacks
                - Fetches remote refs asynchronously via vim.system

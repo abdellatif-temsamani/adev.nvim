@@ -1,4 +1,5 @@
 local changelog = require "adev.changelog"
+local onboarding = require "adev.onboarding"
 local update_manager = require "adev.update_manager"
 
 local M = {
@@ -7,6 +8,11 @@ local M = {
             name = "ADUpdate",
             command = update_manager.update,
             opts = { desc = "Update adev" },
+        },
+        {
+            name = "ADConfig",
+            command = onboarding.edit_config,
+            opts = { desc = "Edit Adev configuration file" },
         },
         {
             name = "ADUpdateCheck",
