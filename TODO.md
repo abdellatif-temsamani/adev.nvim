@@ -2,36 +2,52 @@
 
 ## 🔧 Setup Options to Add
 
+## plugins considered for addition
+
+- lewis6991/hover.nvim
+
+### core features
+
+those will be core features that are required for adev to work
+
+- [x] `update_manager` - `:AdevUpdate` and `:AdevUpdateCheck` commands
+- [x] `changelog` - `:AdevChangelog` command to show latest chances depends on
+      git tags and [changelog](./CHANGELOG.md) file
+- [ ] `telescope integration` - create a telescope picker for adev to show
+      helpful information
+- [ ] `onboarding` - create a onboarding system for adev to show helpful (for
+      new users)
+
 ### Core Configuration
 
-- [ ] `plugin_mode` install it as a plugin (default: false)
-- [ ] `leader` - Custom leader key (default: " ")
-- [ ] `localleader` - Custom local leader key (default: " ")
-- [ ] `auto_update_check` - Enable/disable startup update checks (default: true)
-- [ ] `lazy_loading` - Control lazy loading behavior (default: true)
+- [x] `leader` - Custom leader key (default: " ")
+- [x] `localleader` - Custom local leader key (default: " ")
+- [x] `lazy_loading` - Control lazy loading behavior (default: true)
+- [x] `auto_update_check` - Enable/disable startup update checks (default: true)
+- [x] `version` - lazy.nvim defualt.version (default: nil)
 - [ ] `performance_mode` - Optimize for performance vs features (default: false)
+- [ ] `mouse support` - Enable mouse support (default: false)
+- [x] `ai` - Enable/disable AI assistance (default: false)
+- [x] `ai_plugin` - AI assistance plugin to use (default:
+      "supermaven-inc/supermaven-nvim")
+- [x] `colorscheme` - Colorscheme to use (default: "catppuccin-mocha")
+- [x] `plugins` - Custom list of plugins to install
+- [ ] `plugins_opts` - disable/enable certain core plugins
 
 ### UI & Theme Options
 
-- [ ] `transparent_bg` - Enable transparent background (default: false)
+- [x] `transparent_bg` - Enable transparent background (default: false)
 - [ ] `icons` - Enable/disable nerd font icons (default: true)
-- [ ] `borders` - Border style for UI elements ("single", "rounded", "none")
-- [ ] `winbar` - Custom winbar configuration
-- [ ] `statusline` - Enable/disable lualine (default: true)
-- [ ] `dim_inactive` - Dim inactive windows percentage (default: 0.15)
+- [x] `borders` - Border style for UI elements ("single", "rounded", "none")
+- [ ] `dim_inactive` - Dim inactive windows percentage (default: 0.1)
 
 ### LSP & Completion
 
-- [ ] `lsp_servers` - Custom list of LSP servers to install
+- [x] `lsp` - Enable/disable LSP (default: true)
+- [x] `lsp_servers` - Custom list of LSP servers to install
 - [ ] `diagnostics` - LSP diagnostics configuration
   - [ ] `virtual_text` - Enable virtual diagnostic text
-  - [ ] `signs` - Enable diagnostic signs in gutter
-  - [ ] `underline` - Underline diagnostic text
-  - [ ] `severity_sort` - Sort diagnostics by severity
-- [ ] `completion` - Completion engine settings
-  - [ ] `sources` - Custom completion sources
-  - [ ] `snippet_engine` - Choose snippet engine ("luasnip", "vsnip")
-  - [ ] `ghost_text` - Enable completion ghost text
+  - [ ] `signs` - Enable diagnostic signs in collumn line
 
 ### File Management
 
@@ -43,61 +59,34 @@
 
 ### Git Integration
 
-- [ ] `git_signs` - Enable/disable git signs in gutter
-- [ ] `git_blame` - Enable git blame integration
-- [ ] `lazygit_config` - Custom lazygit configuration
-
-### Terminal & Tasks
-
-- [ ] `terminal` - Terminal integration settings
-- [ ] `shell` - Default shell for terminal
-- [ ] `task_runner` - Enable task runner integration
+- [x] `git_signs` - Enable/disable git signs in gutter
+- [x] `git_blame` - Enable git blame integration
+- [x] `lazygit` - lazygit floating window
 
 ## 🚀 Feature Enhancements
 
 ### Plugin Additions
 
-- [ ] **Debugging Support**
-  - [ ] nvim-dap for debugging
-  - [ ] nvim-dap-ui for debug interface
-  - [ ] Language-specific debug adapters
-- [ ] **Testing Framework**
-  - [ ] neotest for running tests
-  - [ ] Test adapters for different languages
-- [ ] **AI Integration**
-  - [ ] GitHub Copilot support
-  - [ ] CopilotChat for AI assistance
-- [ ] **Database Tools**
-  - [ ] vim-dadbod for database interaction
-  - [ ] Database UI integration
-- [ ] **Session Management**
-  - [ ] persistence.nvim for session restoration
-  - [ ] Project-specific sessions
-- [ ] **Enhanced Git**
-  - [ ] diffview.nvim for better diffs
-  - [ ] neogit for git interface
-  - [ ] GitHub integration improvements
+- [x] **AI Integration**
+  - [x] custom AI assistance
+- [x] **Enhanced Git**
+  - [x] diffview.nvim for better diffs
+  - [x] GitHub integration improvements
 
 ### UI Improvements
 
-- [ ] **Which-key Integration**
-  - [ ] Key binding discovery
-  - [ ] Contextual help
-- [ ] **Enhanced Notifications**
-  - [ ] Better notification system
-  - [ ] Progress indicators
-- [ ] **Improved File Explorer**
-  - [ ] Oil.nvim as alternative
-  - [ ] Yazi integration
-- [ ] **Terminal Enhancements**
-  - [ ] toggleterm.nvim for better terminals
-  - [ ] Multiple terminal management
+- [x] **Which-key Integration**
+  - [x] Key binding discovery
+  - [x] Contextual help
+- [x] **Enhanced Notifications**
+  - [x] Better notification system
+  - [x] Progress indicators
 
 ### Performance Optimizations
 
-- [ ] **Startup Time**
-  - [ ] Profile and optimize slow plugins
-  - [ ] Better lazy loading strategies
+- [x] **Startup Time**
+  - [x] Profile and optimize slow plugins
+  - [x] Better lazy loading strategies
 - [ ] **Memory Usage**
   - [ ] Monitor and optimize memory consumption
   - [ ] Garbage collection improvements
@@ -141,86 +130,3 @@
 - [ ] **Better Error Messages**
   - [ ] User-friendly error reporting
   - [ ] Debugging information
-
-## 🎯 Configuration Examples
-
-### Minimal Setup
-
-```lua
-require("adev").setup({
-    performance_mode = true,
-    icons = false,
-    auto_update_check = false
-})
-```
-
-### Power User Setup
-
-```lua
-require("adev").setup({
-    transparent_bg = true,
-    diagnostics = {
-        virtual_text = true,
-        signs = true,
-        severity_sort = true
-    },
-    completion = {
-        ghost_text = true,
-        sources = { "lsp", "buffer", "path" }
-    },
-    lsp_servers = { "lua_ls", "ts_ls", "rust_analyzer" }
-})
-```
-
-### Development Setup
-
-```lua
-require("adev").setup({
-    git_blame = true,
-    terminal = { shell = "zsh" },
-    file_explorer = "oil",
-    borders = "rounded"
-})
-```
-
-## 📋 Implementation Priority
-
-### High Priority
-
-1. Core setup options (leader, auto_update_check, transparent_bg)
-2. LSP and completion configuration
-3. UI customization options
-4. Better error handling
-
-### Medium Priority
-
-1. Plugin additions (debugging, testing)
-2. Performance optimizations
-3. Enhanced documentation
-4. Session management
-
-### Low Priority
-
-1. Advanced integrations
-2. Experimental features
-3. Alternative plugin options
-4. Complex customizations
-
-## 🔄 Migration Strategy
-
-### Backward Compatibility
-
-- [ ] Ensure existing configurations continue to work
-- [ ] Provide migration guide for breaking changes
-- [ ] Deprecation warnings for old options
-
-### Gradual Implementation
-
-- [ ] Implement options incrementally
-- [ ] Test each addition thoroughly
-- [ ] Update documentation with each change
-
----
-
-**Note**: This TODO list should be implemented gradually to maintain stability
-and ensure each feature is properly tested and documented.

@@ -1,4 +1,4 @@
-local function setup()
+return function()
     local null_setup = require("null-ls").setup
     local builtins = require "null-ls.builtins"
     local h = require "null-ls.helpers"
@@ -10,9 +10,6 @@ local function setup()
 
     -- formatting sources
     local formatting = builtins.formatting
-
-    -- completion sources
-    local completion = builtins.completion
 
     -- deno_fmt
     local deno_fmt = require "adev.config.none-ls.deno_fmt"
@@ -35,6 +32,7 @@ local function setup()
             formatting.cmake_format,
             formatting.isort,
             formatting.blade_formatter,
+            formatting.djhtml,
             formatting.stylua,
             formatting.bibclean,
             formatting.shellharden,
@@ -49,33 +47,10 @@ local function setup()
             formatting.cbfmt,
             deno_fmt.with { filetypes = { "markdown" } }, --
             formatting.sql_formatter,
-            formatting.prettier.with {
-                args = h.range_formatting_args_factory(
-                    {
-                        "--stdin-filepath",
-                        "$FILENAME",
-                        "--tab-width",
-                        "4",
-                        "--embedded-language-formatting",
-                        "auto",
-                    },
-                    "--range-start",
-                    "--range-end",
-                    {
-                        row_offset = -1,
-                        col_offset = -1,
-                    }
-                ),
-                disabled_filetypes = { "markdown" },
-            },
-            -- completion  --------------------------------
-            completion.tags,
-            completion.spell,
+            formatting.prettier,
             -- code_actions  --------------------------------
             code_actions.gitrebase,
             code_actions.proselint,
         },
     }
 end
-
-return { setup = setup }

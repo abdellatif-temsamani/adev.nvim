@@ -22,7 +22,7 @@ return {
                 "java.base/java.lang=ALL-UNNAMED",
                 "-jar",
                 os.getenv "HOME"
-                    .. "/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.7.0.v20250331-1702.jar",
+                    .. "/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_1.7.100.v20251111-0406.jar",
                 "-configuration",
                 os.getenv "HOME" .. "/.local/share/nvim/mason/packages/jdtls/config_linux",
                 "-data",

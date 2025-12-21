@@ -3,7 +3,7 @@
                               ADEV.NVIM DOCUMENTATION
 
 Author:       Abdellatif Dev
-Version:      1.5.0
+Version:      2.0.0
 License:      MIT
 
 ==============================================================================
@@ -36,18 +36,24 @@ extensive functionality.
 Key Features:~
 - Modern UI with Catppuccin Mocha theme and transparent background support
 - Comprehensive LSP support via Mason with 40+ language servers
-- Advanced completion with blink.cmp (v1.3.1) and snippet support
+- Advanced completion with blink.cmp and snippet support
+- AI Integration: Configurable AI assistants (AugmentCode, Supermaven, etc.)
 - Fuzzy finding with Telescope and smart ignore patterns
-- Git integration with Gitsigns, Git Conflict, and Lazygit
+- Git integration with Gitsigns, Git Conflict, Lazygit, and GitHub tools
 - Treesitter syntax highlighting with context and auto-tags
 - Snacks.nvim for modern file explorer and terminal integration
 - Noice.nvim for enhanced UI (cmdline, popupmenu, notifications)
+- Onboarding system with automatic configuration generation
 - Status column with git signs and fold indicators
 - Custom commands and automatic update checking
 - Lazy loading for optimal performance (plugins load only when needed)
 - Modular plugin architecture with event-based loading
 - Health checks for system dependencies and configuration validation
 - Support for 25+ programming languages out of the box
+- Laravel development tools and Blade template support
+- Rust crate management with crates.nvim
+- Java development with jdtls
+- Automatic whitespace cleanup and smart format options
 
 ==============================================================================
 2. ARCHITECTURE & STRUCTURE                           *adev-architecture*
@@ -55,49 +61,64 @@ Key Features:~
 The configuration follows a modular Lua-based architecture: >
 
     ~/.config/nvim/
-    ├── init.lua                  -- Entry point (8 lines)
+    ├── init.lua                  -- Auto-generated entry point
+    ├── lua/adev/init-opts.lua    -- Auto-generated configuration options
     ├── lua/adev/
-    │   ├── init.lua              -- Main module (81 lines)
-    │   ├── commands.lua          -- Custom commands (33 lines)
-    │   ├── health.lua            -- Health checks (280 lines)
+    │   ├── init.lua              -- Main module
+    │   ├── commands.lua          -- Custom commands
+    │   ├── changelog.lua         -- Changelog command
+    │   ├── defaults.lua          -- Default configuration
+    │   ├── lazy.lua              -- Plugin manager setup
+    │   ├── lsp.lua               -- LSP configuration
+    │   ├── onboarding/
+    │   │   └── init.lua          -- Auto configuration generation
+    │   ├── update_manager/
+    │   │   ├── check_update.lua  -- Update checking
+    │   │   ├── init.lua          -- Update manager
+    │   │   └── update.lua        -- Update functionality
     │   ├── utils/
-    │   │   ├── init.lua          -- Utility functions (14 lines)
-    │   │   ├── update.lua        -- Update management (149 lines)
-    │   │   └── consts/
-    │   │       ├── init.lua      -- Constants (18 lines)
-    │   │       └── events.lua    -- Event definitions (186 lines)
+    │   │   ├── init.lua          -- Utility functions
+    │   │   └── events.lua        -- Event definitions
     │   ├── config/               -- Configuration files
+    │   │   ├── lspconfig.lua     -- LSP client configs
     │   │   ├── mini.lua          -- Mini.nvim configuration
-    │   │   ├── treesitter.lua    -- Treesitter setup (21 lines)
     │   │   └── none-ls/          -- None-ls configurations
     │   │       ├── init.lua      -- Main none-ls setup
     │   │       ├── deno_fmt.lua  -- Deno formatter
     │   │       └── dgformat.lua  -- DG formatter
-    │   └── plugins/              -- Plugin specifications (22 files)
-    │       ├── disabled/         -- Disabled plugins
-    │       │   └── cmp.lua       -- Alternative completion engine
-    │       ├── blink-cmp.lua     -- Completion engine (91 lines)
-    │       ├── lsp.lua           -- LSP configuration (282 lines)
-    │       ├── mason.lua         -- LSP/tool installer (116 lines)
-    │       ├── telescope.lua     -- Fuzzy finder (135 lines)
-    │       ├── theme.lua         -- Catppuccin theme (30 lines)
-    │       ├── treesitter.lua    -- Syntax highlighting (41 lines)
-    │       ├── snacks.lua        -- Modern UI components (96 lines)
-    │       ├── gitsigns.lua      -- Git integration
-    │       ├── lualine.lua       -- Statusline
-    │       ├── noice.lua         -- Enhanced UI
-    │       ├── git-conflict.lua  -- Merge conflict resolution
-    │       ├── octo.lua          -- GitHub integration
-    │       ├── todo-comments.lua -- TODO highlighting
+    │   ├── custom-plugins/       -- User custom plugins directory
+    │   │   ├── .gitignore        -- Git ignore for custom plugins
+    │   │   └── example.lua       -- Example custom plugin
+    │   ├── types/                -- Type definitions
+    │   │   ├── adev.lua          -- Adev type annotations
+    │   │   └── init.lua          -- Type system initialization
+    │   ├── ui/                   -- UI configuration
+    │   │   └── init.lua          -- UI setup and theming
+    │   └── plugins/              -- Plugin specifications (25+ files)
+    │       ├── ai.lua            -- AI assistant integration
+    │       ├── blink.lua         -- Completion engine
     │       ├── cloak.lua         -- Environment variable concealing
-    │       ├── highlight-colors.lua -- Color highlighting
-    │       ├── laravel.lua       -- Laravel development tools
+    │       ├── color-highlight.lua -- Color highlighting
+    │       ├── comment.lua       -- Smart commenting
     │       ├── crates.lua        -- Rust crate management
-    │       ├── luasnip.lua       -- Snippet engine
+    │       ├── git-signs.lua     -- Git integration
+    │       ├── jdtls.lua         -- Java development tools
+    │       ├── laravel.lua       -- Laravel development tools
     │       ├── lazydev.lua       -- Lua development enhancements
+    │       ├── lspconfig.lua     -- LSP configurations
+    │       ├── lualine.lua       -- Statusline
+    │       ├── luasnip.lua       -- Snippet engine
+    │       ├── mason.lua         -- LSP/tool installer
     │       ├── mini.lua          -- Various mini plugins
+    │       ├── neogen.lua        -- Code generation
+    │       ├── noice.lua         -- Enhanced UI
     │       ├── none-ls.lua       -- Formatting and linting
-    │       └── nvim-jdtls.lua    -- Java development tools
+    │       ├── octo.lua          -- GitHub integration
+    │       ├── snacks.lua        -- Modern UI components
+    │       ├── telescope.lua     -- Fuzzy finder
+    │       ├── theme.lua         -- Catppuccin theme
+    │       ├── todo-comments.lua -- TODO highlighting
+    │       └── treesitter.lua    -- Syntax highlighting
     ├── plugin/                   -- Core Neovim settings
     │   ├── sets.lua              -- Vim options (41 lines)
     │   ├── keymaps.lua           -- Key mappings (42 lines)
@@ -121,14 +142,21 @@ The configuration follows a modular Lua-based architecture: >
 - Sets winbar to empty space: `vim.o.winbar = " "`
 - Configures leader keys: `vim.g.mapleader = " "` and `vim.g.maplocalleader = " "`
 - Enables true color support: `vim.opt.termguicolors = true`
-- Calls `require("adev").setup()` to bootstrap the configuration
+ - Calls `require("adev").setup()` to bootstrap the configuration
 
-*adev-main-module*~
+ *adev-init-opts*~
+ 3.1.1 Auto-generated Options (`lua/adev/init-opts.lua`):~
+ - Contains user configuration options
+ - Generated by onboarding system on first run
+ - Allows customization without editing core files
+ - Includes defaults for colorscheme, AI assistant, LSP, UI
+
+ *adev-main-module*~
 3.2 Main Module (`lua/adev/init.lua`):~
 - Defines global metadata in `vim.g.Adev`:
   - `_NAME`: "Adev.nvim"
   - `_AUTHOR`: "Abdellatif Dev"
-  - `_VERSION`: "1.5.0"
+  - `_VERSION`: "2.0.0"
   - `config.git`: Git command (defaults to "git")
 - `setup_lazy()`: Bootstraps Lazy.nvim plugin manager
   - Auto-installs Lazy.nvim if not present
@@ -234,10 +262,70 @@ Adev.nvim includes comprehensive error handling throughout the codebase:
 - **Notification safety**: Safe title resolution for all notification functions
 - **Command registration safety**: Commands work even if vim.g.Adev not initialized
 
-This ensures the configuration remains stable even during initialization or
-when components are accessed before full setup completion.
+ This ensures the configuration remains stable even during initialization or
+ when components are accessed before full setup completion.
 
-==============================================================================
+ *adev-changelog*~
+ 3.8 Changelog (`lua/adev/changelog.lua`):~
+ - Handles changelog command functionality
+ - Reads and displays CHANGELOG.md content
+ - Uses Telescope for navigation when available
+
+ *adev-defaults*~
+ 3.9 Defaults (`lua/adev/defaults.lua`):~
+ - Defines default configuration options
+ - Provides fallback values for setup options
+ - Centralizes configuration defaults
+
+ *adev-lazy-setup*~
+ 3.10 Lazy Setup (`lua/adev/lazy.lua`):~
+ - Configures Lazy.nvim plugin manager
+ - Sets up performance optimizations and caching
+ - Manages plugin installation and loading
+
+ *adev-lsp-setup*~
+ 3.11 LSP Setup (`lua/adev/lsp.lua`):~
+ - Configures LSP servers and capabilities
+ - Sets up diagnostic handlers and inlay hints
+ - Manages LSP enablement and server-specific settings
+
+ *adev-onboarding*~
+ 3.12 Onboarding (`lua/adev/onboarding/`):~
+ - Auto-generates configuration files for new users
+ - Provides guided setup on first run
+ - Detects new installations and initializes defaults
+
+ *adev-update-manager*~
+ 3.13 Update Manager (`lua/adev/update_manager/`):~
+ - Handles configuration updates via git
+ - Checks for available updates asynchronously
+ - Provides safe git operations with error handling
+
+ *adev-config*~
+ 3.14 Config (`lua/adev/config/`):~
+ - Contains configuration files for various tools
+ - LSP client configs, mini.nvim settings, none-ls formatters
+ - Modular configuration organization
+
+ *adev-types*~
+ 3.15 Types (`lua/adev/types/`):~
+ - Type definitions and annotations
+ - Lua type system integration
+ - Development-time type checking support
+
+ *adev-ui*~
+ 3.16 UI (`lua/adev/ui/`):~
+ - UI setup and theming configuration
+ - Border styles and appearance settings
+ - Theme application and customization
+
+ *adev-custom-plugins-dir*~
+ 3.17 Custom Plugins (`lua/adev/custom-plugins/`):~
+ - Directory for user-specific plugin additions
+ - Allows safe plugin installation without core modifications
+ - Example template provided for new plugins
+
+ ==============================================================================
 4. PLUGIN CONFIGURATION                                 *adev-plugins*
 
 4.1 Plugin Manager (Lazy.nvim)~
@@ -253,13 +341,16 @@ when components are accessed before full setup completion.
 
 *adev-completion*~
 LSP & Completion:~
-- blink.cmp (v1.3.1): Modern completion engine with Rust implementation
-  - blink.compat: Compatibility layer for other completion sources
+- blink.cmp: Modern completion engine with Rust implementation
   - Cmdline completion with ghost text and auto-show menu
-  - Documentation with auto-show (500ms delay) and single border
+  - Documentation with auto-show and border styling
   - Sources: LSP, path, snippets, buffer, cmdline, omni
   - Laravel-specific completion support
   - LuaSnip integration for snippets
+- AI Integration: Configurable AI assistants
+  - AugmentCode: AI-powered code completion
+  - Supermaven: AI coding assistant
+  - Customizable AI plugin selection
 - nvim-lspconfig: LSP client configurations with 40+ servers
 - mason.nvim: LSP/DAP/linter installer with auto-update
 - mason-lspconfig.nvim: Automatic LSP server installation
@@ -317,9 +408,11 @@ Development Tools:~
 
 *adev-language-specific*~
 Language Specific:~
-- laravel.nvim: Laravel development tools and Blade support
+- laravel.nvim: Laravel development tools and Blade template support
 - crates.nvim: Rust crate management and version checking
+- jdtls: Java development tools and language server integration
 - luasnip: Snippet engine with friendly-snippets and vim-snippets
+- neogen: Code documentation generation
 
 4.3 Loading Strategy~
 - Event-based loading using comprehensive `adev.utils.consts.events`
@@ -448,7 +541,7 @@ Language Specific:~
 :ADInfo       Display Adev version, author, and runtime information.
               Shows:
               - Configuration name: "Adev.nvim"
-              - Version: "1.5.0"
+              - Version: "2.0.0"
               - Author: "Abdellatif Dev"
               - Neovim version (major.minor.patch)
               - LuaJIT version
@@ -476,6 +569,18 @@ Language Specific:~
               - Shows "up-to-date" message if current
               - Includes comprehensive error handling for all git operations
 
+*:AdevChangelog*
+:AdevChangelog Display the changelog for the current version.
+               - Reads from CHANGELOG.md file
+               - Shows recent updates and features
+               - Uses Telescope for navigation if available
+
+*:AdevOnboarding*
+:AdevOnboarding Launch the onboarding wizard for new users.
+                - Provides guided setup for first-time users
+                - Helps configure initial preferences
+                - Interactive configuration assistant
+
 Note: Commands are registered lazily on first `CmdlineEnter` event for
       optimal startup performance. All commands include safe configuration
       access and graceful error handling.
@@ -502,24 +607,27 @@ Note: Commands are registered lazily on first `CmdlineEnter` event for
 
 7.2 Installation:~
 1. Backup existing Neovim configuration: >
-    mv ~/.config/nvim ~/.config/nvim.backup
+     mv ~/.config/nvim ~/.config/nvim.backup
 <
 2. Clone Adev.nvim: >
-    git clone <repository-url> ~/.config/nvim
+     git clone https://github.com/abdellatif-temsamani/adev.nvim ~/.config/nvim
 <
 3. Launch Neovim: >
-    nvim
+     nvim
 <
 4. Run health check: >
-    :checkhealth
+     :checkhealth
 <
 
-7.3 First Run:~
-- Lazy.nvim will automatically install
-- All plugins will be downloaded and configured
-- LSP servers will be installed via Mason
-- Treesitter parsers will be installed on-demand
-- Default colorscheme (catppuccin-mocha) will be applied
+7.3 First Run (Auto Configuration):~
+- Onboarding system detects new installation
+- Automatically generates `init.lua` and `lua/adev/init-opts.lua` with defaults
+- Lazy.nvim installs automatically
+- All plugins download and configure on first run
+- LSP servers install via Mason
+- Treesitter parsers install on-demand
+- Default colorscheme (catppuccin-mocha) applies
+- Configuration files can be edited post-setup for customization
 
 ==============================================================================
 8. SETUP OPTIONS                                        *adev-setup-options*
@@ -644,14 +752,46 @@ Custom Colorscheme Setup:~
 - **Error Prevention**: Setup function includes comprehensive error handling
 - **Type Safety**: Options are validated for correct types where possible
 
+*adev-setup-current-opts*~
+8.5 Current Setup Options:~
+
+The following options are currently supported:
+
+*adev-setup-ai*~
+`ai_assistant` (table, optional)~
+- **Purpose**: Configure AI assistant integration
+- **Default**: { enable = false, plugin = "supermaven-inc/supermaven-nvim" }
+- **Usage**: Enable AI-powered code completion and assistance
+- **Examples**: >
+     ai_assistant = { enable = true, plugin = "supermaven-inc/supermaven-nvim" }
+     ai_assistant = { enable = true, plugin = "augmentcode/augment.vim" }
+<
+
+*adev-setup-lsp-opts*~
+`lsp` (table, optional)~
+- **Purpose**: LSP server configuration
+- **Default**: { enable = true, servers = {default servers} }
+- **Usage**: Control LSP functionality and server list
+- **Examples**: >
+     lsp = { enable = true, servers = {"lua_ls", "pyright", "rust_analyzer"} }
+<
+
+*adev-setup-ui*~
+`ui` (table, optional)~
+- **Purpose**: UI customization options
+- **Default**: { border = "rounded", transparent_bg = false }
+- **Usage**: Configure UI elements and appearance
+- **Examples**: >
+     ui = { border = "single", transparent_bg = true }
+<
+
 *adev-setup-future*~
-8.5 Future Options (Planned):~
+8.6 Future Options (Planned):~
 
 The following options are planned for future releases:
 - `leader`: Custom leader key configuration
 - `auto_update_check`: Control automatic update checking
 - `performance_mode`: Optimize for performance vs features
-- `transparent_bg`: Enable transparent background support
 - `diagnostics`: LSP diagnostics configuration
 - `completion`: Completion engine settings
 
@@ -1014,8 +1154,20 @@ Check related components: >
 
 *adev-custom-plugins*~
 13.1 Adding Plugins:~
-Create files in `lua/adev/plugins/` following Lazy.nvim specification.
-Use event-based loading for optimal performance.
+Create files in `lua/adev/custom-plugins/` for user-specific plugins.
+Use Lazy.nvim specification with event-based loading for optimal performance.
+Example: >
+    -- lua/adev/custom-plugins/my-plugin.lua
+    local events = require "adev.utils.consts.events"
+
+    return {
+        "author/plugin-name",
+        event = events.buffer.new_file,
+        opts = {},
+    }
+<
+
+For core modifications, edit files in `lua/adev/plugins/` directly.
 
 *adev-custom-settings*~
 13.2 Core Settings:~
@@ -1173,8 +1325,8 @@ A: Add `enabled = false` to the plugin specification or comment out/remove
    the plugin file.
 
 Q: What's the difference between blink.cmp and nvim-cmp?~
-A: Adev uses blink.cmp (v1.3.1) for faster performance with Rust implementation.
-   It includes compatibility layer for nvim-cmp sources via blink.compat.
+A: Adev uses blink.cmp for faster performance with Rust implementation.
+    It provides modern completion with enhanced features over nvim-cmp.
 
 *adev-faq-customization*~
 15.2 Customization Questions:~
@@ -1241,31 +1393,33 @@ NOTES                                                         *adev-notes*
 
 - Optimized for modern Neovim (0.11.0+) with latest features
 - Lazy loading ensures fast startup times with event-based plugin loading
-- Modular architecture with 22 plugin files for easy customization
+- Modular architecture with 25+ plugin files for easy customization
+- Onboarding system with automatic configuration generation for new users
 - Built-in updater with automatic update checking on startup
 - Comprehensive LSP support with 40+ language servers out of the box
-- Advanced completion with blink.cmp (v1.3.1) and Rust implementation
+- Advanced completion with blink.cmp and Rust implementation
+- AI integration with configurable assistants (AugmentCode, Supermaven)
 - Extensive plugin ecosystem with careful curation (25+ languages supported)
 - Performance-focused with intelligent loading strategies and caching
-- Health check system with 280 lines of diagnostic code
-- Comprehensive event system with 186 lines of event definitions
+- Health check system with comprehensive diagnostic code
+- Comprehensive event system with extensive event definitions
 - Status column with git signs and fold indicators
 - Modern UI with Snacks.nvim, Noice.nvim, and Catppuccin theme
 - Automatic whitespace cleanup and format options management
+- Laravel development tools with Blade template support
+- Rust crate management with crates.nvim
+- Java development support with jdtls
+- Code generation with Neogen
 - Regular updates and active maintenance
 
-Key Files and Line Counts:~
-- init.lua: 8 lines (minimal entry point)
-- lua/adev/init.lua: 97 lines (main module with error handling)
-- lua/adev/health.lua: 280 lines (comprehensive health checks)
-- lua/adev/utils/init.lua: 52 lines (utilities with safe access)
-- lua/adev/utils/update.lua: 112 lines (update management with safety)
-- lua/adev/commands.lua: 34 lines (command registration with fallbacks)
-- lua/adev/utils/consts/events.lua: 186 lines (event definitions)
-- lua/adev/plugins/lsp.lua: 282 lines (LSP configuration)
-- lua/adev/plugins/telescope.lua: 135 lines (fuzzy finder)
-- lua/adev/plugins/mason.lua: 116 lines (tool management)
-- lua/adev/plugins/blink-cmp.lua: 91 lines (completion engine)
+Key Components:~
+- Auto-generated configuration files for new users
+- Modular plugin system with lazy loading
+- Comprehensive LSP setup with 40+ language servers
+- AI assistant integration with plugin selection
+- Onboarding wizard for guided setup
+- Update manager with changelog integration
+- Extensive customization options and defaults
 
 For the latest updates and community discussions, visit the project repository.
 

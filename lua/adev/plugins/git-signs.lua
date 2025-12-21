@@ -1,15 +1,15 @@
-local events = require "adev.utils.consts.events"
----@diagnostic disable: param-type-mismatch
 return {
     "lewis6991/gitsigns.nvim",
     cond = function()
-        return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
+        return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "")
+            == "true"
     end,
-    event = { events.buffer.new_file, events.buffer.file_pre },
+    lazy = false,
     keys = {
         {
             "<leader>tn",
             function()
+                ---@diagnostic disable-next-line: param-type-mismatch
                 require("gitsigns").nav_hunk "next"
             end,
             desc = "next hunk",
@@ -17,6 +17,7 @@ return {
         {
             "<leader>tp",
             function()
+                ---@diagnostic disable-next-line: param-type-mismatch
                 require("gitsigns").nav_hunk "prev"
             end,
             desc = "previous hunk",

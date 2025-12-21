@@ -1,0 +1,5 @@
+---@class Adev
+---@field git string
+---@field ai_assistant AiAssistantOpts?
+---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
+---@field ui UiOpts?  UI options

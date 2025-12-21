@@ -1,9 +1,9 @@
-local events = require "adev.utils.consts.events"
+local events = require "adev.utils.events"
 
 return {
     {
         "nvim-treesitter/nvim-treesitter-context",
-        event = { events.buffer.new_file, events.buffer.file_pre },
+        event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
         opts = {
             enable = true,
             max_lines = 2,
@@ -13,7 +13,7 @@ return {
     {
         "windwp/nvim-ts-autotag",
 
-        event = { events.buffer.new_file, events.buffer.file_pre },
+        event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
         opts = {
             per_filetype = {
                 ["blade"] = {
@@ -31,10 +31,8 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter",
-        event = { events.buffer.new_file, events.buffer.file_pre },
+        event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
         build = ":TSUpdate",
-        config = function()
-            require("adev.config.treesitter").setup()
-        end,
+        opts = {},
     },
 }

@@ -1,12 +1,12 @@
-local events = require "adev.utils.consts.events"
+local events = require "adev.utils.events"
+
 return {
     "nvimtools/none-ls.nvim",
     dependencies = {
-        "williamboman/mason.nvim",
-        "nvimtools/none-ls.nvim",
+        "jay-babu/mason-null-ls.nvim",
     },
-    event = { events.file.read_pre, events.buffer.new_file, events.lsp.attach },
+    event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
     config = function()
-        require("adev.config.none-ls").setup()
+        require "adev.config.none-ls"()
     end,
 }

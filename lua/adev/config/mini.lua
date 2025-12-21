@@ -1,9 +1,7 @@
-require("mini.bufremove").setup()
-
 require("mini.ai").setup()
 
 local miniclue = require "mini.clue"
-require("mini.clue").setup {
+miniclue.setup {
     triggers = {
         -- Leader triggers
         { mode = "n", keys = "<Leader>" },
