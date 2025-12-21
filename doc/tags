@@ -1,6 +1,8 @@
 :ADCheckUpdate	adev.txt	/*:ADCheckUpdate*
 :ADInfo	adev.txt	/*:ADInfo*
 :ADUpdate	adev.txt	/*:ADUpdate*
+:AdevChangelog	adev.txt	/*:AdevChangelog*
+:AdevOnboarding	adev.txt	/*:AdevOnboarding*
 ADCheckUpdate	adev.txt	/*ADCheckUpdate*
 ADInfo	adev.txt	/*ADInfo*
 ADUpdate	adev.txt	/*ADUpdate*

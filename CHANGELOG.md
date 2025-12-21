@@ -12,6 +12,92 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [2.0.0-2] - 2025-10-30
+
+### 🚀 Features
+
+- _(lspsaga)_ Config
+- Basic onboarding
+
+### 🐛 Bug Fixes
+
+- Uptodate notification
+- <C-A>
+- Telescope borders
+- Adev global
+
+### ◀️ Revert
+
+- _(plugins)_ Remove lspsaga
+
+## [2.0.0-1] - 2025-10-27
+
+### 🚀 Features
+
+- Setup lazy.nvim package manager
+- _(plugins)_ Theme and statusline
+- Options
+- _(plugins)_ Blink-cmp
+- Minimal autocmd setup
+- _(plugins)_ Telescope
+- _(plugins)_ Lazydev
+- _(plugins)_ Lspconfig, mason
+- _(plugins)_ Restoring to v1.5 status
+- Lazyloading
+- _(core)_ Lazy.nvim opts
+- _(lsp)_ Customizable lsp servers
+- _(config)_ Ai assistant
+- Activate ai plugin for testing
+- _(autocmd)_ C and cpp get tab=2
+- _(config)_ Rm init.lua
+- Ui & theme opts
+- Example plugin
+- Notify utils
+- _(core)_ Update manager
+- User commands
+- Adev ui
+- _(plugin)_ Add lspsaga
+- _(plugin)_ Add lspsaga event
+
+### 🐛 Bug Fixes
+
+- _(gitsigns)_ Lazyloading
+- _(lualint)_ Rm duplicated status
+- _(theme)_ Improve setup
+- Formatting
+- _(lualine)_ Optimize config
+- Treesitter
+- _(telescope)_ Smaller preview width
+- _(telescope)_ Switch colorscheme
+- Docs
+- Types
+
+### 💼 Other
+
+- Check git cmd from opts
+
+### 🚜 Refactor
+
+- _(plugins)_ File naming
+- _(config)_ Move theme to catppuccin
+- Update manager
+- _(lsp)_ Moving out of utils
+- Simplify adev.ui.border
+
+### 📚 Documentation
+
+- _(README)_ Refactoring
+
+### 🎨 Styling
+
+- Code formatting
+
+### ⚙️ Miscellaneous Tasks
+
+- Code formatting
+- TODO.md
+- Formatting
+
 ## [1.5.0] - 2025-10-19
 
 ### 🚀 Features

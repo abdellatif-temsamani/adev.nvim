@@ -1,4 +1,4 @@
-local events = {
+return {
     vim = {
         lazy = "VeryLazy",
         startup = "VimEnter",
@@ -32,8 +32,8 @@ local events = {
         write_post = "BufWritePost",
         write_cmd = "BufWriteCmd",
 
-        ---@param buffer_pattern string
-        ---@return string
+        ---@param buffer_pattern string regex of buffers
+        ---@return string BufEnter with specific buffer
         _enter = function(buffer_pattern)
             return string.format("BufEnter %s", buffer_pattern)
         end,
@@ -182,4 +182,3 @@ local events = {
         scrolled = "WinScrolled",
     },
 }
-return events

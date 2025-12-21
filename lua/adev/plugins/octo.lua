@@ -8,7 +8,8 @@ return {
         { "<leader>tc", "<CMD>Octo<CR>", desc = "Octo commands", mode = "n" },
     },
     cond = function()
-        return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "") == "true"
+        return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "")
+            == "true"
     end,
     opts = {
         enable_builtin = true,

@@ -1,0 +1,49 @@
+---
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Extract Changelog Section
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          awk '
+            BEGIN {
+              version = "'"$VERSION"'"
+              header = "^## \\[" version "\\] - "
+            }
+            $0 ~ header {flag=1; getline; next}
+            /^## \[/ && flag {flag=0}
+            /^<!--/ {flag=0}
+            flag
+          ' CHANGELOG.md > RELEASE_NOTES.md
+
+      - name: Debug
+        run: |
+          echo "--- EXTRACTED ---"
+          cat RELEASE_NOTES.md
+          echo "------------------"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Adev.nvim ${{ github.ref_name }}"
+          body_path: RELEASE_NOTES.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

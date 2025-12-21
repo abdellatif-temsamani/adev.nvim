@@ -1,2 +1,4 @@
 spell/
 /lazy-lock.json
+/init.lua
+init-opts.lua

@@ -1,9 +1,10 @@
 return {
     "nvim-telescope/telescope.nvim",
-    module = false,
+    cmd = "Telescope",
     dependencies = {
-        { "nvim-lua/popup.nvim" },
-        { "nvim-lua/plenary.nvim" },
+        "nvim-lua/popup.nvim",
+        "nvim-lua/plenary.nvim",
+        "nvim-telescope/telescope-fzf-native.nvim",
     },
     keys = {
         {
@@ -49,25 +50,18 @@ return {
             desc = "commands",
         },
         {
+            "<leader>fc",
+            function()
+                require("telescope.builtin").colorscheme()
+            end,
+            desc = "colorscheme",
+        },
+        {
             "<leader>fa",
             function()
                 require("telescope.builtin").treesitter()
             end,
             desc = "treesitter",
-        },
-        {
-            "<leader>ft",
-            function()
-                vim.cmd [[ TodoTelescope ]]
-            end,
-            desc = "TodoTelescope",
-        },
-        {
-            "<leader>fn",
-            function()
-                vim.cmd [[ NoiceTelescope ]]
-            end,
-            desc = "NoiceTelescope",
         },
     },
 
@@ -96,7 +90,6 @@ return {
         },
         extensions = {
             fzf = {},
-            worktrees = {},
             noice = {},
         },
         defaults = {
@@ -106,13 +99,13 @@ return {
                     prompt_position = "bottom",
                     height = 0.99,
                     width = 0.99,
-                    preview_width = 0.60, -- Fraction of the layout width
+                    preview_width = 0.45, -- Fraction of the layout width
                 },
             },
             prompt_prefix = " ",
             color_devicons = true,
             selection_strategy = "closest",
-            file_ignore_patterns = require("adev.utils.consts").inored_files,
+            file_ignore_patterns = require("adev.utils").inored_files,
             mappings = {
                 i = {
                     ["<C-x>"] = false,

@@ -1,17 +1,7 @@
 return {
     "echasnovski/mini.nvim",
     version = "*",
-    keys = {
-        {
-            "<leader>bq",
-            function()
-                require("mini.bufremove").wipeout()
-            end,
-            desc = "close buffer",
-        },
-    },
-    priority = 1000,
-    lazy = false,
+    event = require("adev.utils.events").vim.lazy,
     config = function()
         require "adev.config.mini"
     end,

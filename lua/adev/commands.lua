@@ -1,33 +1,61 @@
-local updateManager = require "adev.utils.update"
-local utils = require "adev.utils"
+local changelog = require "adev.changelog"
+local update_manager = require "adev.update_manager"
 
---- Sets up custom user commands for the Adev module.
----@return nil
-local function register()
-    local create_command = vim.api.nvim_create_user_command
-    local name = vim.g.Adev._NAME
+local M = {
+    commands = {
+        {
+            name = "ADUpdate",
+            command = update_manager.update,
+            opts = { desc = "Update adev" },
+        },
+        {
+            name = "ADUpdateCheck",
+            command = update_manager.check_update,
+            opts = { desc = "Check for updates" },
+        },
+        {
+            name = "ADChangelog",
+            command = changelog.show_changelog,
+            opts = {
+                desc = "Show changelog for current or specified version",
+                nargs = "?",
+                complete = function(arg_lead)
+                    local versions = changelog.get_available_versions()
+                    if not versions then
+                        return {}
+                    end
 
-    vim.api.nvim_create_autocmd("CmdlineEnter", {
-        desc = "Register Adev custom commands",
-        once = true,
-        callback = function()
-            create_command("ADInfo", function()
-                utils.info()
-            end, { desc = "info about " .. name })
+                    local matches = {}
+                    for _, version in ipairs(versions) do
+                        if version:find(arg_lead, 1, true) == 1 then
+                            table.insert(matches, version)
+                        end
+                    end
+                    return matches
+                end,
+            },
+        },
+        {
+            name = "ADVersions",
+            command = changelog.list_versions,
+            opts = { desc = "List available versions" },
+        },
+    },
+}
 
-            create_command("ADUpdate", function()
-                updateManager.update_adev()
-            end, {
-                desc = "Update " .. name,
-            })
-
-            create_command("ADCheckUpdate", function()
-                updateManager.check_adev_update()
-            end, {
-                desc = "Check if " .. name .. "has an update",
-            })
-        end,
-    })
+--- Helper to create a user command
+---@param name string
+--- @param callback string|fun(args: vim.api.keyset.create_user_command.command_args)
+--- @param opts vim.api.keyset.user_command Optional `command-attributes`.
+function M:create_user_command(name, callback, opts)
+    vim.api.nvim_create_user_command(name, callback, opts)
 end
 
-return { register = register }
+-- Setup all commands
+function M:setup()
+    for _, command in ipairs(self.commands) do
+        self:create_user_command(command.name, command.command, command.opts)
+    end
+end
+
+return M

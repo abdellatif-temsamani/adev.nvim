@@ -1,4 +1,4 @@
-local events = require "adev.utils.consts.events"
+local events = require "adev.utils.events"
 
 local alts = {
     FIX = { "FIXME", "BUG", "FIXIT", "ISSUE", "ERROR" },
@@ -6,22 +6,29 @@ local alts = {
     TODO = { "PLAN", "TODO", "TASK", "START", "BEGIN" },
     WARN = { "WARNING", "WARN", "HACK" },
     PREF = { "PERF", "OPTIM", "OPTIMIZE", "PERFORMANCE" },
+    INFO = { "INFO", "NOTE", "NOTES", "HINT", "TIP" },
+    TEST = { "TESTING", "PASSED", "FAILED" },
 }
 
 return {
     "folke/todo-comments.nvim",
-    event = { events.buffer.new_file, events.buffer.enter },
+    event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
+    dependencies = { "nvim-telescope/telescope.nvim" },
+    cmd = { "TodoTelescope" },
+    keys = {
+        { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find todo comments" },
+    },
     opts = {
         signs = true,
-        sign_priority = 0,
+        sign_priority = 8,
         keywords = {
             FIX = { icon = "", color = "error", alt = alts.FIX },
             DONE = { icon = "", color = "hint", alt = alts.DONE },
             TODO = { icon = "", color = "info", alt = alts.TODO },
             WARN = { icon = "", color = "warning", alt = alts.WARN },
             PREF = { icon = "", alt = alts.PREF },
-            NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
-            TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
+            NOTE = { icon = " ", color = "hint", alt = alts.INFO },
+            TEST = { icon = "⏲ ", color = "test", alt = alts.TEST },
         },
         merge_keywords = true,
         highlight = {

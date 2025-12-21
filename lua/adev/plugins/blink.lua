@@ -1,4 +1,3 @@
-local events = require "adev.utils.consts.events"
 return {
     {
         "saghen/blink.compat",
@@ -8,22 +7,14 @@ return {
     },
     {
         "saghen/blink.cmp",
-        event = {
-            events.insert.enter,
-            events.cmd.enter,
-            events.lsp.attach,
-        },
-        -- BUG: any version above 1.3.1 don"t work for some reason
-        version = "v1.3.1",
+        -- optional: provides snippets for the snippet source
         dependencies = {
             "joelazar/blink-calc",
-            "saghen/blink.compat",
-            "rafamadriz/friendly-snippets",
-            "honza/vim-snippets",
             "L3MON4D3/LuaSnip",
-            "disrupted/blink-cmp-conventional-commits",
         },
-        ---@module "blink.cmp"
+        event = require("adev.utils.events").insert.enter,
+        version = "1.*",
+        ---@module 'blink.cmp'
         ---@type blink.cmp.Config
         opts = {
             cmdline = {
@@ -37,16 +28,20 @@ return {
                 ["<C-j>"] = { "scroll_documentation_down", "fallback" },
             },
 
+            appearance = {
+                nerd_font_variant = "mono",
+            },
+
             completion = {
                 list = { selection = { preselect = true, auto_insert = true } },
                 accept = { auto_brackets = { enabled = false } },
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 500,
-                    window = { border = "single" },
+                    window = { border = nil },
                 },
                 menu = {
-                    border = "single",
+                    border = nil,
                     draw = {
                         columns = { { "kind_icon", gap = 1, "label", "kind" } },
                     },
@@ -54,25 +49,8 @@ return {
             },
 
             sources = {
-                default = {
-                    "lsp",
-                    "path",
-                    "snippets",
-                    "buffer",
-                    "cmdline",
-                    "calc",
-                },
-
-                per_filetype = {
-                    php = { "laravel", inherit_defaults = true },
-                },
-
+                default = { "lsp", "path", "snippets", "buffer", "calc" },
                 providers = {
-                    laravel = {
-                        name = "laravel",
-                        module = "blink.compat.source",
-                        score_offset = 95, -- show at a higher priority than lsp
-                    },
                     calc = {
                         name = "Calc",
                         module = "blink-calc",
@@ -81,6 +59,7 @@ return {
             },
 
             snippets = { preset = "luasnip" },
+
             fuzzy = {
                 implementation = "rust",
                 sorts = {
@@ -91,5 +70,6 @@ return {
                 },
             },
         },
+        opts_extend = { "sources.default" },
     },
 }

@@ -1,51 +1,68 @@
-local Utils = {}
+local Utils = {
+    ignored_files = {
+        "Cargo.lock",
+        "__pycache__/",
+        "node_modules/",
+        ".git/",
+        ".ccls-cache/",
+        "build/",
+        "target/",
+        "dist/",
+        "yarn.lock",
+        "pnpm-lock.yaml",
+        "lazy-lock.json",
+    },
+    adev_path = vim.fn.stdpath "config",
+}
 
---- Displays a notification to the user.
----@param msg string Content of the notification to show to the user.
----@param level integer|nil One of the values from |vim.log.levels|.
----@diagnostic disable-next-line: unused-local
-function Utils.adev_notify(msg, level)
-    vim.notify(msg, level, {
-        title = vim.g.Adev._NAME,
-    })
+--- @param msg string
+--- @param level integer|nil One of the values from |vim.log.levels|.
+function Utils.notify(msg, level)
+    vim.notify(msg, level, { title = "adev.nvim" })
 end
 
----Display author and version information.
----This is primarily for debugging or user reference.
-function Utils.info()
-    local info = vim.g.Adev
-    local function nvim_version()
-        local v = vim.version()
-        return string.format("%d.%d.%d", v.major, v.minor, v.patch)
-    end
+--- @param msg string
+function Utils.err_notify(msg)
+    Utils.notify(msg, vim.log.levels.ERROR)
+end
 
-    local function git_branch()
-        local config_dir = vim.fn.stdpath "config"
+function Utils.disable_movement(buf)
+    local map = vim.api.nvim_buf_set_keymap
+    local opts = { noremap = true, silent = true }
 
-        local handle = io.popen(string.format("git -C %s rev-parse --abbrev-ref HEAD 2>/dev/null", config_dir))
-        if handle then
-            local result = handle:read "*a"
-            handle:close()
-            result = result:gsub("%s+", "") -- remove any trailing newline
-            if result == "" then
-                return "N/A"
-            end
-            return result
-        else
-            return "N/A"
+    map(buf, "n", "h", "<Nop>", opts)
+    map(buf, "n", "j", "<Nop>", opts)
+    map(buf, "n", "k", "<Nop>", opts)
+    map(buf, "n", "l", "<Nop>", opts)
+    map(buf, "n", "<Up>", "<Nop>", opts)
+    map(buf, "n", "<Down>", "<Nop>", opts)
+    map(buf, "n", "<Left>", "<Nop>", opts)
+    map(buf, "n", "<Right>", "<Nop>", opts)
+end
+
+--- @param a table
+--- @param b table
+--- @return boolean
+function Utils.compare_keys(a, b)
+    for k in pairs(a) do
+        if b[k] == nil then
+            return false
         end
     end
+    for k in pairs(b) do
+        if a[k] == nil then
+            return false
+        end
+    end
+    return true
+end
 
-    local lines = {
-        ("`Name`:    %s"):format(info._NAME),
-        ("`Version`: %s"):format(info._VERSION),
-        ("`Author`:  %s"):format(info._AUTHOR),
-        ("`Neovim`:  %s"):format(nvim_version()),
-        ("`LuaJIT`:  %s"):format(_VERSION),
-        ("`Branch`:  %s"):format(git_branch()),
-    }
-
-    Utils.adev_notify(table.concat(lines, "\n"), vim.log.levels.INFO)
+---@param path string
+---@param content string[]
+function Utils.write_file(path, content)
+    local opts_file = assert(io.open(path, "w"), "Failed to open " .. path)
+    opts_file:write(table.concat(content))
+    opts_file:close()
 end
 
 return Utils

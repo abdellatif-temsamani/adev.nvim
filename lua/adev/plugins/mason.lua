@@ -1,5 +1,3 @@
-local events = require "adev.utils.consts.events"
-
 return {
     {
         "mason-org/mason.nvim",
@@ -8,23 +6,20 @@ return {
         keys = {
             {
                 "<leader>mm",
-                function()
-                    vim.cmd [[ Mason ]]
-                end,
+                "<cmd>Mason<cr>",
                 desc = "go to declaration",
             },
         },
         opts = {
             ui = {
                 check_outdated_packages_on_open = true,
-                border = "single",
+                border = Adev.ui.border,
             },
         },
     },
     {
         "jay-babu/mason-null-ls.nvim",
-        after = "williamboman/mason.nvim",
-        event = { events.buffer.new_file, events.buffer.read_pre },
+        dependencies = "mason-org/mason.nvim",
         opts = {
             ensure_installed = {
                 "gitlint",
@@ -63,8 +58,7 @@ return {
     },
     {
         "mason-org/mason-lspconfig.nvim",
-        event = { events.lsp.attach, events.buffer.read_pre },
-        after = "williamboman/mason.nvim",
+        dependencies = "mason-org/mason.nvim",
         opts = {
             automatic_enable = false,
             ensure_installed = {
@@ -73,16 +67,12 @@ return {
                 "gopls",
                 "eslint",
                 "svelte",
-                "slint_lsp",
-                "svlangserver",
                 "biome",
                 "vue_ls",
-                "svls",
                 "emmet_ls",
                 "bashls",
                 "clangd",
                 "cmake",
-                "htmx",
                 "cssmodules_ls",
                 "dockerls",
                 "docker_compose_language_service",
@@ -100,8 +90,6 @@ return {
                 "tailwindcss",
                 "taplo",
                 "zls",
-                "solidity",
-                "solidity_ls_nomicfoundation",
                 "yamlls",
                 "lemminx",
                 "texlab",

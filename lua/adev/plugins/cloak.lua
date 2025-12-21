@@ -1,6 +1,6 @@
 return {
     "laytan/cloak.nvim",
-    event = require("adev.utils.consts.events").buffer._enter ".env*",
+    event = require("adev.utils.events").buffer._enter ".env*",
     cond = function()
         local files = vim.fn.glob(".env*", false, true)
         return #files > 0

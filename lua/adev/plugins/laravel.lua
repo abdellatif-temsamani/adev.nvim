@@ -1,20 +1,37 @@
 ---@diagnostic disable: undefined-global
 return {
     "adalessa/laravel.nvim",
-    lazy = false,
+    event = require("adev.utils.events").vim.lazy,
     cond = function()
         return vim.fn.filereadable "artisan" ~= 0
     end,
     dependencies = {
+        "nvim-lua/plenary.nvim",
         "neovim/nvim-lspconfig",
-        "tpope/vim-dotenv",
         "nvim-telescope/telescope.nvim",
         "MunifTanjim/nui.nvim",
-        "kevinhwang91/promise-async",
         "nvim-treesitter/nvim-treesitter",
         "nvim-neotest/nvim-nio",
+        "saghen/blink.cmp",
+        "saghen/blink.compat",
     },
     keys = {
+        {
+            "gf",
+            function()
+                local ok, res = pcall(function()
+                    if Laravel.app("gf").cursorOnResource() then
+                        return "<cmd>lua Laravel.commands.run('gf')<cr>"
+                    end
+                end)
+                if not ok or not res then
+                    return "gf"
+                end
+                return res
+            end,
+            expr = true,
+            noremap = true,
+        },
         {
             "<leader>ll",
             function()
@@ -81,5 +98,26 @@ return {
     },
     opts = {
         lsp_server = "intelephense",
+        features = {
+            pickers = {
+                -- "snacks | telescope | fzf-lua | ui-select"
+                -- NOTE: i may change it to telescope or ui-select later
+                provider = "snacks",
+            },
+        },
     },
+    config = function(_, opts)
+        require("laravel").setup(opts)
+
+        local blink = require "blink.cmp"
+
+        blink.add_source_provider("laravel", {
+            name = "laravel",
+            module = "blink.compat.source",
+            score_offset = 95,
+            opts = {},
+        })
+
+        blink.add_filetype_source("php", "laravel")
+    end,
 }

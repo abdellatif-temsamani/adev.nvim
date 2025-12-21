@@ -16,7 +16,6 @@ opt.relativenumber = true
 opt.scrolloff = 8
 opt.hlsearch = false
 opt.smartcase = true
-o.nrformats = "alpha"
 
 -- Cursor
 o.cursorline = true
@@ -37,7 +36,6 @@ opt.splitright = true
 o.equalalways = false
 o.inccommand = "split"
 o.splitkeep = "screen"
-o.winborder = 'single'
 
 -- Indentation
 opt.shiftwidth = 4

@@ -1,6 +1,10 @@
 return {
     "folke/noice.nvim",
-    event = require("adev.utils.consts.events").vim.lazy,
+    event = require("adev.utils.events").vim.lazy,
+    cmd = { "NoiceTelescope" },
+    keys = {
+        { "<leader>fn", "<cmd>NoiceTelescope<cr>", desc = "notifications history" },
+    },
     opts = {
         lsp = {
             override = {

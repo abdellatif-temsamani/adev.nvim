@@ -1,14 +1,14 @@
-local events = require "adev.utils.consts.events"
+local events = require "adev.utils.events"
+local adev_ai_assistant = Adev.ai_assistant
 
-return {
-    {
-        "augmentcode/augment.vim",
-        enabled = false,
-        event = { events.file.read_pre, events.insert.enter },
-    },
-    {
-        "supermaven-inc/supermaven-nvim",
+if adev_ai_assistant then
+    return {
+        adev_ai_assistant.plugin,
+        enabled = adev_ai_assistant.enabled,
+        cmd = adev_ai_assistant.command,
         event = { events.insert.enter },
-        opts = {},
-    },
-}
+        opts = adev_ai_assistant.opts,
+    }
+else
+    return {}
+end

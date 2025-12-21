@@ -16,7 +16,7 @@ return {
     lazy = false,
     opts = {
         options = {
-            theme = "catppuccin-mocha",
+            theme = "auto",
             globalstatus = true,
             disabled_filetypes = { "NvimTree" },
             always_divide_middle = true,
@@ -26,28 +26,25 @@ return {
         sections = {
             lualine_a = { "mode", "branch" },
             lualine_b = { macro_recording },
-            lualine_c = { "branch", "diff", "diagnostics" },
+            lualine_c = { "diff", "diagnostics" },
             lualine_x = { "selectioncount", "encoding", "filetype" },
-            lualine_y = {},
             lualine_z = { "filesize", "location", "progress" },
         },
         winbar = {
-            lualine_c = {
+            lualine_b = {
                 "filename",
+            },
+            lualine_y = {
+                "filetype",
             },
         },
         tabline = {
             lualine_a = {
                 {
                     "tabs",
-                    mode = 4,
-                    max_length = vim.o.columns / 2,
+                    mode = 0,
                 },
             },
-            lualine_b = {},
-            lualine_c = {},
-            lualine_x = {},
-            lualine_y = {},
             lualine_z = { adev_nvim },
         },
         extensions = {},
