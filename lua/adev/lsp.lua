@@ -151,6 +151,7 @@ local lsp_map = {
 ---@return nil
 local function setup(opts)
     local defaults = vim.tbl_keys(lsp_map)
+    -- BUG: opts doesn't do anything yet
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
 
     for lsp, fts in pairs(lsp_map) do
