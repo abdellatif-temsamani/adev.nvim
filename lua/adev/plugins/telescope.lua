@@ -99,7 +99,7 @@ return {
                     prompt_position = "bottom",
                     height = 0.99,
                     width = 0.99,
-                    preview_width = 0.45, -- Fraction of the layout width
+                    preview_width = 0.55,
                 },
             },
             prompt_prefix = " ",

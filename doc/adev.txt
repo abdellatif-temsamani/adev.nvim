@@ -5,6 +5,7 @@
 Author:       Abdellatif Dev
 Version:      2.0.0
 License:      MIT
+Last Updated: 2025-12-21
 
 ==============================================================================
 CONTENTS                                                      *adev-contents*
@@ -35,7 +36,7 @@ extensive functionality.
 
 Key Features:~
 - Modern UI with Catppuccin Mocha theme and transparent background support
-- Comprehensive LSP support via Mason with 47+ language servers
+ - Comprehensive LSP support with 47+ language servers
 - Advanced completion with blink.cmp and snippet support
 - AI Integration: Configurable AI assistants (AugmentCode, Supermaven, etc.)
 - Fuzzy finding with Telescope and smart ignore patterns
@@ -49,7 +50,7 @@ Key Features:~
 - Lazy loading for optimal performance (plugins load only when needed)
 - Modular plugin architecture with event-based loading
 - Health checks for system dependencies and configuration validation
-- Support for 25+ programming languages out of the box
+ - Support for 47+ programming languages out of the box
 - Laravel development tools and Blade template support
 - Rust crate management with crates.nvim
 - Java development with jdtls
@@ -106,7 +107,7 @@ The configuration follows a modular Lua-based architecture: >
     │   │   └── init.lua          -- Type system initialization
     │   ├── ui/                   -- UI configuration
     │   │   └── init.lua          -- UI setup and theming
-    │   └── plugins/              -- Plugin specifications (25+ files)
+    │   └── plugins/              -- Plugin specifications (24 files)
     │       ├── ai.lua            -- AI assistant integration
     │       ├── blink.lua         -- Completion engine
     │       ├── cloak.lua         -- Environment variable concealing
@@ -269,8 +270,8 @@ The configuration follows a modular Lua-based architecture: >
   - ".git/", ".ccls-cache/", "build/", "target/"
   - "dist/", "yarn.lock", "pnpm-lock.yaml", "lazy-lock.json"
 
-*adev-constants-events*~
-`lua/adev/utils/consts/events.lua`:~
+ *adev-constants-events*~
+ `lua/adev/utils/events.lua`:~
 Comprehensive event definitions organized by category:
 - `vim`: VeryLazy, VimEnter, VimLeave, VimResized
 - `buffer`: BufAdd, BufEnter, BufLeave, BufRead, BufWrite, etc.
@@ -451,7 +452,7 @@ Language Specific:~
 - neogen: Code documentation generation
 
 4.3 Loading Strategy~
-- Event-based loading using comprehensive `adev.utils.consts.events`
+ - Event-based loading using comprehensive `adev.utils.events`
 - Key-based loading for interactive commands (lazy until first use)
 - Command-based loading for specific functionality
 - Filetype-based loading for language-specific plugins
@@ -632,11 +633,12 @@ Language Specific:~
                - Shows "up-to-date" message if current
                - Includes comprehensive error handling for all git operations
 
-*:AdevChangelog*
-:AdevChangelog Display the changelog for the current version.
-                - Reads from CHANGELOG.md file
-                - Shows recent updates and features
-                - Uses Telescope for navigation if available
+ *:ADChangelog* *ADChangelog*
+ :ADChangelog Display the changelog for the current or specified version.
+                 - Reads from CHANGELOG.md file
+                 - Shows recent updates and features
+                 - Uses Telescope for navigation if available
+                 - Accepts optional version argument
 
 *:ADVersions* *ADVersions*
 :ADVersions     List all available versions from git tags.
@@ -644,11 +646,7 @@ Language Specific:~
                - Displays versions in reverse chronological order
                - Useful for changelog navigation and version tracking
 
-*:AdevOnboarding*
-:AdevOnboarding Launch the onboarding wizard for new users.
-                - Provides guided setup for first-time users
-                - Helps configure initial preferences
-                - Interactive configuration assistant
+
 
 Note: Commands are registered lazily on first `CmdlineEnter` event for
       optimal startup performance. All commands include safe configuration
@@ -946,7 +944,7 @@ See `TODO.md` for the complete roadmap of planned setup options.
 
 Create a new file in `lua/adev/plugins/`: >
     -- lua/adev/plugins/my-plugin.lua
-    local events = require "adev.utils.consts.events"
+     local events = require "adev.utils.events"
 
     return {
       "author/plugin-name",
@@ -1085,16 +1083,16 @@ Adev.nvim includes these formatting and linting tools via mason-null-ls:
     sql_formatter       -- SQL formatter
     yamllint            -- YAML linter
 
-*adev-lsp-features*~
-10.2 LSP Features:~
-- Autocmd-based server activation by filetype
-- Inlay hints enabled by default
-- Virtual diagnostic lines for current line
-- blink.cmp integration for completions
-- Snippet support enabled
-- Custom handlers for hover and signature help
-- Automatic server installation via Mason
-- Comprehensive filetype mappings in `lsp_map` table
+ *adev-lsp-features*~
+ 10.2 LSP Features:~
+ - Autocmd-based server activation by filetype using `vim.lsp.enable()`
+ - Inlay hints enabled by default
+ - Virtual diagnostic lines for current line
+ - blink.cmp integration for completions
+ - Snippet support enabled
+ - Custom handlers for hover and signature help
+ - Automatic server installation via Mason
+ - Comprehensive filetype mappings in `lsp_map` table
 
 *adev-lsp-special-configs*~
 10.3 Special Configurations:~
@@ -1171,7 +1169,7 @@ Yank Highlighting:~
 - Provides visual feedback for copy operations
 
 *adev-autocommands-events*~
-11.2 Event System (`lua/adev/utils/consts/events.lua`):~
+ 11.2 Event System (`lua/adev/utils/events.lua`):~
 
 Adev.nvim uses a comprehensive event system with 186 lines of event
 definitions organized by category. This allows for precise plugin loading
@@ -1193,7 +1191,7 @@ Event Categories:~
 
 Usage in Plugin Loading:~
 Plugins use these events for lazy loading: >
-    local events = require "adev.utils.consts.events"
+     local events = require "adev.utils.events"
 
     return {
         "plugin/name",
@@ -1294,7 +1292,7 @@ Create files in `lua/adev/custom-plugins/` for user-specific plugins.
 Use Lazy.nvim specification with event-based loading for optimal performance.
 Example: >
     -- lua/adev/custom-plugins/my-plugin.lua
-    local events = require "adev.utils.consts.events"
+     local events = require "adev.utils.events"
 
     return {
         "author/plugin-name",
@@ -1530,13 +1528,13 @@ NOTES                                                         *adev-notes*
 - Optimized for modern Neovim (0.11.0+) with latest features
 - Dynamic version detection from git tags
 - Lazy loading ensures fast startup times with event-based plugin loading
-- Modular architecture with 25+ plugin files for easy customization
+ - Modular architecture with 24 plugin files for easy customization
 - Onboarding system with automatic configuration generation for new users
 - Built-in updater with automatic update checking on startup
-- Comprehensive LSP support with 40+ language servers out of the box
+ - Comprehensive LSP support with 47+ language servers out of the box
 - Advanced completion with blink.cmp and Rust implementation
 - AI integration with configurable assistants (AugmentCode, Supermaven)
-- Extensive plugin ecosystem with careful curation (25+ languages supported)
+ - Extensive plugin ecosystem with careful curation (47+ languages supported)
 - Performance-focused with intelligent loading strategies and caching
 - Health check system with comprehensive diagnostic code
 - Comprehensive event system with extensive event definitions
