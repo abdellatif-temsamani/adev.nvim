@@ -5,13 +5,13 @@ local M = {}
 
 --- Parse the changelog content and extract the section for a specific version
 ---@param content string The full changelog content
----@param version string The version to extract (e.g., "2.0.0-2")
+---@param version string The version to extract (e.g., "2.0.0")
 ---@return string|nil The changelog section for the version, or nil if not found
 local function extract_version_section(content, version)
     -- Remove 'v' prefix if present in version for matching
     local clean_version = version:gsub("^v", "")
 
-    -- Pattern to match version headers like "## [2.0.0-2] - 2025-10-30"
+    -- Pattern to match version headers like "## [2.0.0] - 2025-10-30"
     local version_pattern = "%[" .. clean_version:gsub("%-", "%%-") .. "%]"
 
     local lines = vim.split(content, "\n")

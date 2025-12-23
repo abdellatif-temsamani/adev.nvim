@@ -155,6 +155,7 @@ local function setup(opts)
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
 
     for lsp, fts in pairs(lsp_map) do
+        assert(vim.tbl_contains(defaults, lsp), ("LSP '%s' is not in defaults"):format(lsp))
         vim.api.nvim_create_autocmd({ events.buffer.read_post, events.buffer.new_file }, {
             group = _generate_group(lsp),
             callback = function(args)

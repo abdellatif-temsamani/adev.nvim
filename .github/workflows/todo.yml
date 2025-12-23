@@ -29,7 +29,7 @@ jobs:
           excludePattern: "^(node_modules/)"
           blobLines: 7
           blobLinesBefore: 4
-          keywords: "BEGIN,BUG,ERROR,FIXIT,FIXME,HACK,ISSUE,OPTIM,OPTIMIZE,PERF,PERFORMANCE,PLAN,START,TASK,TODO,WARN,WARNING"
+          keywords: "BUG,ERROR,FIXIT,FIXME,HACK,ISSUE,OPTIM,OPTIMIZE,PERF,PERFORMANCE,PLAN,START,TASK,TODO"
           reopenClosed: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
