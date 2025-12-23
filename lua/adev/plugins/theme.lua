@@ -3,6 +3,7 @@ return {
     name = "catppuccin",
     priority = 1000,
     lazy = false,
+    build = ":CatppuccinCompile",
     enabled = Adev.catppuccin.enable,
     opts = {
         flavour = Adev.catppuccin.flavour,
