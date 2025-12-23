@@ -42,7 +42,7 @@ return {
                 enable = true,
                 enable_autocmd = false,
             },
-            ignore_install = { "zimbu" },
+            ignore_install = { "zimbu", "ipkg" },
             highlight = {
                 enable = true,
                 additional_vim_regex_highlighting = false,
