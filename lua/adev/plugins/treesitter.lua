@@ -33,18 +33,24 @@ return {
         "nvim-treesitter/nvim-treesitter",
         event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
         build = ":TSUpdate",
-        opts = {},
-        config = function()
-            local autocmd = vim.api.nvim_create_autocmd
-            autocmd(events.file.type, {
-                pattern = "*",
-                callback = function(args)
-                    if vim.bo[args.buf].buftype ~= "" then
-                        return
-                    end
-                    vim.treesitter.start()
-                end,
-            })
+        opts = {
+            sync_install = false,
+            ensure_installed = "all",
+            auto_install = true,
+            indent = { enable = true },
+            context_commentstring = {
+                enable = true,
+                enable_autocmd = false,
+            },
+            ignore_install = { "zimbu" },
+            highlight = {
+                enable = true,
+                additional_vim_regex_highlighting = false,
+            },
+        },
+        config = function(_, opts)
+            local treesitter = require "nvim-treesitter.configs"
+            treesitter.setup(opts)
         end,
     },
 }
