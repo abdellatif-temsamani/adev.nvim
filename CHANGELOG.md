@@ -12,19 +12,24 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
-## [2.0.0] - 2025-12-21
+## [2.0.1] - 2025-12-23
 
 ### 🚀 Features
 
 - Add treesitter auto-start configuration and update project release name
+- Temp implementation of ADConfig
 
 ### 🐛 Bug Fixes
 
 - _(gitsigns)_ Lazyloading
+- Add assertion for LSP defaults in lsp.lua
+- Treesitter config
 
 ### 📚 Documentation
 
 - Update CHANGELOG.md
+- Update documentation to reflect codebase changes
+- Update documentation to reflect codebase changes
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -105,6 +110,7 @@ curated plugins and settings.
 
 ### 🐛 Bug Fixes
 
+- [**breaking**] Cmp
 - Sets config
 
 ### 📚 Documentation
