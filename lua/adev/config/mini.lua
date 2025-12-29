@@ -1,3 +1,4 @@
+-- NOTE: may replace with nvim-treesitter/nvim-treesitter-textobjects
 require("mini.ai").setup()
 
 local miniclue = require "mini.clue"
