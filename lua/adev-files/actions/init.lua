@@ -1,6 +1,6 @@
 local on_create_confirm = require "adev-files.actions.create"
-local ui = require "adev.ui"
-local utils = require "adev.utils"
+local ui = require "adev-common.ui"
+local utils = require "adev-common.utils"
 
 local M = {
     cwd = vim.fn.getcwd(),

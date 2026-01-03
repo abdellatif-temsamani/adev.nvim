@@ -89,7 +89,7 @@ return {
             prompt_prefix = " ",
             color_devicons = true,
             selection_strategy = "closest",
-            file_ignore_patterns = require("adev.utils").ignored_files,
+            file_ignore_patterns = require("adev-common.utils").ignored_files,
             mappings = {
                 i = {
                     ["<C-x>"] = false,

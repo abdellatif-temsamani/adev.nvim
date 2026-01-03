@@ -1,4 +1,4 @@
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 
 ---@param git_cmd fun(cmd: string[], opts: vim.SystemOpts): vim.SystemObj
 ---@param branch string

@@ -1,8 +1,8 @@
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 local ui = vim.ui
 
 local Ui = {
-    input = require "adev.ui.input",
+    input = require "adev-common.ui.input",
 }
 
 ---@param prompt string
