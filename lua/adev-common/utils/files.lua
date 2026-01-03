@@ -44,7 +44,7 @@ function M.get_basepath(cwd)
         return ""
     end
 
-    return dir
+    return dir .. "/"
 end
 
 return M

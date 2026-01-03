@@ -17,7 +17,7 @@ return function(prompt, opts, on_confirm)
     ---@type InputOpts
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
 
-    vim.ui.input({
+    Snacks.input.input({
         prompt = "[" .. opts.title .. "]: " .. prompt,
         default = opts.default,
         completion = opts.completion,

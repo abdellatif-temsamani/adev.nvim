@@ -31,7 +31,6 @@ return {
             hover = {
                 border = {
                     style = Adev.ui.border,
-                    padding = { 0, 2 },
                 },
             },
             mini = {
@@ -40,11 +39,6 @@ return {
                 },
             },
             cmdline_popup = {
-                border = {
-                    style = Adev.ui.border,
-                },
-            },
-            cmdline_input = {
                 border = {
                     style = Adev.ui.border,
                 },
