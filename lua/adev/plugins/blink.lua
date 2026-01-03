@@ -19,7 +19,7 @@ return {
         opts = {
             cmdline = {
                 enabled = true,
-                keymap = { preset = "inherit" },
+                keymap = { preset = "cmdline" },
                 completion = { ghost_text = { enabled = true }, menu = { auto_show = true } },
             },
 

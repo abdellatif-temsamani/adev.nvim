@@ -1,10 +1,15 @@
 local utils = require "adev-common.utils"
 
----@param input string|nil
+---@param input? string
 ---@return nil
 return function(input)
     if not input or input == "" then
         utils.notify("No file/dir to create", vim.log.levels.ERROR)
+        return
+    end
+
+    if utils.files.file_exists(input) then
+        utils.notify("path already exists", vim.log.levels.ERROR)
         return
     end
 
