@@ -22,6 +22,34 @@ return {
         presets = {
             lsp_doc_border = true,
         },
+        views = {
+            popup = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            hover = {
+                border = {
+                    style = Adev.ui.border,
+                    padding = { 0, 2 },
+                },
+            },
+            mini = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            cmdline_popup = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            cmdline_input = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+        },
     },
     dependencies = {
         "MunifTanjim/nui.nvim",
