@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global
 return {
     "adalessa/laravel.nvim",
-    event = require("adev.utils.events").vim.lazy,
+    event = require("adev-common.utils.events").vim.lazy,
     cond = function()
         return vim.fn.filereadable "artisan" ~= 0
     end,

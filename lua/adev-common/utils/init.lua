@@ -12,7 +12,7 @@ local Utils = {
         "pnpm-lock.yaml",
         "lazy-lock.json",
     },
-    files = require "adev.utils.files",
+    files = require "adev-common.utils.files",
 }
 
 --- @param msg string

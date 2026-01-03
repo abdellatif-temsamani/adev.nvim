@@ -1,4 +1,4 @@
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 
 ---@param input string|nil
 ---@return nil

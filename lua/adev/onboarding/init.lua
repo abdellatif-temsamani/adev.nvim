@@ -1,5 +1,5 @@
 local defaults = require "adev.defaults"
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 
 local OnBoarding = {
     init = utils.files:get_config_file "/init.lua",

@@ -1,5 +1,5 @@
 local update_manager = require "adev.update_manager"
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 
 local M = {}
 

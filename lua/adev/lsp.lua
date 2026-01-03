@@ -1,4 +1,4 @@
-local events = require "adev.utils.events"
+local events = require "adev-common.utils.events"
 
 ---@param key string
 ---@return integer — Integer id of the created group.

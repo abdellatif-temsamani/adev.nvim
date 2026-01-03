@@ -1,4 +1,4 @@
-local events = require "adev.utils.events"
+local events = require "adev-common.utils.events"
 local autocmd = vim.api.nvim_create_autocmd
 local general_grp = vim.api.nvim_create_augroup("GENERAL", { clear = true })
 local onbarding_group = vim.api.nvim_create_augroup("ONBOARDING", { clear = true })
