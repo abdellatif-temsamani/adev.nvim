@@ -1,4 +1,5 @@
-local utils = require("adev-files.utils")
+local ui = require "adev.ui"
+local utils = require("adev.utils")
 local on_create_confirm = require("adev-files.actions.create")
 
 local M = {
@@ -6,8 +7,8 @@ local M = {
 }
 
 function M.create()
-    local dir = utils.get_basepath(M.cwd) or "" -- starting point
-    utils.input("Create a file/dir [trailing / for dir]", dir, "file", on_create_confirm)
+    local dir = utils.files.get_basepath(M.cwd) or "" -- starting point
+    ui.input("Create a file/dir [trailing / for dir]", dir, "file", on_create_confirm)
 end
 
 function M:setup_keymaps()

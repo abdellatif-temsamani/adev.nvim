@@ -17,8 +17,10 @@ local Utils = {
 
 --- @param msg string
 --- @param level integer|nil One of the values from |vim.log.levels|.
-function Utils.notify(msg, level)
-    vim.notify(msg, level, { title = "adev.nvim" })
+--- @param title? string if not provided defautls to adev.nvim
+function Utils.notify(msg, level, title)
+    title = title or "adev.nvim"
+    vim.notify(msg, level, { title = "[" .. title .. "]" })
 end
 
 --- @param msg string

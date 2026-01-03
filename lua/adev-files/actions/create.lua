@@ -1,4 +1,4 @@
-local utils = require("adev-files.utils")
+local utils = require("adev.utils")
 
 ---@param input string|nil
 ---@return nil
