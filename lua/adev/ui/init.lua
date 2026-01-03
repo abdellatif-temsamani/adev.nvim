@@ -5,7 +5,7 @@ local Ui = {}
 
 ---@param prompt string
 local function wrap_prompt(prompt)
-    return string.format("Adev >> %s: ", prompt)
+    return string.format("[Adev] %s: ", prompt)
 end
 
 ---@class InputOpts
