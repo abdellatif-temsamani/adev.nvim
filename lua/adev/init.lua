@@ -49,6 +49,10 @@ function M.setup(opts)
         require("adev.lsp").setup(opts.lsp.servers)
     end
 
+    require "adev-files".setup()
+    if not opts.catppuccin.enabled and opts.colorscheme == 'catppuccin' then
+        opts.colorscheme = "default"
+    end
     vim.cmd(string.format("colorscheme %s", opts.colorscheme))
 end
 

@@ -4,7 +4,7 @@ return {
     priority = 1000,
     lazy = false,
     build = ":CatppuccinCompile",
-    enabled = Adev.catppuccin.enable,
+    enabled = Adev.catppuccin.enabled,
     opts = {
         flavour = Adev.catppuccin.flavour,
         transparent_background = Adev.catppuccin.transparent,

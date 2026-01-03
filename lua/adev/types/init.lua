@@ -13,7 +13,7 @@
 ---@alias BorderStyle "double"|"single"|"shadow"|"rounded"|"solid"|"none"
 
 ---@class CatppuccinOpts
----@field enable boolean?  Enable catppuccin (default: `true`)
+---@field enabled boolean?  Enable catppuccin (default: `true`)
 ---@field flavour CatppuccinFlavor?  catppuccin flavour (default: `"mocha"`)
 ---@field transparent boolean?  Enable transparent background (default: `false`)
 
