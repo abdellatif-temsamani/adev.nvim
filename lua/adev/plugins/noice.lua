@@ -23,6 +23,17 @@ return {
             lsp_doc_border = true,
         },
         views = {
+            cmdline_popup = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            popupmenu = {
+                relative = "editor",
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
             popup = {
                 border = {
                     style = Adev.ui.border,
@@ -34,11 +45,6 @@ return {
                 },
             },
             mini = {
-                border = {
-                    style = Adev.ui.border,
-                },
-            },
-            cmdline_popup = {
                 border = {
                     style = Adev.ui.border,
                 },

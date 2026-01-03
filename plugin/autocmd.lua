@@ -51,7 +51,8 @@ autocmd(events.file.type, {
     pattern = "*",
     command = "setlocal formatoptions-=r formatoptions-=c formatoptions-=o",
 })
-autocmd("BufWritePost", {
+
+autocmd(events.buffer.write_post, {
     group = onbarding_group,
     pattern = onboarding.init_opts,
     callback = function()

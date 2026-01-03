@@ -6,7 +6,7 @@ local M = {
 ---@param path string
 ---@return boolean
 function M.file_exists(path)
-    return vim.fn.filereadable(path) == 1
+    return vim.fn.filereadable(path) == 1 or vim.fn.isdirectory(path) == 1
 end
 
 --- Open or create a file then write the content to it
@@ -35,7 +35,7 @@ end
 function M.get_basepath(cwd)
     -- Get directory of current buffer relative to cwd
     local buf_path = vim.api.nvim_buf_get_name(0)
-    local dir = vim.fn.fnamemodify(buf_path, ":h")
+    local dir = vim.fs.dirname(buf_path)
     if dir:sub(1, #cwd) == cwd then
         dir = dir:sub(#cwd + 2) -- +2 to remove trailing slash
     end
