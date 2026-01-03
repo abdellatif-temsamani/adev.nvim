@@ -12,7 +12,7 @@ local Utils = {
         "pnpm-lock.yaml",
         "lazy-lock.json",
     },
-    adev_path = vim.fn.stdpath "config",
+    files = require "adev.utils.files",
 }
 
 --- @param msg string
@@ -26,20 +26,7 @@ function Utils.err_notify(msg)
     Utils.notify(msg, vim.log.levels.ERROR)
 end
 
-function Utils.disable_movement(buf)
-    local map = vim.api.nvim_buf_set_keymap
-    local opts = { noremap = true, silent = true }
-
-    map(buf, "n", "h", "<Nop>", opts)
-    map(buf, "n", "j", "<Nop>", opts)
-    map(buf, "n", "k", "<Nop>", opts)
-    map(buf, "n", "l", "<Nop>", opts)
-    map(buf, "n", "<Up>", "<Nop>", opts)
-    map(buf, "n", "<Down>", "<Nop>", opts)
-    map(buf, "n", "<Left>", "<Nop>", opts)
-    map(buf, "n", "<Right>", "<Nop>", opts)
-end
-
+--- check two tables and returns true if they're the same
 --- @param a table
 --- @param b table
 --- @return boolean
@@ -55,21 +42,6 @@ function Utils.compare_keys(a, b)
         end
     end
     return true
-end
-
----@param path string
----@param content string[]
-function Utils.write_file(path, content)
-    local file = assert(io.open(path, "w"), "Failed to open " .. path)
-    file:write(table.concat(content))
-    file:close()
-end
-
---- get a file in adev config
----@param relative_path string erample `"/init.lua"`
----@return string
-function Utils:get_config_file(relative_path)
-    return self.adev_path .. relative_path
 end
 
 return Utils
