@@ -29,4 +29,24 @@ function M:get_config_file(relative_path)
     return self.adev_path .. relative_path
 end
 
+--- get working directory of the current buffer
+--- @param cwd string
+--- @param buf? integer | nil
+--- @return string
+function M.get_basepath(cwd, buf)
+    -- Get directory of current buffer relative to cwd
+    local buf_path = vim.api.nvim_buf_get_name(0)
+    local dir = vim.fn.fnamemodify(buf_path, ":h")
+    if dir:sub(1, #cwd) == cwd then
+        dir = dir:sub(#cwd + 2) -- +2 to remove trailing slash
+    end
+
+    if dir == "." then
+        return ""
+    end
+
+    return dir
+end
+
+
 return M
