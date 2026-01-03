@@ -1,7 +1,9 @@
 local utils = require "adev.utils"
 local ui = vim.ui
 
-local Ui = {}
+local Ui = {
+    input = require "adev.ui.input",
+}
 
 ---@param prompt string
 local function wrap_prompt(prompt)
@@ -11,18 +13,6 @@ end
 ---@class SelectOpts
 ---@field prompt string
 ---@field on_confirm fun(item): nil
-
---- @param prompt string
---- @param default string
---- @param completion string
---- @param on_confirm fun(item): nil
-function Ui.input(prompt, default, completion, on_confirm)
-    vim.ui.input({
-        prompt = "[adev.files]: " .. prompt,
-        default = default,
-        completion = completion,
-    }, on_confirm)
-end
 
 ---@generic T
 ---@param items T[]
