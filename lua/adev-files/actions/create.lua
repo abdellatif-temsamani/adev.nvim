@@ -1,4 +1,4 @@
-local utils = require("adev.utils")
+local utils = require "adev.utils"
 
 ---@param input string|nil
 ---@return nil
@@ -38,7 +38,7 @@ return function(input)
     -- Create the file
     local file = io.open(path, "w")
     if file then
-        file:write("")
+        file:write ""
         file:close()
         utils.notify("File created: " .. path)
         vim.cmd("e " .. vim.fn.fnameescape(path))

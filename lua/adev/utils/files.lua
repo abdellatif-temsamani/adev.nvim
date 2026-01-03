@@ -31,9 +31,8 @@ end
 
 --- get working directory of the current buffer
 --- @param cwd string
---- @param buf? integer | nil
 --- @return string
-function M.get_basepath(cwd, buf)
+function M.get_basepath(cwd)
     -- Get directory of current buffer relative to cwd
     local buf_path = vim.api.nvim_buf_get_name(0)
     local dir = vim.fn.fnamemodify(buf_path, ":h")
@@ -47,6 +46,5 @@ function M.get_basepath(cwd, buf)
 
     return dir
 end
-
 
 return M

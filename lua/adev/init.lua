@@ -6,9 +6,9 @@ local M = {}
 
 ---@param opts SetupOpts?
 function M.setup(opts)
+    assert(opts, "opts is nil")
     ---@type SetupOpts
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
-    assert(opts, "opts is nil")
 
     vim.g.mapleader = opts.mapleader
     vim.g.maplocalleader = opts.mapleader
@@ -49,8 +49,8 @@ function M.setup(opts)
         require("adev.lsp").setup(opts.lsp.servers)
     end
 
-    require "adev-files".setup()
-    if not opts.catppuccin.enabled and opts.colorscheme == 'catppuccin' then
+    require("adev-files").setup()
+    if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then
         opts.colorscheme = "default"
     end
     vim.cmd(string.format("colorscheme %s", opts.colorscheme))

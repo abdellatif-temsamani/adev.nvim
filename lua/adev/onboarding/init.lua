@@ -30,7 +30,7 @@ end
 function OnBoarding.restart_neovim(delay)
     delay = delay or 1500
 
-    utils.notify("restating neovim in " .. delay .. "ms", vim.log.levels.TRACE)
+    utils.notify("restarting neovim in " .. delay .. "ms", vim.log.levels.TRACE)
     vim.defer_fn(function()
         if vim.fn.has "nvim-0.12.0" == 1 then
             vim.cmd [[ restart ]]
