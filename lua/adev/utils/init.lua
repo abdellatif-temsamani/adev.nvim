@@ -60,9 +60,16 @@ end
 ---@param path string
 ---@param content string[]
 function Utils.write_file(path, content)
-    local opts_file = assert(io.open(path, "w"), "Failed to open " .. path)
-    opts_file:write(table.concat(content))
-    opts_file:close()
+    local file = assert(io.open(path, "w"), "Failed to open " .. path)
+    file:write(table.concat(content))
+    file:close()
+end
+
+--- get a file in adev config
+---@param relative_path string erample `"/init.lua"`
+---@return string
+function Utils:get_config_file(relative_path)
+    return self.adev_path .. relative_path
 end
 
 return Utils
