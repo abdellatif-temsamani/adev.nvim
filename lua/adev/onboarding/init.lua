@@ -28,13 +28,16 @@ end
 --- Restart Neovim after a delay
 ---@param delay number? Delay in milliseconds
 function OnBoarding.restart_neovim(delay)
+    delay = delay or 1500
+
+    utils.notify("restating neovim in " .. delay .. "ms")
     vim.defer_fn(function()
         if vim.fn.has "nvim-0.12.0" == 1 then
             vim.cmd [[ restart ]]
         else
             vim.cmd [[ qa! ]]
         end
-    end, delay or 1500)
+    end, delay)
 end
 
 --- onboarding a new user by generating a new config
@@ -93,7 +96,6 @@ function OnBoarding:onboarding()
         return
     end
 end
-
 function OnBoarding.edit_config()
     vim.cmd("edit " .. OnBoarding.init_opts)
 end
