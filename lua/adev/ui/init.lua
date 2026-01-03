@@ -5,30 +5,23 @@ local Ui = {}
 
 ---@param prompt string
 local function wrap_prompt(prompt)
-    return string.format("Adev >> %s: ", prompt)
+    return string.format("[Adev] %s: ", prompt)
 end
 
----@class InputOpts
+---@class SelectOpts
 ---@field prompt string
----@field on_confirm fun(item: string): nil
+---@field on_confirm fun(item): nil
 
----@class SelectOpts: InputOpts
----@field on_confirm fun(item ): nil
-
----@param opts InputOpts
-function Ui.input(opts)
-    local defaults = {
-
-        prompt = "",
-        on_confirm = function(item)
-            utils.notify(item)
-        end,
-    }
-
-    ---@type InputOpts
-    opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
-
-    ui.input({ prompt = wrap_prompt(opts.prompt) }, opts.on_confirm)
+--- @param prompt string
+--- @param default string
+--- @param completion string
+--- @param on_confirm fun(item): nil
+function Ui.input(prompt, default, completion, on_confirm)
+    vim.ui.input({
+        prompt = "[adev.files]: " .. prompt,
+        default = default,
+        completion = completion,
+    }, on_confirm)
 end
 
 ---@generic T
