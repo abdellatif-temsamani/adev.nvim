@@ -11,13 +11,6 @@ return {
             desc = "close buffer",
         },
         {
-            "<leader>n",
-            function()
-                Snacks.explorer()
-            end,
-            desc = "Files",
-        },
-        {
             "<leader>wa",
             function()
                 Snacks.zen.zoom()
