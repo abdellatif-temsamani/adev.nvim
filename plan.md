@@ -1,0 +1,4 @@
+- [ ] refactor some files
+- [ ] clean plugins
+- [ ] remove file tree viewer
+- [ ] create a custom file manager

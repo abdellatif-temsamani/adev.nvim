@@ -2,6 +2,7 @@ return {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
     dependencies = {
+        "nvim-mini/mini.icons",
         "nvim-lua/popup.nvim",
         "nvim-lua/plenary.nvim",
         "nvim-telescope/telescope-fzf-native.nvim",
@@ -69,23 +70,6 @@ return {
         pickers = {
             find_files = {
                 hidden = true,
-                find_command = {
-                    "rg",
-                    "--files",
-                    "--hidden",
-                    "--glob=!**/yarn.lock",
-                    "--glob=!**/pnpm-lock.yaml",
-                    "--glob=!**/node_modules/*",
-                    "--glob=!**/.git/*",
-                    "--glob=!**/Cargo.lock*",
-                    "--glob=!**/.idea/*",
-                    "--glob=!**/__pycache__/*",
-                    "--glob=!**/.vscode/*",
-                    "--glob=!**/build/*",
-                    "--glob=!**/dist/*",
-                    "--glob=!**/yarn.lock",
-                    "--glob=!**/package-lock.json",
-                },
             },
         },
         extensions = {
