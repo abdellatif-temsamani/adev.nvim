@@ -53,7 +53,7 @@ return function()
     local pwd = utils.files.get_dirname()
     local files = vim.fs.dir(pwd)
 
-    local current_files = { "root: " .. pwd, "" }
+    local current_files = { "root: " .. pwd .. " [q: quit]", "" }
     for name, type in files do
         table.insert(current_files, string.format("%s: %s", type, name))
     end
