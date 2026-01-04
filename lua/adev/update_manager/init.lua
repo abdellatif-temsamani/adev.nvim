@@ -17,7 +17,7 @@ local function git_cmd(cmd, opts, on_exit)
     return vim.system(
         gitcmd,
         vim.tbl_extend("force", opts, {
-            cwd = utils.adev_path,
+            cwd = utils.files.adev_path,
         }),
         on_exit
     )
