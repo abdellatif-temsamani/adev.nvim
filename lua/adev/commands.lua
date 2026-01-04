@@ -33,17 +33,18 @@ local M = {
 
                     local matches = {}
                     for _, version in ipairs(versions) do
-                        if version:find(arg_lead, 1, true) == 1 then
+                        if version:sub(1, #arg_lead) == arg_lead then
                             table.insert(matches, version)
                         end
                     end
+
                     return matches
                 end,
             },
         },
         {
-            name = "ADVersions",
-            command = changelog.list_versions,
+            name = "ADInfo",
+            command = changelog.get_info,
             opts = { desc = "List available versions" },
         },
     },

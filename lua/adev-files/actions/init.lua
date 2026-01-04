@@ -7,7 +7,7 @@ local M = {
 }
 
 function M.create()
-    local dir = utils.files.get_basepath(M.cwd) or "" -- starting point
+    local dir = utils.files.get_dirname(M.cwd) or "" -- starting point
     ui.input("Create a file/dir [trailing / for dir]", {
         default = dir,
         completion = "file",
