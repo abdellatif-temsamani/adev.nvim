@@ -3,18 +3,20 @@ if exists("b:current_syntax")
 endif
 
 " keywords
-syntax keyword adevKeyword file directory
+syntax keyword adevFilesKeyword file directory
 
 " colon operator
-syntax match adevOps ": "
+syntax match adevFilesOps ": "
 
 " value after colon (space optional)
-syntax match adevString ":\s\+.*$" contains=adevOps
+syntax match adevFilesString ":\s\+.*$" contains=adevOps
+syntax match adevFilesTitle "root: .*"
 
 " highlights
-highlight link adevKeyword Keyword
-highlight link adevOps Operator
-highlight link adevString ColorColumn
+highlight link adevFilesKeyword Keyword
+highlight link adevFilesOps Operator
+highlight link adevFilesString Pmenu
+highlight link adevFilesTitle Directory
 
 let b:current_syntax = "adev_files"
 
