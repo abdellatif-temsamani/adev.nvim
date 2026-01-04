@@ -2,21 +2,56 @@ if exists("b:current_syntax")
   finish
 endif
 
-" keywords
-syntax keyword adevFilesKeyword file directory
+" ============================================================
+" Adev Files Syntax Highlighting
+" Format: root: <path> | file: <name> | directory: <name>
+" ============================================================
 
-" colon operator
-syntax match adevFilesOps ": "
+" Keywords - separate colors for file and directory
+syntax keyword adevFilesFile file
+syntax keyword adevFilesDirectory directory
 
-" value after colon (space optional)
-syntax match adevFilesString ":\s\+.*$" contains=adevOps
-syntax match adevFilesTitle "root: .*"
+" Root title line (distinct from directories)
+syntax match adevFilesTitle "^root:.*$"
 
-" highlights
-highlight link adevFilesKeyword Keyword
-highlight link adevFilesOps Operator
-highlight link adevFilesString Pmenu
-highlight link adevFilesTitle Directory
+" Colon operator for key-value separator
+syntax match adevFilesSeparator contained ":\s*"
+
+" Values after keywords (after the colon and optional whitespace)
+syntax match adevFilesFileValue "file:\s*\zs.*" contains=adevFilesSeparator
+syntax match adevFilesDirValue "directory:\s*\zs.*" contains=adevFilesSeparator
+
+" Special characters in paths (/, \, ., -, _, space, etc.)
+syntax match adevFilesSpecial contained "[/\\._-]"
+
+" Quoted strings (for paths with special characters)
+syntax region adevFilesQuote start=+"+ end=+"+ contained
+syntax region adevFilesQuote start=+'+ end=+'+ contained
+
+" ============================================================
+" Highlight Groups
+" ============================================================
+
+" Keywords - different colors for file vs directory
+highlight link adevFilesFile Keyword
+highlight link adevFilesDirectory Function
+
+" Root title - distinct bold color for visibility
+highlight default link adevFilesTitle Type
+highlight default adevFilesTitle gui=bold cterm=bold
+
+" Separator - colon operator
+highlight link adevFilesSeparator Operator
+
+" Values - strings for paths/filenames
+highlight link adevFilesFileValue String
+highlight link adevFilesDirValue String
+
+" Special characters - subtle differentiation in paths
+highlight link adevFilesSpecial Special
+
+" Quoted strings - same as values but explicit
+highlight link adevFilesQuote String
 
 let b:current_syntax = "adev_files"
 

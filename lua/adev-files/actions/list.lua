@@ -10,9 +10,12 @@ local function create_win(buf, height)
     vim.bo[buf].filetype = "adev_files"
 
     vim.keymap.set({ "n", "v" }, "q", "<cmd>bwipeout<CR>", { buffer = buf })
-    ui.window:new_floating(buf, {
+    local win = ui.window:new_floating(buf, {
         height = height,
     })
+
+    vim.wo[win].cursorline = true
+    vim.wo[win].cursorlineopt = "line"
 end
 
 ---@param a string
