@@ -20,12 +20,19 @@ local Utils = {
 --- @param title? string if not provided defautls to adev.nvim
 function Utils.notify(msg, level, title)
     title = title or "adev.nvim"
-    vim.notify(msg, level, { title = "[" .. title .. "]" })
+    if vim.in_fast_event() then
+        vim.schedule(function()
+            vim.notify(msg, level, { title = "[" .. title .. "]" })
+        end)
+    else
+        vim.notify(msg, level, { title = "[" .. title .. "]" })
+    end
 end
 
 --- @param msg string
-function Utils.err_notify(msg)
-    Utils.notify(msg, vim.log.levels.ERROR)
+--- @param title? string if not provided defautls to adev.nvim
+function Utils.err_notify(msg, title)
+    Utils.notify(msg, vim.log.levels.ERROR, title)
 end
 
 --- check two tables and returns true if they're the same
