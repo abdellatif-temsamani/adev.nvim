@@ -36,11 +36,15 @@ function M.get_dirname()
     -- Get directory of current buffer relative to cwd
     local buf_path = vim.api.nvim_buf_get_name(0)
     local dir = vim.fs.dirname(buf_path)
-    if dir:sub(1, #M.cwd) == M.cwd then
-        dir = dir:sub(#M.cwd + 2) -- +2 to remove trailing slash
+    if dir and dir:sub(1, #M.cwd) == M.cwd then
+        if #dir == #M.cwd then
+            dir = "."
+        else
+            dir = dir:sub(#M.cwd + 2) -- +2 to remove trailing slash
+        end
     end
 
-    return dir .. "/"
+    return (dir or ".") .. "/"
 end
 
 return M
