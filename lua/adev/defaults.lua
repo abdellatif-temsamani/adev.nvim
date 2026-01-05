@@ -5,7 +5,7 @@ local defaults = {
     auto_update_check = true,
     colorscheme = "catppuccin",
     catppuccin = {
-        enable = true,
+        enabled = true,
         flavour = "mocha",
         transparent = false,
     },
@@ -18,7 +18,6 @@ local defaults = {
         plugin_version = nil,
     },
     lsp = {
-        servers = nil,
         enable = true,
     },
     ai_assistant = {

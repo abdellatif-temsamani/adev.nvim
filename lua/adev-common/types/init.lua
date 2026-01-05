@@ -26,7 +26,6 @@
 ---@field auto_update_check boolean?  Check for plugin updates on startup (default: `true`)
 
 ---@class LspOpts
----@field servers string[]?  List of servers to enable (default: `nil`) if `nil` or {} then all default servers are enabled
 ---@field enable boolean?  Enable LSP (default: `true`)
 
 ---@class AiAssistantOpts

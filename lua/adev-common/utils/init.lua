@@ -40,16 +40,32 @@ end
 --- @param b table
 --- @return boolean
 function Utils.compare_keys(a, b)
-    for k in pairs(a) do
+    if type(a) ~= "table" or type(b) ~= "table" then
+        return false
+    end
+
+    for k, v in pairs(a) do
         if b[k] == nil then
             return false
         end
+
+        if type(v) == "table" then
+            if type(b[k]) ~= "table" then
+                return false
+            end
+
+            if not Utils.compare_keys(v, b[k]) then
+                return false
+            end
+        end
     end
+
     for k in pairs(b) do
         if a[k] == nil then
             return false
         end
     end
+
     return true
 end
 

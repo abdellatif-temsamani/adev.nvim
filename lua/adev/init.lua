@@ -46,7 +46,7 @@ function M.setup(opts)
     }
 
     if opts.lsp.enable then
-        require("adev.lsp").setup(opts.lsp.servers)
+        require("adev.lsp").setup()
     end
 
     require("adev-files").setup()
