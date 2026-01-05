@@ -51,6 +51,7 @@ function OnBoarding:onboarding()
             if not status then
                 current = {}
             end
+            -- BUG: not fully working
             ---@type SetupOpts
             config = vim.tbl_deep_extend("keep", {}, current, defaults)
             for key in pairs(config) do
