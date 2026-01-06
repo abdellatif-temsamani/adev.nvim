@@ -3,7 +3,6 @@ return function()
     vim.diagnostic.config { virtual_text = { current_line = true } }
 
     local vim_capabilities = vim.lsp.protocol.make_client_capabilities()
-    vim_capabilities.textDocument.completion.completionItem.snippetSupport = false
     local capabilities = require("blink.cmp").get_lsp_capabilities(vim_capabilities)
 
     vim.lsp.config("*", {
