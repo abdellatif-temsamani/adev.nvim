@@ -3,16 +3,16 @@ local M = {
 }
 
 --- Checks if a file exists
----@param path string
----@return boolean
+--- @param path string
+--- @return boolean
 function M.file_exists(path)
     return vim.fn.filereadable(path) == 1 or vim.fn.isdirectory(path) == 1
 end
 
 --- Open or create a file then write the content to it
----@param path string
----@param content string[]
----@param mode? openmode
+--- @param path string
+--- @param content string[]
+--- @param mode? openmode
 function M.write_file(path, content, mode)
     ---@type openmode
     mode = mode or "w"
@@ -23,8 +23,8 @@ function M.write_file(path, content, mode)
 end
 
 --- get a file in adev config
----@param relative_path string erample `"/init.lua"`
----@return string
+--- @param relative_path string erample `"/init.lua"`
+--- @return string
 function M:get_config_file(relative_path)
     return self.adev_path .. relative_path
 end
@@ -34,7 +34,15 @@ end
 function M.get_dirname()
     -- Get directory of current buffer relative to cwd
     local buf_path = vim.api.nvim_buf_get_name(0)
+    if buf_path == "" then
+        return "./"
+    end
+
     local dir = vim.fs.dirname(buf_path)
+    if not dir then
+        return "./"
+    end
+
     local cwd = vim.fn.getcwd()
     if dir and dir:sub(1, #cwd) == cwd then
         if #dir == #cwd then
@@ -48,7 +56,7 @@ function M.get_dirname()
 end
 
 --- open a file
----@param path string
+--- @param path string
 function M.open_file(path)
     vim.cmd("edit " .. path)
 end
