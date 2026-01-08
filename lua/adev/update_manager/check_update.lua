@@ -5,7 +5,10 @@ local utils = require "adev-common.utils"
 return function(git_cmd, branch)
     -- Step 1: Fetch all remote tags asynchronously
     git_cmd({ "fetch", "--tags" }, { text = true }, function(fetch_res)
-        assert(fetch_res.code == 0 , "Failed to fetch tags")
+        if fetch_res.code ~= 0 then
+            utils.err_notify "Failed to fetch tags"
+            return
+        end
 
         -- Step 2: Get latest remote tag for current branch
         local remote_ref = string.format("origin/%s", branch or "main")

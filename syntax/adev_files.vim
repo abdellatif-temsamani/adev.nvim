@@ -18,8 +18,8 @@ syntax match adevFilesTitle "^root:.*$"
 syntax match adevFilesSeparator contained ":\s*"
 
 " Values after keywords (after the colon and optional whitespace)
-syntax match adevFilesFileValue "file:\s*\zs.*" contains=adevFilesSeparator
-syntax match adevFilesDirValue "directory:\s*\zs.*" contains=adevFilesSeparator
+syntax match adevFilesFileValue "file:\s*.*" contains=adevFilesSeparator
+syntax match adevFilesDirValue "directory:\s*.*" contains=adevFilesSeparator
 
 " Special characters in paths (/, \, ., -, _, space, etc.)
 syntax match adevFilesSpecial contained "[/\\._-]"
