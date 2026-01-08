@@ -99,7 +99,7 @@ function OnBoarding:onboarding()
 end
 
 function OnBoarding.edit_config()
-    vim.cmd("edit " .. OnBoarding.init_opts)
+    utils.files.open_file(OnBoarding.init_opts)
 end
 
 return OnBoarding

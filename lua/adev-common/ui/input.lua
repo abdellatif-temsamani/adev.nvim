@@ -1,7 +1,7 @@
 ---@class InputOpts
----@field default string
----@field completion string
----@field title string
+---@field default? string
+---@field completion? string
+---@field title? string
 
 ---@type InputOpts
 local defaults = {
@@ -12,8 +12,8 @@ local defaults = {
 
 ---@param prompt string
 ---@param on_confirm fun(item): nil
----@param opts InputOpts
-return function(prompt, opts, on_confirm)
+---@param opts? InputOpts
+return function(prompt, on_confirm, opts)
     ---@type InputOpts
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
 

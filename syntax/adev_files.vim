@@ -33,8 +33,8 @@ syntax region adevFilesQuote start=+'+ end=+'+ contained
 " ============================================================
 
 " Keywords - different colors for file vs directory
-highlight link adevFilesFile Keyword
-highlight link adevFilesDirectory Function
+highlight link adevFilesFile Function
+highlight link adevFilesDirectory Comment
 
 " Root title - distinct bold color for visibility
 highlight default link adevFilesTitle Type

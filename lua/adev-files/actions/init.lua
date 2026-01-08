@@ -6,11 +6,11 @@ local M = {}
 function M.create()
     local dir = utils.files.get_dirname() or ""
     local on_create_confirm = require "adev-files.actions.create"
-    ui.input("Create a file/dir [trailing / for dir]", {
+    ui.input("Create a file/dir [trailing / for dir]", on_create_confirm, {
         default = dir,
         completion = "file",
         title = "adev-files",
-    }, on_create_confirm)
+    })
 end
 
 function M.list()

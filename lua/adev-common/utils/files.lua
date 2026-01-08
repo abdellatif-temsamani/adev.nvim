@@ -47,4 +47,10 @@ function M.get_dirname()
     return (dir or ".") .. "/"
 end
 
+--- open a file
+---@param path string
+function M.open_file(path)
+    vim.cmd("edit " .. path)
+end
+
 return M
