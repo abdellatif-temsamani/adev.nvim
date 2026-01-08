@@ -1,6 +1,5 @@
 local M = {
     adev_path = vim.fn.stdpath "config",
-    cwd = vim.fn.getcwd(),
 }
 
 --- Checks if a file exists
@@ -36,11 +35,12 @@ function M.get_dirname()
     -- Get directory of current buffer relative to cwd
     local buf_path = vim.api.nvim_buf_get_name(0)
     local dir = vim.fs.dirname(buf_path)
-    if dir and dir:sub(1, #M.cwd) == M.cwd then
-        if #dir == #M.cwd then
+    local cwd = vim.fn.getcwd()
+    if dir and dir:sub(1, #cwd) == cwd then
+        if #dir == #cwd then
             dir = "."
         else
-            dir = dir:sub(#M.cwd + 2) -- +2 to remove trailing slash
+            dir = dir:sub(#cwd + 2) -- +2 to remove trailing slash
         end
     end
 

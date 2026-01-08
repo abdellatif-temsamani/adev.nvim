@@ -15,7 +15,7 @@ end
 --- @field width? integer
 --- @field height? integer
 
---- @class FloatingWinOpts
+--- @type FloatingWinOpts
 M.floating_defaults = {
     width = 40,
     height = 5,

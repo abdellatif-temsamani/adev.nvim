@@ -53,7 +53,7 @@ function OnBoarding:onboarding()
             end
             -- BUG: not fully working
             ---@type SetupOpts
-            config = vim.tbl_deep_extend("keep", {}, current, defaults)
+            config = vim.tbl_deep_extend("force", defaults, current)
             for key in pairs(config) do
                 if defaults[key] == nil then
                     config[key] = nil
