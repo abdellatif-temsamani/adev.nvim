@@ -6,8 +6,8 @@ local OnBoarding = {
     init_opts = utils.files:get_config_file "/lua/adev/init-opts.lua",
 }
 
---- checks if current config has diffenrents than the default config
----@return boolean
+--- checks if current config has differences than the default config
+--- @return boolean
 function OnBoarding.config_changed()
     local status, currents = pcall(require, "adev.init-opts")
     if not status then
@@ -80,6 +80,8 @@ function OnBoarding:onboarding()
         "local status, opts = pcall(require, 'adev.init-opts')\n",
         "if status then \n",
         '\trequire("adev").setup(opts)\n',
+        "else\n",
+        '\tvim.notify("Failed to load adev config: " .. tostring(opts), vim.log.levels.ERROR)\n',
         "end\n",
         "\n",
     }
