@@ -1,14 +1,8 @@
-> ⚠️ **IMPORTANT NOTICE:**\
-> **Israeli users are strictly prohibited from using this project.**\
-> **FREE PALESTINE.**
+> **Personal Statement**
 >
-> This restriction is imposed as a clear and urgent protest against the ongoing
-> occupation, violence, and human rights violations committed by the Israeli
-> state against the Palestinian people.\
-> By banning usage in Israel, this project stands in solidarity with Palestine
-> and calls for justice, freedom, and an end to oppression.
->
-> **IMPORTANT NOTICE ENDS**
+> I stand in solidarity with the Palestinian people and support their
+> fundamental human rights. I oppose ongoing violence, occupation, and human
+> rights violations, and I call for justice, dignity, and freedom for all.
 
 # Adev.nvim 🚀
 
@@ -81,35 +75,35 @@ extensive functionality.
 2. **Clone Adev.nvim**:
 
    ```bash
-    git clone https://github.com/abdellatif-temsamani/adev.nvim ~/.config/nvim
+   git clone https://github.com/abdellatif-temsamani/adev.nvim ~/.config/nvim
    ```
 
 3. **Start Neovim** (auto-configuration for new users):
 
-    ```bash
-    nvim
-    ```
+   ```bash
+   nvim
+   ```
 
-    **For new users**: Adev.nvim will automatically detect that you're new and
-    generate the necessary configuration files (`init.lua` and `lua/adev/init-opts.lua`)
-    with default settings. It will then restart Neovim to apply the
-    configuration.
+   **For new users**: Adev.nvim will automatically detect that you're new and
+   generate the necessary configuration files (`init.lua` and
+   `lua/adev/init-opts.lua`) with default settings. It will then restart Neovim
+   to apply the configuration.
 
-    **For advanced users**: If you want to customize before first run, you can
-    manually create the config:
+   **For advanced users**: If you want to customize before first run, you can
+   manually create the config:
 
-    ```bash
-    nvim ~/.config/nvim/lua/adev/init.lua
-    ```
+   ```bash
+   nvim ~/.config/nvim/lua/adev/init.lua
+   ```
 
-    Then write your custom setup:
+   Then write your custom setup:
 
-    ```lua
-    require("adev").setup {
-        -- Your custom options here
-        -- See :help adev-setup for full options
-    }
-    ```
+   ```lua
+   require("adev").setup {
+       -- Your custom options here
+       -- See :help adev-setup for full options
+   }
+   ```
 
 ### Configuration
 
@@ -219,106 +213,106 @@ For detailed documentation on all setup options and advanced configuration, see
 
 ## 🛠️ Commands
 
- Adev.nvim provides several custom commands to enhance your workflow:
+Adev.nvim provides several custom commands to enhance your workflow:
 
- - **`:ADUpdate`** - Update Adev configuration via git pull
- - **`:ADConfig`** - Edit Adev configuration file
- - **`:ADUpdateCheck`** - Check for available updates without updating
- - **`:ADChangelog`** - View the changelog for current or specified version
- - **`:ADVersions`** - List available versions from git tags
- - **`:Lazy profile`** - Analyze plugin loading times
- - **`:Lazy sync`** - Update all plugins
- - **`:Mason`** - Manage LSP servers and tools
- - **`:Telescope`** - Fuzzy find files, buffers, and more
+- **`:ADUpdate`** - Update Adev configuration via git pull
+- **`:ADConfig`** - Edit Adev configuration file
+- **`:ADUpdateCheck`** - Check for available updates without updating
+- **`:ADChangelog`** - View the changelog for current or specified version
+- **`:ADVersions`** - List available versions from git tags
+- **`:Lazy profile`** - Analyze plugin loading times
+- **`:Lazy sync`** - Update all plugins
+- **`:Mason`** - Manage LSP servers and tools
+- **`:Telescope`** - Fuzzy find files, buffers, and more
 
- ## 📁 Project Structure
+## 📁 Project Structure
 
-  ```
-  ~/.config/nvim/
-  ├── CHANGELOG.md              -- Change history
-  ├── cliff.toml                -- Git-cliff configuration
-  ├── CODE_OF_CONDUCT.md        -- Code of conduct
-  ├── CONTRIBUTING.md           -- Contributing guidelines
-  ├── LICENSE                   -- License file
-  ├── README.md                 -- Project README
-  ├── TODO.md                   -- TODO list
-  ├── init.lua                  -- Auto-generated entry point
-  ├── lazy-lock.json            -- Plugin lockfile
-  ├── doc/                      -- Documentation
-  │   ├── adev.txt              -- This documentation
-  │   └── tags                  -- Help tags
-  ├── images/                   -- Images and assets
-  │   └── startuptime.png       -- Performance benchmark
-  ├── lua/adev/                 -- Main configuration modules
-  │   ├── init.lua              -- Main module
-  │   ├── init-opts.lua         -- Auto-generated configuration options (included in .gitignore)
-  │   ├── commands.lua          -- Custom commands
-  │   ├── changelog.lua         -- Changelog command
-  │   ├── defaults.lua          -- Default configuration
-  │   ├── lazy.lua              -- Plugin manager setup
-  │   ├── lsp.lua               -- LSP configuration
-  │   ├── onboarding/           -- Auto configuration generation
-  │   │   └── init.lua          -- Onboarding system
-  │   ├── update_manager/       -- Update management
-  │   │   ├── check_update.lua  -- Update checking
-  │   │   ├── init.lua          -- Update manager
-  │   │   └── update.lua        -- Update functionality
-  │   ├── utils/                -- Utility functions
-  │   │   ├── init.lua          -- Utility functions
-  │   │   └── events.lua        -- Event definitions
-  │   ├── config/               -- Configuration files
-  │   │   ├── lspconfig.lua     -- LSP client configs
-  │   │   ├── mini.lua          -- Mini.nvim configuration
-  │   │   └── none-ls/          -- None-ls configurations
-  │   │       ├── init.lua      -- Main none-ls setup
-  │   │       ├── deno_fmt.lua  -- Deno formatter
-  │   │       └── dgformat.lua  -- DG formatter
-  │   ├── custom-plugins/       -- User custom plugins directory
-  │   │   └── example.lua       -- Example custom plugin
-  │   ├── types/                -- Type definitions
-  │   │   ├── adev.lua          -- Adev type annotations
-  │   │   └── init.lua          -- Type system initialization
-  │   ├── ui/                   -- UI configuration
-  │   │   └── init.lua          -- UI setup and theming
-  │   └── plugins/              -- Plugin specifications (24 files)
-  │       ├── ai.lua            -- AI assistant integration
-  │       ├── blink.lua         -- Completion engine
-  │       ├── cloak.lua         -- Environment variable concealing
-  │       ├── color-highlight.lua -- Color highlighting
-  │       ├── comment.lua       -- Smart commenting
-  │       ├── crates.lua        -- Rust crate management
-  │       ├── git-signs.lua     -- Git integration
-  │       ├── jdtls.lua         -- Java development tools
-  │       ├── laravel.lua       -- Laravel development tools
-  │       ├── lazydev.lua       -- Lua development enhancements
-  │       ├── lspconfig.lua     -- LSP configurations
-  │       ├── lualine.lua       -- Statusline
-  │       ├── luasnip.lua       -- Snippet engine
-  │       ├── mason.lua         -- LSP/tool installer
-  │       ├── mini.lua          -- Various mini plugins
-  │       ├── neogen.lua        -- Code generation
-  │       ├── noice.lua         -- Enhanced UI
-  │       ├── none-ls.lua       -- Formatting and linting
-  │       ├── octo.lua          -- GitHub integration
-  │       ├── snacks.lua        -- Modern UI components
-  │       ├── telescope.lua     -- Fuzzy finder
-  │       ├── theme.lua         -- Catppuccin theme
-  │       ├── todo-comments.lua -- TODO highlighting
-  │       └── treesitter.lua    -- Syntax highlighting
-  ├── plugin/                   -- Core Neovim settings
-  │   ├── autocmd.lua           -- Autocommands (53 lines)
-  │   ├── keymaps.lua           -- Key mappings (151 lines)
-  │   └── options.lua           -- Vim options (65 lines)
-  └── queries/                  -- Custom queries
-      └── lua/                  -- Lua-specific queries
-          └── highlights.scm    -- Lua syntax highlighting
-  ```
+```
+~/.config/nvim/
+├── CHANGELOG.md              -- Change history
+├── cliff.toml                -- Git-cliff configuration
+├── CODE_OF_CONDUCT.md        -- Code of conduct
+├── CONTRIBUTING.md           -- Contributing guidelines
+├── LICENSE                   -- License file
+├── README.md                 -- Project README
+├── TODO.md                   -- TODO list
+├── init.lua                  -- Auto-generated entry point
+├── lazy-lock.json            -- Plugin lockfile
+├── doc/                      -- Documentation
+│   ├── adev.txt              -- This documentation
+│   └── tags                  -- Help tags
+├── images/                   -- Images and assets
+│   └── startuptime.png       -- Performance benchmark
+├── lua/adev/                 -- Main configuration modules
+│   ├── init.lua              -- Main module
+│   ├── init-opts.lua         -- Auto-generated configuration options (included in .gitignore)
+│   ├── commands.lua          -- Custom commands
+│   ├── changelog.lua         -- Changelog command
+│   ├── defaults.lua          -- Default configuration
+│   ├── lazy.lua              -- Plugin manager setup
+│   ├── lsp.lua               -- LSP configuration
+│   ├── onboarding/           -- Auto configuration generation
+│   │   └── init.lua          -- Onboarding system
+│   ├── update_manager/       -- Update management
+│   │   ├── check_update.lua  -- Update checking
+│   │   ├── init.lua          -- Update manager
+│   │   └── update.lua        -- Update functionality
+│   ├── utils/                -- Utility functions
+│   │   ├── init.lua          -- Utility functions
+│   │   └── events.lua        -- Event definitions
+│   ├── config/               -- Configuration files
+│   │   ├── lspconfig.lua     -- LSP client configs
+│   │   ├── mini.lua          -- Mini.nvim configuration
+│   │   └── none-ls/          -- None-ls configurations
+│   │       ├── init.lua      -- Main none-ls setup
+│   │       ├── deno_fmt.lua  -- Deno formatter
+│   │       └── dgformat.lua  -- DG formatter
+│   ├── custom-plugins/       -- User custom plugins directory
+│   │   └── example.lua       -- Example custom plugin
+│   ├── types/                -- Type definitions
+│   │   ├── adev.lua          -- Adev type annotations
+│   │   └── init.lua          -- Type system initialization
+│   ├── ui/                   -- UI configuration
+│   │   └── init.lua          -- UI setup and theming
+│   └── plugins/              -- Plugin specifications (24 files)
+│       ├── ai.lua            -- AI assistant integration
+│       ├── blink.lua         -- Completion engine
+│       ├── cloak.lua         -- Environment variable concealing
+│       ├── color-highlight.lua -- Color highlighting
+│       ├── comment.lua       -- Smart commenting
+│       ├── crates.lua        -- Rust crate management
+│       ├── git-signs.lua     -- Git integration
+│       ├── jdtls.lua         -- Java development tools
+│       ├── laravel.lua       -- Laravel development tools
+│       ├── lazydev.lua       -- Lua development enhancements
+│       ├── lspconfig.lua     -- LSP configurations
+│       ├── lualine.lua       -- Statusline
+│       ├── luasnip.lua       -- Snippet engine
+│       ├── mason.lua         -- LSP/tool installer
+│       ├── mini.lua          -- Various mini plugins
+│       ├── neogen.lua        -- Code generation
+│       ├── noice.lua         -- Enhanced UI
+│       ├── none-ls.lua       -- Formatting and linting
+│       ├── octo.lua          -- GitHub integration
+│       ├── snacks.lua        -- Modern UI components
+│       ├── telescope.lua     -- Fuzzy finder
+│       ├── theme.lua         -- Catppuccin theme
+│       ├── todo-comments.lua -- TODO highlighting
+│       └── treesitter.lua    -- Syntax highlighting
+├── plugin/                   -- Core Neovim settings
+│   ├── autocmd.lua           -- Autocommands (53 lines)
+│   ├── keymaps.lua           -- Key mappings (151 lines)
+│   └── options.lua           -- Vim options (65 lines)
+└── queries/                  -- Custom queries
+    └── lua/                  -- Lua-specific queries
+        └── highlights.scm    -- Lua syntax highlighting
+```
 
- ## 📊 Performance
+## 📊 Performance
 
- ![Startup Time](./images/startuptime.png)
+![Startup Time](./images/startuptime.png)
 
- _Startup time measured on a typical development machine._
+_Startup time measured on a typical development machine._
 
 ## 🤝 Contributing
 
