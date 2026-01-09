@@ -8,7 +8,7 @@
 
 > The over-engineered Neovim distribution for developers who want everything
 
-[![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)](https://github.com/abdellatif-temsamani/adev.nvim)
+[![Version](https://img.shields.io/badge/version-2.0.2-blue.svg)](https://github.com/abdellatif-temsamani/adev.nvim)
 
 Adev.nvim is a feature-rich Neovim configuration that provides a complete
 development environment out of the box. Built with modern Neovim features and
