@@ -9,16 +9,20 @@ local function on_create(input)
         return
     end
 
-    if utils.files.file_exists(input) then
+    -- Check if user requested a directory before expanding path
+    local is_dir = input:sub(-1) == "/"
+
+    -- Expand user input once (handles ~, relative paths, variables)
+    local expanded = vim.fn.expand(input)
+
+    -- Normalize: remove trailing slashes for uniformity
+    local path = expanded:gsub("/+$", "")
+
+    -- Use the same expanded path for all checks and operations
+    if utils.files.file_exists(path) then
         utils.notify("path already exists", vim.log.levels.ERROR)
         return
     end
-
-    -- Normalize input: remove trailing slashes for uniformity
-    local path = input:gsub("/+$", "")
-
-    -- Determine if the user wants a directory
-    local is_dir = vim.fn.isdirectory(path) == 1 or input:sub(-1) == "/"
 
     if is_dir then
         -- Create directory and all intermediate dirs
