@@ -1,4 +1,4 @@
-local events = require "adev.utils.events"
+local events = require "adev-common.utils.events"
 
 ---@param key string
 ---@return integer — Integer id of the created group.
@@ -147,15 +147,10 @@ local lsp_map = {
 }
 
 --- Setup lsp autocmds enabled by the user
----@param opts string[]
 ---@return nil
-local function setup(opts)
-    local defaults = vim.tbl_keys(lsp_map)
-    -- BUG: opts doesn't do anything yet
-    opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
-
+local function setup()
+    -- TODO: add props to dynamically enable or disable lsps
     for lsp, fts in pairs(lsp_map) do
-        assert(vim.tbl_contains(defaults, lsp), ("LSP '%s' is not in defaults"):format(lsp))
         vim.api.nvim_create_autocmd({ events.buffer.read_post, events.buffer.new_file }, {
             group = _generate_group(lsp),
             callback = function(args)

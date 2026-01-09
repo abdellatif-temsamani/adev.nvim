@@ -3,7 +3,8 @@ return {
     name = "catppuccin",
     priority = 1000,
     lazy = false,
-    enabled = Adev.catppuccin.enable,
+    build = ":CatppuccinCompile",
+    enabled = Adev.catppuccin.enabled,
     opts = {
         flavour = Adev.catppuccin.flavour,
         transparent_background = Adev.catppuccin.transparent,

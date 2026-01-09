@@ -1,4 +1,4 @@
-local events = require "adev.utils.events"
+local events = require "adev-common.utils.events"
 
 local alts = {
     FIX = { "FIXME", "BUG", "FIXIT", "ISSUE", "ERROR" },

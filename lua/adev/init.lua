@@ -1,14 +1,14 @@
 local defaults = require "adev.defaults"
 local update_manager = require "adev.update_manager"
-local err_notify = require("adev.utils").err_notify
+local err_notify = require("adev-common.utils").err_notify
 
 local M = {}
 
----@param opts SetupOpts?
+---@param opts SetupOpts
 function M.setup(opts)
+    assert(opts, "opts is nil")
     ---@type SetupOpts
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
-    assert(opts, "opts is nil")
 
     vim.g.mapleader = opts.mapleader
     vim.g.maplocalleader = opts.mapleader
@@ -23,6 +23,7 @@ function M.setup(opts)
         ai_assistant = opts.ai_assistant,
         catppuccin = opts.catppuccin,
         ui = opts.ui,
+        flags = opts.flags,
     }
 
     if vim.fn.executable(opts.git) == 0 then
@@ -46,9 +47,16 @@ function M.setup(opts)
     }
 
     if opts.lsp.enable then
-        require("adev.lsp").setup(opts.lsp.servers)
+        require("adev.lsp").setup()
     end
 
+    if opts.flags.experimental_adev_files then
+        require("adev-files").setup()
+    end
+
+    if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then
+        opts.colorscheme = "default"
+    end
     vim.cmd(string.format("colorscheme %s", opts.colorscheme))
 end
 

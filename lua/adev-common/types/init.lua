@@ -8,12 +8,13 @@
 ---@field colorscheme string?  Theme to use (default: `"catppuccin"`) to use a custom theme, is must be installed first in `custom-plugins`
 ---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
 ---@field ui UiOpts?  UI options
+---@field flags AdevFlags feature flags
 
 ---@alias CatppuccinFlavor "macchiato" | "frappe" | "latte" | "mocha"
 ---@alias BorderStyle "double"|"single"|"shadow"|"rounded"|"solid"|"none"
 
 ---@class CatppuccinOpts
----@field enable boolean?  Enable catppuccin (default: `true`)
+---@field enabled boolean?  Enable catppuccin (default: `true`)
 ---@field flavour CatppuccinFlavor?  catppuccin flavour (default: `"mocha"`)
 ---@field transparent boolean?  Enable transparent background (default: `false`)
 
@@ -26,7 +27,6 @@
 ---@field auto_update_check boolean?  Check for plugin updates on startup (default: `true`)
 
 ---@class LspOpts
----@field servers string[]?  List of servers to enable (default: `nil`) if `nil` or {} then all default servers are enabled
 ---@field enable boolean?  Enable LSP (default: `true`)
 
 ---@class AiAssistantOpts

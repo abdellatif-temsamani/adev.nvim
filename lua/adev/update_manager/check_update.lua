@@ -1,7 +1,7 @@
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 
---- @param git_cmd GitCmd
---- @param branch string
+---@param git_cmd GitCmd
+---@param branch string
 return function(git_cmd, branch)
     -- Step 1: Fetch all remote tags asynchronously
     git_cmd({ "fetch", "--tags" }, { text = true }, function(fetch_res)

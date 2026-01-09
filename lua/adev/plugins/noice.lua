@@ -1,6 +1,7 @@
 return {
     "folke/noice.nvim",
-    event = require("adev.utils.events").vim.lazy,
+    priority = 1000,
+    lazy = false,
     cmd = { "NoiceTelescope" },
     keys = {
         { "<leader>fn", "<cmd>NoiceTelescope<cr>", desc = "notifications history" },
@@ -21,6 +22,34 @@ return {
         },
         presets = {
             lsp_doc_border = true,
+        },
+        views = {
+            cmdline_popup = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            popupmenu = {
+                relative = "editor",
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            popup = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            hover = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
+            mini = {
+                border = {
+                    style = Adev.ui.border,
+                },
+            },
         },
     },
     dependencies = {

@@ -51,7 +51,7 @@ those will be core features that are required for adev to work
 
 ### File Management
 
-- [ ] `file_explorer` - Choose file explorer ("snacks", "oil", "nvim-tree")
+- [ ] `custom ui for file management` replaces snacks explorer
 - [ ] `auto_save` - Enable auto-save functionality
 - [ ] `backup` - Enable backup files
 - [ ] `swap` - Enable swap files

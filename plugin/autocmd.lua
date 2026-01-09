@@ -1,12 +1,12 @@
-local events = require "adev.utils.events"
+local events = require "adev-common.utils.events"
 local autocmd = vim.api.nvim_create_autocmd
 local general_grp = vim.api.nvim_create_augroup("GENERAL", { clear = true })
-local onbarding_group = vim.api.nvim_create_augroup("ONBARDING", { clear = true })
+local onbarding_group = vim.api.nvim_create_augroup("ONBOARDING", { clear = true })
+local onboarding = require "adev.onboarding"
 
 autocmd(events.vim.startup, {
     group = onbarding_group,
     callback = function()
-        local onboarding = require "adev.onboarding"
         onboarding:onboarding()
     end,
 })
@@ -50,4 +50,12 @@ autocmd(events.file.type, {
     group = general_grp,
     pattern = "*",
     command = "setlocal formatoptions-=r formatoptions-=c formatoptions-=o",
+})
+
+autocmd(events.buffer.write_post, {
+    group = onbarding_group,
+    pattern = onboarding.init_opts,
+    callback = function()
+        onboarding.restart_neovim()
+    end,
 })

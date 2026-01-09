@@ -33,17 +33,18 @@ local M = {
 
                     local matches = {}
                     for _, version in ipairs(versions) do
-                        if version:find(arg_lead, 1, true) == 1 then
+                        if version:sub(1, #arg_lead) == arg_lead then
                             table.insert(matches, version)
                         end
                     end
+
                     return matches
                 end,
             },
         },
         {
-            name = "ADVersions",
-            command = changelog.list_versions,
+            name = "ADInfo",
+            command = changelog.get_info,
             opts = { desc = "List available versions" },
         },
     },
@@ -51,8 +52,8 @@ local M = {
 
 --- Helper to create a user command
 ---@param name string
---- @param callback string|fun(args: vim.api.keyset.create_user_command.command_args)
---- @param opts vim.api.keyset.user_command Optional `command-attributes`.
+---@param callback string|fun(args: vim.api.keyset.create_user_command.command_args)
+---@param opts vim.api.keyset.user_command Optional `command-attributes`.
 function M:create_user_command(name, callback, opts)
     vim.api.nvim_create_user_command(name, callback, opts)
 end

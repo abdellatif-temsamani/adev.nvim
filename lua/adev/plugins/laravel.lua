@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global
 return {
     "adalessa/laravel.nvim",
-    event = require("adev.utils.events").vim.lazy,
+    event = require("adev-common.utils.events").vim.lazy,
     cond = function()
         return vim.fn.filereadable "artisan" ~= 0
     end,
@@ -100,9 +100,8 @@ return {
         lsp_server = "intelephense",
         features = {
             pickers = {
-                -- "snacks | telescope | fzf-lua | ui-select"
-                -- NOTE: i may change it to telescope or ui-select later
-                provider = "snacks",
+                ---@type "snacks" | "telescope" | "fzf-lua" | "ui-select"
+                provider = "telescope",
             },
         },
     },

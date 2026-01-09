@@ -1,5 +1,5 @@
 local update_manager = require "adev.update_manager"
-local utils = require "adev.utils"
+local utils = require "adev-common.utils"
 
 local M = {}
 
@@ -64,7 +64,7 @@ local function get_version_changelog(version)
     end
 
     -- Read the changelog file
-    local changelog_path = utils.adev_path .. "/CHANGELOG.md"
+    local changelog_path = utils.files:get_config_file "/CHANGELOG.md"
     local file = io.open(changelog_path, "r")
     if not file then
         utils.err_notify "Could not open CHANGELOG.md"
@@ -155,9 +155,9 @@ end
 --- Get list of available versions from git tags
 ---@return string[]|nil List of available versions, or nil if error
 function M.get_available_versions()
-    local git_cmd = { _G.Adev.git, "tag", "--list", "--sort=-version:refname" }
+    local git_cmd = { _G.Adev.git, "tag", "--list", "--sort=-creatordate" } -- sort by creation date descending
     local result = vim.system(git_cmd, {
-        cwd = utils.adev_path,
+        cwd = utils.files.adev_path,
         text = true,
     }):wait()
 
@@ -176,19 +176,26 @@ function M.get_available_versions()
     return versions
 end
 
---- Show available versions
-function M.list_versions()
+function M.get_info()
     local versions = M.get_available_versions()
-    if not versions then
+    local version = versions and versions[1]
+
+    if not version then
+        vim.notify("Adev.nvim: no available version found", vim.log.levels.ERROR)
         return
     end
 
-    print "Available versions:"
-    for _, version in ipairs(versions) do
-        print("  " .. version)
-    end
-    print "\nUsage: :ADChangelog [version]"
-    print "Example: :ADChangelog v1.5.0"
+    local info = {
+        name = "Adev.nvim",
+        version = version,
+        url = "https://github.com/abdellatif-temsamani/adev.nvim/",
+    }
+
+    -- Use structured notification instead of just vim.inspect
+    local message =
+        string.format("\nName: %s\nVersion: %s\nURL: %s", info.name, info.version, info.url)
+
+    utils.notify(message, vim.log.levels.INFO)
 end
 
 return M

@@ -12,13 +12,14 @@ return {
             "joelazar/blink-calc",
             "L3MON4D3/LuaSnip",
         },
-        event = require("adev.utils.events").insert.enter,
+        event = require("adev-common.utils.events").insert.enter,
         version = "1.*",
         ---@module 'blink.cmp'
         ---@type blink.cmp.Config
         opts = {
             cmdline = {
-                keymap = { preset = "inherit" },
+                enabled = true,
+                keymap = { preset = "cmdline" },
                 completion = { ghost_text = { enabled = true }, menu = { auto_show = true } },
             },
 
