@@ -31,8 +31,8 @@ extensive functionality.
   Neogen
 - **File Management**: Telescope for fuzzy finding, snacks for file exploration
 - **Development Tools**: Laravel support, Rust crates, Java JDTLS, and more
-- **Customization**: Extensive configuration options for personalizing the
-  experience
+- **Feature Flags**: Experimental features can be enabled/disabled via flags
+  - `experimental_adev_files`: Enable new adev-files file management system
 
 ## 🚀 Quick Start
 
@@ -208,6 +208,22 @@ require("adev").setup {
 For a complete list of configuration options, see `:help adev-setup` or check
 the [defaults.lua](lua/adev/defaults.lua) file.
 
+## 🚩 Feature Flags
+
+Adev includes an experimental feature flags system to enable/disable features:
+
+- `experimental_adev_files`: Enable the new adev-files file management system
+
+To enable experimental features, set flags in your `init-opts.lua`:
+
+```lua
+return {
+    flags = {
+        experimental_adev_files = true,
+    },
+}
+```
+
 For detailed documentation on all setup options and advanced configuration, see
 `:help adev`.
 
@@ -271,6 +287,7 @@ Adev.nvim provides several custom commands to enhance your workflow:
 │   │   └── example.lua       -- Example custom plugin
 │   ├── types/                -- Type definitions
 │   │   ├── adev.lua          -- Adev type annotations
+│   │   ├── flags.lua         -- Feature flags definitions
 │   │   └── init.lua          -- Type system initialization
 │   ├── ui/                   -- UI configuration
 │   │   └── init.lua          -- UI setup and theming

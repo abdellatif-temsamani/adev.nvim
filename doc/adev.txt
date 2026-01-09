@@ -102,12 +102,18 @@ The configuration follows a modular Lua-based architecture: >
     │   │       └── dgformat.lua  -- DG formatter
     │   ├── custom-plugins/       -- User custom plugins directory
     │   │   └── example.lua       -- Example custom plugin
-    │   ├── types/                -- Type definitions
-    │   │   ├── adev.lua          -- Adev type annotations
-    │   │   └── init.lua          -- Type system initialization
+│   ├── types/                -- Type definitions
+│   │   ├── adev.lua          -- Adev type annotations
+│   │   ├── flags.lua         -- Feature flags definitions
+│   │   └── init.lua          -- Type system initialization
     │   ├── ui/                   -- UI configuration
     │   │   └── init.lua          -- UI setup and theming
-    │   └── plugins/              -- Plugin specifications (24 files)
+    │   ├── adev-files/           -- Experimental file management
+    │   │   ├── actions/          -- File actions (create, etc.)
+    │   │   │   ├── create.lua    -- File creation logic
+    │   │   │   └── init.lua      -- Actions initialization
+    │   │   └── init.lua          -- adev-files module
+    │   └── plugins/              -- Plugin specifications (25 files)
     │       ├── ai.lua            -- AI assistant integration
     │       ├── blink.lua         -- Completion engine
     │       ├── cloak.lua         -- Environment variable concealing
@@ -342,11 +348,19 @@ Adev.nvim includes comprehensive error handling throughout the codebase:
  - LSP client configs, mini.nvim settings, none-ls formatters
  - Modular configuration organization
 
- *adev-types*~
- 3.15 Types (`lua/adev/types/`):~
- - Type definitions and annotations
- - Lua type system integration
- - Development-time type checking support
+  *adev-types*~
+  3.15 Types (`lua/adev/types/`):~
+  - Type definitions and annotations
+  - Lua type system integration
+  - Development-time type checking support
+  - Feature flags definitions (`flags.lua`)
+
+ *adev-flags*~
+  3.16 Feature Flags (`lua/adev-common/types/flags.lua`):~
+  - Feature flags system for enabling/disabling experimental features
+  - `experimental_adev_files`: Enable the new adev-files file management system
+  - Flags can be configured via setup options
+  - Used to conditionally load features based on user preferences
 
  *adev-ui*~
  3.16 UI (`lua/adev/ui/`):~
@@ -533,14 +547,15 @@ Language Specific:~
     <leader>cq    Close fold
 
 *adev-snacks-mappings*~
-5.8 Snacks.nvim (`<leader>` prefix):~
+ 5.8 Snacks.nvim (`<leader>` prefix):~
 
-     <leader>n     File explorer (Snacks.explorer)
-     <leader>N     Neovim News (doc/news.txt)
-     <leader>bq    Close buffer (Snacks.bufdelete)
-     <leader>wa    Toggle zoom (Snacks.zen.zoom)
-     <leader>to    Lazygit terminal
-     <leader>tq    GitHub dashboard (gh-dash)
+      <leader>N     Neovim News (doc/news.txt)
+      <leader>bq    Close buffer (Snacks.bufdelete)
+      <leader>wa    Toggle zoom (Snacks.zen.zoom)
+      <leader>to    Lazygit terminal
+      <leader>tq    GitHub dashboard (gh-dash)
+
+Note: `<leader>n` (File explorer) is only available when `experimental_adev_files` flag is disabled.
 
 *adev-laravel-mappings*~
 5.9 Laravel (`<leader>l` prefix):~
@@ -842,13 +857,27 @@ The `SetupOpts` table supports the following configuration options:
 - **Default**: `{ enable = true, servers = nil }`
 - **Usage**: Control LSP functionality and server list
 - **Examples**: >
-     lsp = { enable = true }         -- Enable all default servers
-     lsp = { enable = false }        -- Disable LSP
-     lsp = { enable = true, servers = {"lua_ls", "pyright"} } -- Custom servers
+      lsp = { enable = true }         -- Enable all default servers
+      lsp = { enable = false }        -- Disable LSP
+      lsp = { enable = true, servers = {"lua_ls", "pyright"} } -- Custom servers
 <
 - **Notes**:
   - `enable`: Enable/disable LSP functionality
   - `servers`: Override default server list (nil uses all available servers)
+
+*adev-setup-flags*~
+`flags` (table, optional)~
+- **Purpose**: Configure feature flags for experimental features
+- **Default**: `{ experimental_adev_files = false }`
+- **Usage**: Enable or disable experimental features
+- **Examples**: >
+      flags = { experimental_adev_files = false } -- Disable (default)
+      flags = { experimental_adev_files = true }  -- Enable experimental features
+<
+- **Notes**:
+  - `experimental_adev_files`: Enable the new adev-files file management system
+  - When enabled, `<leader>n` key mapping activates the file explorer
+  - Feature flags allow testing new features without modifying core code
 
 *adev-setup-ai-assistant*~
 `ai_assistant` (table, optional)~
@@ -929,18 +958,19 @@ Custom Colorscheme Setup:~
 - **Type Safety**: Options are validated for correct types where possible
 
 *adev-setup-current-opts*~
-8.5 Current Setup Options:~
+  8.5 Current Setup Options:~
 
-All setup options are documented above in section 8.2. The configuration supports extensive customization of:
+  All setup options are documented above in section 8.2. The configuration supports extensive customization of:
 
-- Git executable path and update behavior
-- Leader key configuration
-- Automatic update checking
-- Colorscheme and theme settings
-- UI appearance (borders, transparency)
-- Plugin manager behavior
-- LSP server configuration
-- AI assistant integration
+  - Git executable path and update behavior
+  - Leader key configuration
+  - Automatic update checking
+  - Colorscheme and theme settings
+  - UI appearance (borders, transparency)
+  - Plugin manager behavior
+  - LSP server configuration
+  - AI assistant integration
+  - Feature flags for experimental features
 
 See the examples in section 8.3 for complete configuration patterns.
 
