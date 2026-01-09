@@ -102,10 +102,10 @@ The configuration follows a modular Lua-based architecture: >
     │   │       └── dgformat.lua  -- DG formatter
     │   ├── custom-plugins/       -- User custom plugins directory
     │   │   └── example.lua       -- Example custom plugin
-│   ├── types/                -- Type definitions
-│   │   ├── adev.lua          -- Adev type annotations
-│   │   ├── flags.lua         -- Feature flags definitions
-│   │   └── init.lua          -- Type system initialization
+    │   ├── types/                -- Type definitions
+    │   │   ├── adev.lua          -- Adev type annotations
+    │   │   ├── flags.lua         -- Feature flags definitions
+    │   │   └── init.lua          -- Type system initialization
     │   ├── ui/                   -- UI configuration
     │   │   └── init.lua          -- UI setup and theming
     │   ├── adev-files/           -- Experimental file management
@@ -145,30 +145,6 @@ The configuration follows a modular Lua-based architecture: >
     └── queries/                  -- Custom queries
         └── lua/                  -- Lua-specific queries
             └── highlights.scm    -- Lua syntax highlighting
-    │       ├── luasnip.lua       -- Snippet engine
-    │       ├── mason.lua         -- LSP/tool installer
-    │       ├── mini.lua          -- Various mini plugins
-    │       ├── neogen.lua        -- Code generation
-    │       ├── noice.lua         -- Enhanced UI
-    │       ├── none-ls.lua       -- Formatting and linting
-    │       ├── octo.lua          -- GitHub integration
-    │       ├── snacks.lua        -- Modern UI components
-    │       ├── telescope.lua     -- Fuzzy finder
-    │       ├── theme.lua         -- Catppuccin theme
-    │       ├── todo-comments.lua -- TODO highlighting
-    │       └── treesitter.lua    -- Syntax highlighting
-    ├── plugin/                   -- Core Neovim settings
-    │   ├── options.lua           -- Vim options (65 lines)
-    │   ├── keymaps.lua           -- Key mappings (152 lines)
-    │   ├── autocmd.lua           -- Autocommands (54 lines)
-    │   └── queries/              -- Custom queries
-    │       └── lua/              -- Lua-specific queries
-    ├── doc/
-    │   ├── adev.txt              -- This documentation
-    │   └── tags                  -- Help tags
-    ├── lazy-lock.json            -- Plugin lockfile
-    └── images/
-        └── startuptime.png       -- Performance benchmark
 <
 
 ==============================================================================
@@ -356,9 +332,9 @@ Adev.nvim includes comprehensive error handling throughout the codebase:
   - Feature flags definitions (`flags.lua`)
 
  *adev-flags*~
-  3.16 Feature Flags (`lua/adev-common/types/flags.lua`):~
-  - Feature flags system for enabling/disabling experimental features
-  - `experimental_adev_files`: Enable the new adev-files file management system
+ 3.16 Feature Flags (`lua/adev/types/flags.lua`):~
+   - Feature flags system for enabling/disabling experimental features
+   - `flags.experimental_adev_files`: Enable the new adev-files file management system
   - Flags can be configured via setup options
   - Used to conditionally load features based on user preferences
 
@@ -555,7 +531,10 @@ Language Specific:~
       <leader>to    Lazygit terminal
       <leader>tq    GitHub dashboard (gh-dash)
 
-Note: `<leader>n` (File explorer) is only available when `experimental_adev_files` flag is disabled.
+Note: `<leader>n` behavior depends on `flags.experimental_adev_files`:
+  - When `flags.experimental_adev_files = false` (default): `<leader>n` opens the Snacks file explorer
+  - When `flags.experimental_adev_files = true`: `<leader>n` becomes a prefix for adev-files commands
+    (`<leader>na` = create file/directory, `<leader>nl` = list files)
 
 *adev-laravel-mappings*~
 5.9 Laravel (`<leader>l` prefix):~
@@ -875,9 +854,9 @@ The `SetupOpts` table supports the following configuration options:
       flags = { experimental_adev_files = true }  -- Enable experimental features
 <
 - **Notes**:
-  - `experimental_adev_files`: Enable the new adev-files file management system
-  - When enabled, `<leader>n` key mapping activates the file explorer
-  - Feature flags allow testing new features without modifying core code
+   - `flags.experimental_adev_files`: Enable the new adev-files file management system
+   - When `flags.experimental_adev_files = true`: `<leader>n` becomes a prefix for adev-files commands
+   - Feature flags allow testing new features without modifying core code
   - Use `:ADConfig` command to easily edit configuration and modify flags
 
 *adev-setup-ai-assistant*~
