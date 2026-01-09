@@ -26,7 +26,6 @@ end
 --- get a file in adev config
 ---@param relative_path string example `"/init.lua"`
 ---@return string
----@return string
 function M:get_config_file(relative_path)
     return self.adev_path .. relative_path
 end
