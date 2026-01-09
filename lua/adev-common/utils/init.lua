@@ -15,9 +15,9 @@ local Utils = {
     files = require "adev-common.utils.files",
 }
 
---- @param msg string
---- @param level integer|nil One of the values from |vim.log.levels|.
---- @param title? string if not provided defautls to adev.nvim
+---@param msg string
+---@param level integer|nil One of the values from |vim.log.levels|.
+---@param title? string if not provided defautls to adev.nvim
 function Utils.notify(msg, level, title)
     title = title or "adev.nvim"
     if vim.in_fast_event() then
@@ -29,16 +29,16 @@ function Utils.notify(msg, level, title)
     end
 end
 
---- @param msg string
---- @param title? string if not provided defautls to adev.nvim
+---@param msg string
+---@param title? string if not provided defautls to adev.nvim
 function Utils.err_notify(msg, title)
     Utils.notify(msg, vim.log.levels.ERROR, title)
 end
 
 --- check two tables and returns true if they're the same
---- @param a table
---- @param b table
---- @return boolean
+---@param a table
+---@param b table
+---@return boolean
 function Utils.compare_keys(a, b)
     if type(a) ~= "table" or type(b) ~= "table" then
         return false

@@ -8,7 +8,7 @@ local OnBoarding = {
 }
 
 --- checks if current config has differences than the default config
---- @return boolean
+---@return boolean
 function OnBoarding.config_changed()
     local status, currents = pcall(require, "adev.init-opts")
     if not status then
@@ -27,7 +27,7 @@ function OnBoarding:first_time()
 end
 
 --- Restart Neovim after a delay
---- @param delay number? Delay in milliseconds
+---@param delay number? Delay in milliseconds
 function OnBoarding.restart_neovim(delay)
     delay = delay or 1500
 

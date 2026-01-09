@@ -2,7 +2,7 @@ local local_check_update = require "adev.update_manager.check_update"
 local local_update = require "adev.update_manager.update"
 local utils = require "adev-common.utils"
 
---- @alias GitCmd fun(cmd: string[], opts: vim.SystemOpts, on_exit: fun(out: vim.SystemCompleted)?): vim.SystemObj
+---@alias GitCmd fun(cmd: string[], opts: vim.SystemOpts, on_exit: fun(out: vim.SystemCompleted)?): vim.SystemObj
 
 ---@param cmd string[]
 ---@param opts vim.SystemOpts

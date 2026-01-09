@@ -100,7 +100,7 @@ return {
         lsp_server = "intelephense",
         features = {
             pickers = {
-                --- @type "snacks" | "telescope" | "fzf-lua" | "ui-select"
+                ---@type "snacks" | "telescope" | "fzf-lua" | "ui-select"
                 provider = "telescope",
             },
         },

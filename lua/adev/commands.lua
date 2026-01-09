@@ -52,8 +52,8 @@ local M = {
 
 --- Helper to create a user command
 ---@param name string
---- @param callback string|fun(args: vim.api.keyset.create_user_command.command_args)
---- @param opts vim.api.keyset.user_command Optional `command-attributes`.
+---@param callback string|fun(args: vim.api.keyset.create_user_command.command_args)
+---@param opts vim.api.keyset.user_command Optional `command-attributes`.
 function M:create_user_command(name, callback, opts)
     vim.api.nvim_create_user_command(name, callback, opts)
 end
