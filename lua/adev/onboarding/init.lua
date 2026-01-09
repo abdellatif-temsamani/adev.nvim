@@ -1,5 +1,6 @@
 local defaults = require "adev.defaults"
 local utils = require "adev-common.utils"
+local config_merge = require "adev.onboarding.config-merge"
 
 local OnBoarding = {
     init = utils.files:get_config_file "/init.lua",
@@ -51,14 +52,8 @@ function OnBoarding:onboarding()
             if not status then
                 current = {}
             end
-            -- BUG: not fully working
             ---@type SetupOpts
-            config = vim.tbl_deep_extend("force", defaults, current)
-            for key in pairs(config) do
-                if defaults[key] == nil then
-                    config[key] = nil
-                end
-            end
+            config = config_merge.merge_configs(defaults, current)
         else
             return
         end
