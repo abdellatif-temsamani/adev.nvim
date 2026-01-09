@@ -25,6 +25,7 @@ end
 
 local UpdateManager = {}
 
+-- BUG: notifies to update to an older version
 UpdateManager.check_update = function()
     local_check_update(git_cmd, UpdateManager.get_branch())
 end

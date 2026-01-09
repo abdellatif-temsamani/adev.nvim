@@ -3,6 +3,7 @@ local utils = require "adev-common.utils"
 ---@param git_cmd fun(cmd: string[], opts: vim.SystemOpts): vim.SystemObj
 ---@param branch string
 return function(git_cmd, branch)
+    -- NOTE: maybe it should run `git pull`
     branch = branch or "main" -- default to main if branch not provided
 
     -- Step 1: Fetch all remote tags
