@@ -4,7 +4,7 @@ local err_notify = require("adev-common.utils").err_notify
 
 local M = {}
 
----@param opts SetupOpts?
+---@param opts SetupOpts
 function M.setup(opts)
     assert(opts, "opts is nil")
     ---@type SetupOpts

@@ -48,6 +48,9 @@ curated plugins and settings.
 - _(blink)_ Completions
 - Spelling
 - Refactor config merging to properly handle user-only keys
+- _(typo)_ Lua/adev-common/utils/files.lua
+- Docs
+- _(adev-files)_ Expand paths consistently before file operations
 
 ### 🚜 Refactor
 
