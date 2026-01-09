@@ -11,7 +11,7 @@ local defaults = {
 }
 
 ---@param prompt string
----@param on_confirm fun(item): nil
+---@param on_confirm fun(item: string|nil): nil
 ---@param opts? InputOpts
 return function(prompt, on_confirm, opts)
     ---@type InputOpts
