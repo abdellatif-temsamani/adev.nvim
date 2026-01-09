@@ -878,6 +878,7 @@ The `SetupOpts` table supports the following configuration options:
   - `experimental_adev_files`: Enable the new adev-files file management system
   - When enabled, `<leader>n` key mapping activates the file explorer
   - Feature flags allow testing new features without modifying core code
+  - Use `:ADConfig` command to easily edit configuration and modify flags
 
 *adev-setup-ai-assistant*~
 `ai_assistant` (table, optional)~

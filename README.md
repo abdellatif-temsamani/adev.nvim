@@ -214,7 +214,7 @@ Adev includes an experimental feature flags system to enable/disable features:
 
 - `experimental_adev_files`: Enable the new adev-files file management system
 
-To enable experimental features, set flags in your `init-opts.lua`:
+To enable experimental features, run `:ADConfig` to edit your `init-opts.lua` and add:
 
 ```lua
 return {
