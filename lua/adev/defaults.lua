@@ -26,6 +26,9 @@ local defaults = {
         command = "Augment",
         opts = nil,
     },
+    flags = {
+        experimental_adev_files = false,
+    },
 }
 
 return defaults

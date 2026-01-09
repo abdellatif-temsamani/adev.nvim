@@ -8,6 +8,7 @@
 ---@field colorscheme string?  Theme to use (default: `"catppuccin"`) to use a custom theme, is must be installed first in `custom-plugins`
 ---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
 ---@field ui UiOpts?  UI options
+---@field flags AdevFlags feature flags
 
 ---@alias CatppuccinFlavor "macchiato" | "frappe" | "latte" | "mocha"
 ---@alias BorderStyle "double"|"single"|"shadow"|"rounded"|"solid"|"none"

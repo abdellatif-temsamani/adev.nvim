@@ -23,6 +23,7 @@ function M.setup(opts)
         ai_assistant = opts.ai_assistant,
         catppuccin = opts.catppuccin,
         ui = opts.ui,
+        flags = opts.flags,
     }
 
     if vim.fn.executable(opts.git) == 0 then
@@ -49,7 +50,10 @@ function M.setup(opts)
         require("adev.lsp").setup()
     end
 
-    require("adev-files").setup()
+    if opts.flags.experimental_adev_files then
+        require("adev-files").setup()
+    end
+
     if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then
         opts.colorscheme = "default"
     end
