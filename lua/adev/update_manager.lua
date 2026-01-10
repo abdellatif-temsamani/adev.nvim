@@ -4,19 +4,26 @@ local utils = require "adev-common.utils"
 local M = {}
 
 local function get_remote_tag(branch, callback)
-    git.git({ "fetch", "--tags" }, function(fetch_res)
+    git.git({ "fetch", "origin", branch }, function(fetch_res)
         if not fetch_res or fetch_res.code ~= 0 then
-            utils.err_notify "Failed to fetch tags"
+            utils.err_notify "Failed to fetch from remote"
             callback(nil)
             return
         end
-        git.git({ "describe", "--tags", "--abbrev=0", "origin/" .. branch }, function(res)
-            if not res or res.code ~= 0 or not res.stdout then
-                utils.err_notify("Failed to get remote tag for origin/" .. branch)
+        git.git({ "fetch", "--tags" }, function(tags_res)
+            if not tags_res or tags_res.code ~= 0 then
+                utils.err_notify "Failed to fetch tags"
                 callback(nil)
                 return
             end
-            callback(vim.trim(res.stdout))
+            git.git({ "describe", "--tags", "--abbrev=0", "origin/" .. branch }, function(res)
+                if not res or res.code ~= 0 or not res.stdout then
+                    utils.err_notify("Failed to get remote tag for origin/" .. branch)
+                    callback(nil)
+                    return
+                end
+                callback(vim.trim(res.stdout))
+            end)
         end)
     end)
 end
@@ -83,7 +90,9 @@ function M.update()
                 git.git({ "checkout", remote_tag }, function(res)
                     if res and res.code == 0 then
                         utils.notify(string.format("Updated to %s", remote_tag))
-                        require("adev.onboarding"):onboarding()
+                        vim.schedule(function()
+                            require("adev.onboarding"):onboarding()
+                        end)
                     else
                         utils.err_notify(string.format("Failed to update to %s", remote_tag))
                     end
