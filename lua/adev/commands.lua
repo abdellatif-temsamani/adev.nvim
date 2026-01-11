@@ -10,14 +10,14 @@ local M = {
             opts = { desc = "Update adev" },
         },
         {
-            name = "ADConfig",
-            command = onboarding.edit_config,
-            opts = { desc = "Edit Adev configuration file" },
-        },
-        {
             name = "ADUpdateCheck",
             command = update_manager.check_update,
             opts = { desc = "Check for updates" },
+        },
+        {
+            name = "ADConfig",
+            command = onboarding.edit_config,
+            opts = { desc = "Edit Adev configuration file" },
         },
         {
             name = "ADChangelog",

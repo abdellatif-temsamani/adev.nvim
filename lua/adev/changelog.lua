@@ -96,15 +96,39 @@ function M.get_available_versions()
 end
 
 function M.get_info()
-    local version = git.get_available_versions()
+    local version = git.get_version()
     if not version then
         return
     end
-    local message = string.format(
-        "\nName: Adev.nvim\nVersion: %s\nURL: https://github.com/abdellatif-temsamani/adev.nvim/",
-        version
-    )
-    utils.notify(message, vim.log.levels.INFO)
+    local message = {
+        string.format("- `Version`: %s" ,vim.inspect(version)),
+        "- `Author`: Abdellatif Dev",
+        "- `URL`: [github](https://github.com/abdellatif-temsamani/adev.nvim/)",
+    }
+
+    local buf = ui.window.create_buf(message, {
+        listed = false,
+        scratch = true,
+        bo = {
+            modifiable = false,
+            filetype = "markdown",
+        },
+    })
+
+    ui.window.floating_window {
+        buf = buf,
+        title = "Adev.nvim Info",
+        border = Adev.ui.border,
+        width = 0.3,
+        height = 0.3,
+        wo = {
+            spell = false,
+            wrap = true,
+            signcolumn = "no",
+            statuscolumn = " ",
+            conceallevel = 2,
+        },
+    }
 end
 
 return M

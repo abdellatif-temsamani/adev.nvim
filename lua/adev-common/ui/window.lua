@@ -15,6 +15,7 @@ M.buf_defaults = {
 ---@param opts? BufOpts opts for the buffer
 ---@return integer buf - buffer id
 function M.create_buf(content, opts)
+    ---@type BufOpts
     opts = vim.tbl_deep_extend("force", {}, M.buf_defaults, opts or {})
 
     local buf = vim.api.nvim_create_buf(opts.listed, opts.scratch)

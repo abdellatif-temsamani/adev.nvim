@@ -1,2 +1,0 @@
----@class AdevFlags
----@field experimental_adev_files boolean enable adev-flags experimental file manager

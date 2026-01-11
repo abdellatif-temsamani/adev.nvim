@@ -83,6 +83,7 @@ function OnBoarding:onboarding()
     utils.restart_neovim(2000)
 end
 
+-- TODO: overhaul to custom UI
 function OnBoarding.edit_config()
     utils.files.open_file(OnBoarding.init_opts)
 end

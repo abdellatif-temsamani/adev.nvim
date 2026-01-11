@@ -41,17 +41,11 @@ end
 
 function M.check_update()
     git.get_branch(function(branch)
-        if not branch then
-            return
-        end
+        assert(branch, "couldn't get branch")
         get_remote_tag(branch, function(remote_tag)
-            if not remote_tag then
-                return
-            end
+            assert(remote_tag, "couldn't get remote_tag")
             get_local_tag(function(local_tag)
-                if not local_tag then
-                    return
-                end
+                assert(local_tag, "couldn't get local_tag")
                 if remote_tag == local_tag then
                     utils.notify(string.format("adev.nvim: %s @ %s", local_tag, branch))
                 else
@@ -72,17 +66,11 @@ end
 
 function M.update()
     git.get_branch(function(branch)
-        if not branch then
-            return
-        end
+        assert(branch, "couldn't get branch")
         get_remote_tag(branch, function(remote_tag)
-            if not remote_tag then
-                return
-            end
+            assert(remote_tag, "couldn't get remote_tag")
             get_local_tag(function(local_tag)
-                if not local_tag then
-                    return
-                end
+                assert(local_tag, "couldn't get local_tag")
                 if remote_tag == local_tag then
                     utils.notify(string.format("adev.nvim is up to date on %s", branch))
                     return
