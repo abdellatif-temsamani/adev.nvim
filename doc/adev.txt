@@ -3,7 +3,7 @@
                               ADEV.NVIM DOCUMENTATION
 
 Author:       Abdellatif Dev
-Version:      2.0.2
+Version:      2.0.3
 License:      MIT
 Last Updated: 2025-12-21
 
