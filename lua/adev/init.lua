@@ -6,7 +6,6 @@ local M = {}
 
 ---@param opts SetupOpts
 function M.setup(opts)
-    assert(opts, "opts is nil")
     ---@type SetupOpts
     opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
 

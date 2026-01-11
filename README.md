@@ -8,12 +8,13 @@
 
 > The over-engineered Neovim distribution for developers who want everything
 
-[![Version](https://img.shields.io/badge/version-2.0.2-blue.svg)](https://github.com/abdellatif-temsamani/adev.nvim)
+[![Version](https://img.shields.io/badge/version-2.0.3-blue.svg)](https://github.com/abdellatif-temsamani/adev.nvim)
 
 Adev.nvim is a feature-rich Neovim configuration that provides a complete
 development environment out of the box. Built with modern Neovim features and
 carefully selected plugins, it offers blazing-fast performance while maintaining
-extensive functionality.
+extensive functionality. Includes custom-plugin support, update-manager,
+feature-flags system, and ADConfig for easy configuration.
 
 ## ✨ Features
 
@@ -251,8 +252,7 @@ Adev.nvim provides several custom commands to enhance your workflow:
 ├── CONTRIBUTING.md           -- Contributing guidelines
 ├── LICENSE                   -- License file
 ├── README.md                 -- Project README
-├── TODO.md                   -- TODO list
-├── init.lua                  -- Auto-generated entry point
+├── init.lua                  -- Entry point
 ├── lazy-lock.json            -- Plugin lockfile
 ├── doc/                      -- Documentation
 │   ├── adev.txt              -- This documentation
@@ -268,6 +268,7 @@ Adev.nvim provides several custom commands to enhance your workflow:
 │   ├── lazy.lua              -- Plugin manager setup
 │   ├── lsp.lua               -- LSP configuration
 │   ├── onboarding/           -- Auto configuration generation
+│   │   ├── config-merge.lua  -- Configuration merging
 │   │   └── init.lua          -- Onboarding system
 │   ├── update_manager/       -- Update management
 │   │   ├── check_update.lua  -- Update checking
@@ -278,20 +279,26 @@ Adev.nvim provides several custom commands to enhance your workflow:
 │   │   └── events.lua        -- Event definitions
 │   ├── config/               -- Configuration files
 │   │   ├── lspconfig.lua     -- LSP client configs
-│   │   ├── mini.lua          -- Mini.nvim configuration
 │   │   └── none-ls/          -- None-ls configurations
 │   │       ├── init.lua      -- Main none-ls setup
 │   │       ├── deno_fmt.lua  -- Deno formatter
 │   │       └── dgformat.lua  -- DG formatter
 │   ├── custom-plugins/       -- User custom plugins directory
-│   │   └── example.lua       -- Example custom plugin
+│   │   ├── example.lua       -- Example custom plugin
+│   │   └── test.lua          -- Test custom plugin
 │   ├── types/                -- Type definitions
 │   │   ├── adev.lua          -- Adev type annotations
 │   │   ├── flags.lua         -- Feature flags definitions
 │   │   └── init.lua          -- Type system initialization
 │   ├── ui/                   -- UI configuration
 │   │   └── init.lua          -- UI setup and theming
-│   └── plugins/              -- Plugin specifications (24 files)
+│   ├── adev-files/           -- Experimental file management
+│   │   ├── actions/          -- File actions
+│   │   │   ├── create.lua    -- File creation logic
+│   │   │   ├── init.lua      -- Actions initialization
+│   │   │   └── list.lua      -- File listing logic
+│   │   ├── init.lua          -- adev-files module
+│   └── plugins/              -- Plugin specifications (25 files)
 │       ├── ai.lua            -- AI assistant integration
 │       ├── blink.lua         -- Completion engine
 │       ├── cloak.lua         -- Environment variable concealing
@@ -316,13 +323,33 @@ Adev.nvim provides several custom commands to enhance your workflow:
 │       ├── theme.lua         -- Catppuccin theme
 │       ├── todo-comments.lua -- TODO highlighting
 │       └── treesitter.lua    -- Syntax highlighting
+├── lua/adev-common/          -- Shared common modules
+│   ├── types/                -- Shared type definitions
+│   │   ├── adev.lua          -- Adev type annotations
+│   │   ├── flags.lua         -- Feature flags definitions
+│   │   └── init.lua          -- Type system initialization
+│   ├── ui/                   -- Shared UI utilities
+│   │   ├── init.lua          -- UI utilities
+│   │   ├── input.lua         -- Input dialogs
+│   │   └── window.lua        -- Window utilities
+│   └── utils/                -- Shared utility functions
+│       ├── init.lua          -- Utility functions
+│       ├── files.lua         -- File utilities
+│       └── events.lua        -- Event definitions
 ├── plugin/                   -- Core Neovim settings
-│   ├── autocmd.lua           -- Autocommands (53 lines)
-│   ├── keymaps.lua           -- Key mappings (151 lines)
-│   └── options.lua           -- Vim options (65 lines)
-└── queries/                  -- Custom queries
-    └── lua/                  -- Lua-specific queries
-        └── highlights.scm    -- Lua syntax highlighting
+│   ├── autocmd.lua           -- Autocommands
+│   ├── keymaps.lua           -- Key mappings
+│   └── options.lua           -- Vim options
+├── queries/                  -- Custom queries
+│   └── lua/                  -- Lua-specific queries
+│       └── highlights.scm    -- Lua syntax highlighting
+├── spec/                     -- Test specifications
+│   ├── adev/                 -- Adev tests
+│   │   └── onboarding/       -- Onboarding tests
+│   └── adev-common/          -- Adev-common tests
+│       └── utils/            -- Utils tests
+└── syntax/                   -- Syntax files
+    └── adev_files.vim        -- adev-files syntax highlighting
 ```
 
 ## 📊 Performance

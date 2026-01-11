@@ -3,7 +3,7 @@
                               ADEV.NVIM DOCUMENTATION
 
 Author:       Abdellatif Dev
-Version:      2.0.2
+Version:      2.0.3
 License:      MIT
 Last Updated: 2025-12-21
 
@@ -32,7 +32,8 @@ CONTENTS                                                      *adev-contents*
 Adev.nvim is a feature-rich Neovim configuration that provides a complete
 development environment out of the box. Built with modern Neovim features and
 carefully selected plugins, it offers blazing-fast performance while maintaining
-extensive functionality.
+extensive functionality. Includes custom-plugin support, update-manager,
+feature-flags system, and ADConfig for easy configuration.
 
 Key Features:~
 - Modern UI with Catppuccin Mocha theme and transparent background support
@@ -68,8 +69,7 @@ The configuration follows a modular Lua-based architecture: >
     ├── CONTRIBUTING.md           -- Contributing guidelines
     ├── LICENSE                   -- License file
     ├── README.md                 -- Project README
-    ├── TODO.md                   -- TODO list
-    ├── init.lua                  -- Auto-generated entry point
+    ├── init.lua                  -- Entry point
     ├── lazy-lock.json            -- Plugin lockfile
     ├── doc/                      -- Documentation
     │   ├── adev.txt              -- This documentation
@@ -85,6 +85,7 @@ The configuration follows a modular Lua-based architecture: >
     │   ├── lazy.lua              -- Plugin manager setup
     │   ├── lsp.lua               -- LSP configuration
     │   ├── onboarding/           -- Auto configuration generation
+    │   │   ├── config-merge.lua  -- Configuration merging
     │   │   └── init.lua          -- Onboarding system
     │   ├── update_manager/       -- Update management
     │   │   ├── check_update.lua  -- Update checking
@@ -95,13 +96,13 @@ The configuration follows a modular Lua-based architecture: >
     │   │   └── events.lua        -- Event definitions
     │   ├── config/               -- Configuration files
     │   │   ├── lspconfig.lua     -- LSP client configs
-    │   │   ├── mini.lua          -- Mini.nvim configuration
     │   │   └── none-ls/          -- None-ls configurations
     │   │       ├── init.lua      -- Main none-ls setup
     │   │       ├── deno_fmt.lua  -- Deno formatter
     │   │       └── dgformat.lua  -- DG formatter
     │   ├── custom-plugins/       -- User custom plugins directory
-    │   │   └── example.lua       -- Example custom plugin
+    │   │   ├── example.lua       -- Example custom plugin
+    │   │   └── test.lua          -- Test custom plugin
     │   ├── types/                -- Type definitions
     │   │   ├── adev.lua          -- Adev type annotations
     │   │   ├── flags.lua         -- Feature flags definitions
@@ -109,10 +110,11 @@ The configuration follows a modular Lua-based architecture: >
     │   ├── ui/                   -- UI configuration
     │   │   └── init.lua          -- UI setup and theming
     │   ├── adev-files/           -- Experimental file management
-    │   │   ├── actions/          -- File actions (create, etc.)
+    │   │   ├── actions/          -- File actions
     │   │   │   ├── create.lua    -- File creation logic
-    │   │   │   └── init.lua      -- Actions initialization
-    │   │   └── init.lua          -- adev-files module
+    │   │   │   ├── init.lua      -- Actions initialization
+    │   │   │   └── list.lua      -- File listing logic
+    │   │   ├── init.lua          -- adev-files module
     │   └── plugins/              -- Plugin specifications (25 files)
     │       ├── ai.lua            -- AI assistant integration
     │       ├── blink.lua         -- Completion engine
@@ -138,13 +140,33 @@ The configuration follows a modular Lua-based architecture: >
     │       ├── theme.lua         -- Catppuccin theme
     │       ├── todo-comments.lua -- TODO highlighting
     │       └── treesitter.lua    -- Syntax highlighting
+    ├── lua/adev-common/          -- Shared common modules
+    │   ├── types/                -- Shared type definitions
+    │   │   ├── adev.lua          -- Adev type annotations
+    │   │   ├── flags.lua         -- Feature flags definitions
+    │   │   └── init.lua          -- Type system initialization
+    │   ├── ui/                   -- Shared UI utilities
+    │   │   ├── init.lua          -- UI utilities
+    │   │   ├── input.lua         -- Input dialogs
+    │   │   └── window.lua        -- Window utilities
+    │   └── utils/                -- Shared utility functions
+    │       ├── init.lua          -- Utility functions
+    │       ├── files.lua         -- File utilities
+    │       └── events.lua        -- Event definitions
     ├── plugin/                   -- Core Neovim settings
-    │   ├── autocmd.lua           -- Autocommands (53 lines)
-    │   ├── keymaps.lua           -- Key mappings (151 lines)
-    │   └── options.lua           -- Vim options (65 lines)
-    └── queries/                  -- Custom queries
-        └── lua/                  -- Lua-specific queries
-            └── highlights.scm    -- Lua syntax highlighting
+    │   ├── autocmd.lua           -- Autocommands
+    │   ├── keymaps.lua           -- Key mappings
+    │   └── options.lua           -- Vim options
+    ├── queries/                  -- Custom queries
+    │   └── lua/                  -- Lua-specific queries
+    │       └── highlights.scm    -- Lua syntax highlighting
+    ├── spec/                     -- Test specifications
+    │   ├── adev/                 -- Adev tests
+    │   │   └── onboarding/       -- Onboarding tests
+    │   └── adev-common/          -- Adev-common tests
+    │       └── utils/            -- Utils tests
+    └── syntax/                   -- Syntax files
+        └── adev_files.vim        -- adev-files syntax highlighting
 <
 
 ==============================================================================
@@ -964,7 +986,7 @@ The following options are planned for future releases:
 - `diagnostics`: LSP diagnostics configuration
 - `completion`: Completion engine settings
 
-See `TODO.md` for the complete roadmap of planned setup options.
+See `:h adev-plan` for the complete roadmap of planned setup options.
 
 ==============================================================================
 9. CONFIGURATION EXAMPLES                            *adev-config-examples*

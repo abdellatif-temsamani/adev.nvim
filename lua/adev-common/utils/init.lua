@@ -69,4 +69,19 @@ function Utils.compare_keys(a, b)
     return true
 end
 
+--- Restart Neovim after a delay
+---@param delay number? Delay in milliseconds `default = 2000`
+function Utils.restart_neovim(delay)
+    delay = delay or 2000
+
+    Utils.notify("restarting neovim in " .. delay .. "ms", vim.log.levels.TRACE)
+    vim.defer_fn(function()
+        if vim.fn.has "nvim-0.12.0" == 1 then
+            vim.cmd [[ restart ]]
+        else
+            vim.cmd [[ qa! ]]
+        end
+    end, delay)
+end
+
 return Utils

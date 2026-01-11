@@ -5,17 +5,17 @@ local utils = require "adev-common.utils"
 ---@param buf integer buffer id
 ---@param height integer height of window
 local function create_win(buf, height)
-    vim.bo[buf].bufhidden = "wipe"
-    vim.bo[buf].modifiable = false
-    vim.bo[buf].filetype = "adev_files"
-
-    vim.keymap.set({ "n", "v" }, "q", "<cmd>bwipeout<CR>", { buffer = buf })
-    local win = ui.window:new_floating(buf, {
+    ui.window.floating_window {
+        title = "Adev Files [q: quit]",
+        buf = buf,
+        width = 64,
         height = height,
-    })
-
-    vim.wo[win].cursorline = true
-    vim.wo[win].cursorlineopt = "line"
+        border = "single",
+        wo = {
+            cursorline = true,
+            cursorlineopt = "line",
+        },
+    }
 end
 
 ---@param a string
@@ -53,12 +53,20 @@ return function()
     local pwd = utils.files.get_dirname()
     local files = vim.fs.dir(pwd)
 
-    local current_files = { "root: " .. pwd .. " [q: quit]", "" }
+    local current_files = { "root: " .. pwd }
     for name, type in files do
         table.insert(current_files, string.format("%s: %s", type, name))
     end
     table.sort(current_files, sort_files)
-    local buf = ui.window.create_buf(current_files, true, true)
+
+    local buf = ui.window.create_buf(current_files, {
+        scratch = true,
+        listed = false,
+        bo = {
+            filetype = "adev_files",
+            modifiable = false,
+        },
+    })
 
     create_win(buf, #current_files)
 end

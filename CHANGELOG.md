@@ -12,6 +12,32 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [2.0.3] - 2026-01-11
+
+### 🚀 Features
+
+- Add feature flags system for experimental features (#5)
+
+### 🐛 Bug Fixes
+
+- Improve remote tag fetching and async handling
+
+### 🚜 Refactor
+
+- Improve onboarding module structure
+- Consolidate update_manager into single module
+- Extract git utilities to common module
+- _(utils)_ Restart_nvim to nvim
+- Unify window and buffer creation API
+- _(utils)_ Restart neovim take 2000ms instead of 1500ms
+- _(blink)_ Start on CmdEnter
+- Consolidate types and improve error handling
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix dupe @return
+- _(coderabbit)_ Added .coderabbit.yaml
+
 ## [2.0.2] - 2026-01-09
 
 ### 🚀 Features

@@ -1,3 +1,5 @@
+local events = require "adev-common.utils.events"
+
 return {
     {
         "saghen/blink.compat",
@@ -12,7 +14,7 @@ return {
             "joelazar/blink-calc",
             "L3MON4D3/LuaSnip",
         },
-        event = require("adev-common.utils.events").insert.enter,
+        event = { events.cmd.enter, events.insert.enter },
         version = "1.*",
         ---@module 'blink.cmp'
         ---@type blink.cmp.Config
