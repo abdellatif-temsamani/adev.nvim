@@ -1,4 +1,5 @@
 local git = require "adev-common.git"
+local ui = require "adev-common.ui"
 local utils = require "adev-common.utils"
 
 local M = {}
@@ -65,13 +66,16 @@ function M.show_changelog(args)
         return
     end
 
-    local buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(changelog, "\n"))
-    vim.bo[buf].filetype = "markdown"
-    vim.bo[buf].modifiable = false
-    vim.bo[buf].readonly = true
+    local buf = ui.window.create_buf(vim.split(changelog, "\n"), {
+        listed = false,
+        scratch = true,
+        bo = {
+            modifiable = false,
+            filetype = "markdown",
+        },
+    })
 
-    Snacks.win {
+    ui.window.floating_window {
         buf = buf,
         title = "Adev.nvim Changelog - " .. (args and args.args or git.get_version() or "Unknown"),
         border = Adev.ui.border,
