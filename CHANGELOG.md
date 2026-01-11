@@ -104,6 +104,91 @@
 - _(adev-files)_ List files help index
 - Add project-specific git attributes for neovim config
 
+## [2.0.2] - 2026-01-09
+
+### 🚀 Features
+
+- Add build command for Catppuccin theme
+- Update treesitter
+- Adev-files
+- _(core)_ Spliting to adev, adev-common
+- _(adev-files)_ List files
+- Add build command for Catppuccin theme
+- Update treesitter
+- Adev-files
+- _(core)_ Spliting to adev, adev-common
+- _(adev-files)_ List files
+- Add feature flags system
+
+### 🐛 Bug Fixes
+
+- _(treesitter)_ Add ipkg to ignore_install list
+- Remove those annoying arg auto fill snippets
+- _(blink)_ Cmdline completions
+- _(onboarding)_ If init.lua exist but init-opts.lua not found edge case
+- _(core)_ Fix onboarding
+- Get_dirname
+- _(blink)_ Completions
+- Spelling
+- _(treesitter)_ Add ipkg to ignore_install list
+- Treesitter
+- Remove those annoying arg auto fill snippets
+- _(blink)_ Cmdline completions
+- _(onboarding)_ If init.lua exist but init-opts.lua not found edge case
+- _(core)_ Fix onboarding
+- Get_dirname
+- _(blink)_ Completions
+- Spelling
+- Refactor config merging to properly handle user-only keys
+- _(typo)_ Lua/adev-common/utils/files.lua
+- Docs
+- _(adev-files)_ Expand paths consistently before file operations
+
+### 🚜 Refactor
+
+- _(onboarding)_ ADConfig hot-reloads nvim
+- _(plugins)_ Changing plugins configs
+- _(mini)_ Move to standalone mini.nvim plugins
+- _(adev-files)_ Common-utils
+- Simplify mini plugin spec nesting and update UI structure
+- Improve neovim config utilities and plugin settings
+- _(adev-files)_ Refactor list files to open in a floating window
+- _(adev-files)_ List files improve highlighting
+- Improve input UI signature and centralize file operations
+- Improve code structure and error handling
+- _(onboarding)_ ADConfig hot-reloads nvim
+- _(plugins)_ Changing plugins configs
+- _(mini)_ Move to standalone mini.nvim plugins
+- _(adev-files)_ Common-utils
+- Simplify mini plugin spec nesting and update UI structure
+- Improve neovim config utilities and plugin settings
+- _(adev-files)_ Refactor list files to open in a floating window
+- _(adev-files)_ List files improve highlighting
+- Improve input UI signature and centralize file operations
+- Improve code structure and error handling
+- Restructure adev-files actions
+
+### 📚 Documentation
+
+- Improve personal statement supporting Palestinian human rights
+- Update TODO.md with custom file management UI
+- Update TODO.md with custom file management UI
+- Update documentation with feature flags info
+- Mention :ADConfig command for modifying flags
+
+### 🎨 Styling
+
+- Fix lua doc comment syntax
+
+### ⚙️ Miscellaneous Tasks
+
+- _(laravel)_ Switch to laravel
+- _(adev-files)_ List files help index
+- Add project-specific git attributes for neovim config
+- _(laravel)_ Switch to laravel
+- _(adev-files)_ List files help index
+- Add project-specific git attributes for neovim config
+
 ## [2.0.1] - 2025-12-23
 
 ### 🚀 Features
