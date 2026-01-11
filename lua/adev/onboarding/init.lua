@@ -33,21 +33,6 @@ function OnBoarding:first_time()
     return config_exists
 end
 
---- Restart Neovim after a delay
----@param delay number? Delay in milliseconds
-local function restart_neovim(delay)
-    delay = delay or 1500
-
-    utils.notify("restarting neovim in " .. delay .. "ms", vim.log.levels.TRACE)
-    vim.defer_fn(function()
-        if vim.fn.has "nvim-0.12.0" == 1 then
-            vim.cmd [[ restart ]]
-        else
-            vim.cmd [[ qa! ]]
-        end
-    end, delay)
-end
-
 --- onboarding a new user by generating a new config
 --- init.lua and init-opts.lua
 function OnBoarding:onboarding()
@@ -95,7 +80,7 @@ function OnBoarding:onboarding()
     assert(success, "Save failed: " .. tostring(err))
 
     utils.notify "adev.nvim configuration created"
-    restart_neovim()
+    utils.restart_neovim(2000)
 end
 
 function OnBoarding.edit_config()
