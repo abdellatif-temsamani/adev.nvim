@@ -12,14 +12,16 @@ function M.check_update()
         utils.notify("adev.nvim: " .. cache.tag)
         return
     end
-    git.get_available_versions(function(versions)
-        if not versions or #versions == 0 then
-            utils.notify("adev.nvim: Unable to check updates", vim.log.levels.WARN)
-            return
-        end
-        local tag = versions[1]
-        cache = { tag = tag, timestamp = now }
-        utils.notify("adev.nvim: " .. tag)
+    git.git({ "fetch", "--tags", "-q" }, function()
+        git.get_available_versions(function(versions)
+            if not versions or #versions == 0 then
+                utils.notify("adev.nvim: Unable to check updates", vim.log.levels.WARN)
+                return
+            end
+            local tag = versions[1]
+            cache = { tag = tag, timestamp = now }
+            utils.notify("adev.nvim: " .. tag)
+        end)
     end)
 end
 
@@ -62,12 +64,14 @@ function M.update()
     if use_cache then
         proceed(cache.tag)
     else
-        git.get_available_versions(function(versions)
-            local tag = versions and #versions > 0 and versions[1] or nil
-            if tag then
-                cache = { tag = tag, timestamp = now }
-            end
-            proceed(tag)
+        git.git({ "fetch", "--tags", "-q" }, function()
+            git.get_available_versions(function(versions)
+                local tag = versions and #versions > 0 and versions[1] or nil
+                if tag then
+                    cache = { tag = tag, timestamp = now }
+                end
+                proceed(tag)
+            end)
         end)
     end
 end
