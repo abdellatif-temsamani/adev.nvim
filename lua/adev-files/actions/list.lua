@@ -68,5 +68,6 @@ return function()
         },
     })
 
+    --- TODO: switch to telescope
     create_win(buf, #current_files)
 end
