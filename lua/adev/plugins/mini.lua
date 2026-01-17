@@ -68,4 +68,18 @@ return {
         event = events.insert.enter,
         opts = {},
     },
+    {
+        "nvim-mini/mini.files",
+        cond = not Adev.flags.experimental_adev_files,
+        opts = {},
+        keys = {
+            {
+                "<leader>n",
+                function()
+                    MiniFiles.open()
+                end,
+                desc = "find files",
+            },
+        },
+    },
 }

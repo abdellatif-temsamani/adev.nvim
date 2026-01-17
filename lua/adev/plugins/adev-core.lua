@@ -1,7 +1,6 @@
 local files = require "adev-common.utils.files"
 
 return {
-    dependencies = { "nvim-telescope/telescope.nvim" },
     dir = files.adev_path .. "/lua/adev-files/",
     config = function(_, opts)
         require("adev-files").setup(opts)
