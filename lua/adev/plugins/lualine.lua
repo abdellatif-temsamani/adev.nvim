@@ -24,7 +24,7 @@ return {
         sections = {
             lualine_a = { "mode" },
             lualine_b = { macro_recording },
-            lualine_c = { "branch", "diff", "diagnostics", "lsp_status" },
+            lualine_c = { "branch", "diff", "diagnostics" },
 
             lualine_x = { "selectioncount", "encoding", "filetype", "filesize", "fileformat" },
             lualine_y = {},
@@ -44,6 +44,7 @@ return {
                     disabled_buftypes = { "quickfix", "prompt" },
                 },
             },
+            lualine_x = { "lsp_status" },
             lualine_z = { adev_nvim },
         },
         extensions = {},
