@@ -1,0 +1,36 @@
+{
+	"arrow function": {
+		"prefix": "arrow",
+		"body": [
+			"() => {",
+			"\t${0}",
+			"}"
+		],
+		"description": "Arrow function with empty parameters"
+	},
+	"arrow function with param": {
+		"prefix": "af",
+		"body": [
+			"(${1:param}) => {",
+			"\t${0}",
+			"}"
+		],
+		"description": "Arrow function with single parameter"
+	},
+	"arrow function with params": {
+		"prefix": "afp",
+		"body": [
+			"(${1:param1}, ${2:param2}) => {",
+			"\t${0}",
+			"}"
+		],
+		"description": "Arrow function with multiple parameters"
+	},
+	"arrow function return": {
+		"prefix": "afr",
+		"body": [
+			"(${1:param}) => ${2:return value}"
+		],
+		"description": "Arrow function with implicit return"
+	}
+}

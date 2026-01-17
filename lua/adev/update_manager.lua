@@ -30,13 +30,13 @@ function M.update()
     local use_cache = cache.tag and (now - cache.timestamp) < CACHE_TTL
     local function proceed(tag)
         if not tag then
-            utils.err_notify("Failed to get remote tag")
+            utils.err_notify "Failed to get remote tag"
             return
         end
         local update_branch = "update/" .. tag
         git.get_branch(function(current_branch)
             if current_branch == update_branch then
-                utils.notify("adev.nvim is up to date")
+                utils.notify "adev.nvim is up to date"
                 return
             end
             git.git({ "checkout", "-B", update_branch, tag }, function(res)

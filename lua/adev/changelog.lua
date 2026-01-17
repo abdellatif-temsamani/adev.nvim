@@ -101,7 +101,7 @@ function M.get_info()
         return
     end
     local message = {
-        string.format("- `Version`: %s" ,vim.inspect(version)),
+        string.format("- `Version`: %s", vim.inspect(version)),
         "- `Author`: Abdellatif Dev",
         "- `URL`: [github](https://github.com/abdellatif-temsamani/adev.nvim/)",
     }
