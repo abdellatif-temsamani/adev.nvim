@@ -64,8 +64,6 @@ return {
                     window = { border = nil },
                 },
 
-                ghost_text = { enabled = true },
-
                 menu = {
                     border = nil,
                     draw = {
