@@ -47,10 +47,6 @@ function M.setup(opts)
         require("adev.lsp").setup()
     end
 
-    if opts.flags.experimental_adev_files then
-        require("adev-files").setup()
-    end
-
     if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then
         opts.colorscheme = "default"
     end
