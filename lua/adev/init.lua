@@ -12,8 +12,6 @@ function M.setup(opts)
     vim.g.mapleader = opts.mapleader
     vim.g.maplocalleader = opts.mapleader
 
-    --- NOTE: fixes layout shifts
-    vim.o.winbar = " "
     vim.o.winborder = opts.ui.border
 
     ---@type Adev
