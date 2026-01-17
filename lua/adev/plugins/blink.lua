@@ -117,6 +117,12 @@ return {
 
             fuzzy = {
                 implementation = "rust",
+                sorts = {
+                    "exact",
+                    -- defaults
+                    "score",
+                    "sort_text",
+                },
             },
         },
         opts_extend = { "sources.default" },
