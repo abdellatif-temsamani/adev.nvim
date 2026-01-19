@@ -67,7 +67,16 @@ components are:
 
 CUSTOMIZATION						*adev-customization*
 
-To customize Adev.nvim, create lua/adev/init-opts.lua: >
+To customize Adev.nvim, use the :ADConfig command to open the configuration file: >
+
+:ADConfig
+<
+
+This will open lua/adev/init-opts.lua for editing. Do not modify init.lua or
+lua/adev/init-opts.lua directly, as init.lua is auto-generated and changes may
+be overwritten. Use :ADConfig instead.
+
+Example configuration: >
 
 return {
   git = {
@@ -84,12 +93,19 @@ return {
 
 FEATURE FLAGS						*adev-feature-flags*
 
-Control experimental features via flags: >
+Control experimental features via flags using :ADConfig: >
+
+:ADConfig
+<
+
+Then add to your configuration: >
 
 return {
-  experimental_adev_files = true,  -- Enable file management
-  ai_assistant = {
-    enabled = true
+  flags = {
+    experimental_adev_files = true,  -- Enable file management
+    ai_assistant = {
+      enabled = true
+    }
   }
 }
 <
@@ -272,8 +288,8 @@ PLUGIN MANAGEMENT					*adev-plugin-management*
 EXPERIMENTAL FEATURES				*adev-experimental*
 
 Adev.nvim includes experimental features that are under development. These
-features may be unstable and are disabled by default. Enable them by setting
-feature flags in your init-opts.lua.
+features may be unstable and are disabled by default. Enable them using
+:ADConfig to set feature flags in your configuration.
 
 ==============================================================================
 ADEV-FILES						*adev-files*
@@ -296,7 +312,7 @@ Planned features:
 
 ENABLING ADEV-FILES					*adev-files-enable*
 
-To enable adev-files, add to lua/adev/init-opts.lua: >
+To enable adev-files, use :ADConfig to edit your configuration and add: >
 
 return {
   flags = {
@@ -356,7 +372,7 @@ SLOW STARTUP						*adev-slow-startup*
 Problem: Neovim takes too long to start.
 Solution:
 1. Check :Lazy profile for slow plugins
-2. Disable unused plugins in init-opts.lua
+2. Disable unused features using :ADConfig
 3. Clear plugin cache: :Lazy clean
 4. Update to latest Neovim version
 
@@ -383,10 +399,10 @@ Q: How do I add my own plugins?
 A: Create files in lua/adev/custom-plugins/ following the Lazy spec format.
 
 Q: Can I use a different color scheme?
-A: Yes, set colorscheme in init-opts.lua or modify lua/adev/plugins/theme.lua.
+A: Yes, set colorscheme using :ADConfig.
 
 Q: How do I disable LSP for certain filetypes?
-A: Modify lua/adev/lsp.lua to remove unwanted filetypes.
+A: Use :ADConfig to set lsp.servers to exclude unwanted filetypes.
 
 Q: Where are my snippets stored?
 A: In the snippets/ directory. Edit or add .snippets files.

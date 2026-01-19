@@ -29,7 +29,7 @@ feature-flags system, and ADConfig for easy configuration.
 
 ### Prerequisites
 
-- Neovim 0.9.0 or higher
+- Neovim 0.11.0 or higher
 - Git
 - Node.js 16+ (for LSP servers)
 - A terminal with modern features
@@ -58,8 +58,8 @@ first run.
 
 ## ✨ Features
 
-- **Plugin Management**: lazy.nvim package manager with lazy-loaded plugins and 30+
-  carefully selected plugins
+- **Plugin Management**: lazy.nvim package manager with lazy-loaded plugins and
+  30+ carefully selected plugins
 - **LSP Support**: Built-in Language Server Protocol support for 30+ languages
 - **Modern Completion**: Blink.cmp with fuzzy matching and snippet support
 - **Syntax Highlighting**: Tree-sitter for advanced syntax parsing
@@ -72,7 +72,9 @@ first run.
 
 ## 🔧 Custom Plugins
 
-Adev.nvim supports adding your own custom plugins without modifying the core configuration. Custom plugins are stored in the `lua/adev/custom-plugins/` directory.
+Adev.nvim supports adding your own custom plugins without modifying the core
+configuration. Custom plugins are stored in the `lua/adev/custom-plugins/`
+directory.
 
 ### Adding a Custom Plugin
 
@@ -94,9 +96,13 @@ return {
 
 ### Caution: Custom Plugins are Git Ignored
 
-⚠️ **Important**: Custom plugins in `lua/adev/custom-plugins/` are intended for personal use and are not tracked by version control. This prevents committing personal or sensitive plugin configurations to the repository.
+⚠️ **Important**: Custom plugins in `lua/adev/custom-plugins/` are intended for
+personal use and are not tracked by version control. This prevents committing
+personal or sensitive plugin configurations to the repository.
 
-If you want to share your custom plugins or include them in version control, consider:
+If you want to share your custom plugins or include them in version control,
+consider:
+
 - Moving them to a separate repository
 - Using a fork of Adev.nvim
 - Contributing them upstream if they benefit the community
