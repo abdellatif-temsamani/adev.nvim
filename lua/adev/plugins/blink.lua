@@ -13,6 +13,7 @@ return {
         dependencies = {
             "joelazar/blink-calc",
             "L3MON4D3/LuaSnip",
+            "nvim-mini/mini.icons",
         },
         event = { events.cmd.enter, events.insert.enter },
         version = "1.*",
@@ -22,7 +23,10 @@ return {
             cmdline = {
                 enabled = true,
                 keymap = { preset = "cmdline" },
-                completion = { ghost_text = { enabled = true }, menu = { auto_show = true } },
+                completion = {
+                    ghost_text = { enabled = true },
+                    menu = { auto_show = true },
+                },
             },
 
             keymap = {
@@ -36,17 +40,65 @@ return {
             },
 
             completion = {
-                list = { selection = { preselect = true, auto_insert = true } },
-                accept = { auto_brackets = { enabled = false } },
+                trigger = {
+                    show_on_keyword = true,
+                    show_on_trigger_character = true,
+                    show_on_insert_on_trigger_character = true,
+                    show_on_accept_on_trigger_character = true,
+                },
+
+                list = {
+                    selection = {
+                        preselect = true,
+                        auto_insert = true,
+                    },
+                },
+
+                accept = {
+                    auto_brackets = { enabled = false },
+                },
+
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 500,
                     window = { border = nil },
                 },
+
                 menu = {
                     border = nil,
                     draw = {
-                        columns = { { "kind_icon", gap = 1, "label", "kind" } },
+                        columns = {
+                            { "kind_icon", gap = 1, "label", "kind" },
+                        },
+
+                        components = {
+                            kind_icon = {
+                                text = function(ctx)
+                                    local ok, icons = pcall(require, "mini.icons")
+                                    if not ok then
+                                        return ""
+                                    end
+                                    return select(1, icons.get("lsp", ctx.kind))
+                                end,
+                                highlight = function(ctx)
+                                    local ok, icons = pcall(require, "mini.icons")
+                                    if not ok then
+                                        return nil
+                                    end
+                                    return select(2, icons.get("lsp", ctx.kind))
+                                end,
+                            },
+
+                            kind = {
+                                highlight = function(ctx)
+                                    local ok, icons = pcall(require, "mini.icons")
+                                    if not ok then
+                                        return nil
+                                    end
+                                    return select(2, icons.get("lsp", ctx.kind))
+                                end,
+                            },
+                        },
                     },
                 },
             },

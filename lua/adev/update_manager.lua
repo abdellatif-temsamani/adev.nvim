@@ -3,91 +3,77 @@ local utils = require "adev-common.utils"
 
 local M = {}
 
-local function get_remote_tag(branch, callback)
-    git.git({ "fetch", "origin", branch }, function(fetch_res)
-        if not fetch_res or fetch_res.code ~= 0 then
-            utils.err_notify "Failed to fetch from remote"
-            callback(nil)
-            return
-        end
-        git.git({ "fetch", "--tags" }, function(tags_res)
-            if not tags_res or tags_res.code ~= 0 then
-                utils.err_notify "Failed to fetch tags"
-                callback(nil)
-                return
-            end
-            git.git({ "describe", "--tags", "--abbrev=0", "origin/" .. branch }, function(res)
-                if not res or res.code ~= 0 or not res.stdout then
-                    utils.err_notify("Failed to get remote tag for origin/" .. branch)
-                    callback(nil)
-                    return
-                end
-                callback(vim.trim(res.stdout))
-            end)
-        end)
-    end)
-end
-
-local function get_local_tag(callback)
-    git.git({ "describe", "--tags", "--abbrev=0" }, function(res)
-        if not res or res.code ~= 0 or not res.stdout then
-            utils.err_notify "Failed to get local tag"
-            callback(nil)
-            return
-        end
-        callback(vim.trim(res.stdout))
-    end)
-end
+local cache = { tag = nil, timestamp = nil }
+local CACHE_TTL = 300000
 
 function M.check_update()
-    git.get_branch(function(branch)
-        assert(branch, "couldn't get branch")
-        get_remote_tag(branch, function(remote_tag)
-            assert(remote_tag, "couldn't get remote_tag")
-            get_local_tag(function(local_tag)
-                assert(local_tag, "couldn't get local_tag")
-                if remote_tag == local_tag then
-                    utils.notify(string.format("adev.nvim: %s @ %s", local_tag, branch))
-                else
-                    utils.notify(
-                        string.format(
-                            "Update available: %s → %s @ %s",
-                            local_tag,
-                            remote_tag,
-                            branch
-                        ),
-                        vim.log.levels.WARN
-                    )
-                end
-            end)
+    local now = vim.uv.now()
+    if cache.tag and (now - cache.timestamp) < CACHE_TTL then
+        utils.notify("adev.nvim: " .. cache.tag)
+        return
+    end
+    git.git({ "fetch", "--tags", "-q" }, function()
+        git.get_available_versions(function(versions)
+            if not versions or #versions == 0 then
+                utils.notify("adev.nvim: Unable to check updates", vim.log.levels.WARN)
+                return
+            end
+            local tag = versions[1]
+            cache = { tag = tag, timestamp = now }
+            utils.notify("adev.nvim: " .. tag)
         end)
     end)
 end
 
 function M.update()
-    git.get_branch(function(branch)
-        assert(branch, "couldn't get branch")
-        get_remote_tag(branch, function(remote_tag)
-            assert(remote_tag, "couldn't get remote_tag")
-            get_local_tag(function(local_tag)
-                assert(local_tag, "couldn't get local_tag")
-                if remote_tag == local_tag then
-                    utils.notify(string.format("adev.nvim is up to date on %s", branch))
-                    return
+    local now = vim.uv.now()
+    local use_cache = cache.tag and (now - cache.timestamp) < CACHE_TTL
+    local function proceed(tag)
+        if not tag then
+            utils.err_notify "Failed to get remote tag"
+            return
+        end
+        local update_branch = "update/" .. tag
+        git.get_branch(function(current_branch)
+            if current_branch == update_branch then
+                utils.notify "adev.nvim is up to date"
+                return
+            end
+            git.git({ "checkout", "-B", update_branch, tag }, function(res)
+                if res and res.code == 0 then
+                    utils.notify("Updated to " .. tag)
+                    vim.schedule(function()
+                        require("adev.onboarding"):onboarding()
+                    end)
+                    git.git({ "branch", "--list", "update/*" }, function(branch_res)
+                        if branch_res and branch_res.code == 0 and branch_res.stdout then
+                            for old_branch in vim.gsplit(branch_res.stdout, "\n", { plain = true }) do
+                                old_branch = vim.trim(old_branch)
+                                if old_branch ~= "" and old_branch ~= update_branch then
+                                    git.delete_branch(old_branch)
+                                end
+                            end
+                        end
+                    end)
+                else
+                    utils.err_notify("Failed to update to " .. tag)
                 end
-                git.git({ "checkout", remote_tag }, function(res)
-                    if res and res.code == 0 then
-                        utils.notify(string.format("Updated to %s", remote_tag))
-                        vim.schedule(function()
-                            require("adev.onboarding"):onboarding()
-                        end)
-                    else
-                        utils.err_notify(string.format("Failed to update to %s", remote_tag))
-                    end
-                end)
             end)
         end)
-    end)
+    end
+    if use_cache then
+        proceed(cache.tag)
+    else
+        git.git({ "fetch", "--tags", "-q" }, function()
+            git.get_available_versions(function(versions)
+                local tag = versions and #versions > 0 and versions[1] or nil
+                if tag then
+                    cache = { tag = tag, timestamp = now }
+                end
+                proceed(tag)
+            end)
+        end)
+    end
 end
 
 return M

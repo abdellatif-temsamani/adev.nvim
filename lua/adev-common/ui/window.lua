@@ -22,8 +22,8 @@ function M.create_buf(content, opts)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
 
     vim.iter(opts.bo):each(
-    ---@param key vim.bo
-    ---@param value string|boolean|integer|number
+        ---@param key vim.bo
+        ---@param value string|boolean|integer|number
         function(key, value)
             vim.bo[buf][key] = value
         end

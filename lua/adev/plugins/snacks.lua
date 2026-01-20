@@ -2,77 +2,57 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
-    keys = (function()
-        local keys = {}
-        if not Adev.flags.experimental_adev_files then
-            vim.list_extend(keys, {
-                {
-                    "<leader>n",
-                    function()
-                        Snacks.explorer()
-                    end,
-                    desc = "Files",
-                },
-            })
-        end
-        vim.list_extend(keys, {
-            {
-                "<leader>bq",
-                function()
-                    Snacks.bufdelete()
-                end,
-                desc = "close buffer",
-            },
-            {
-                "<leader>wa",
-                function()
-                    Snacks.zen.zoom()
-                end,
-                desc = "Toggle Zoom",
-            },
-            {
-                "<leader>to",
-                function()
-                    Snacks.lazygit {
-                        win = {
-                            style = "terminal",
-                            border = Adev.ui.border,
-                        },
-                    }
-                end,
-                desc = "lazygit",
-            },
-            {
-                "<leader>N",
-                desc = "Neovim News",
-                function()
-                    Snacks.win {
-                        file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
+    keys = {
+        {
+            "<leader>bq",
+            function()
+                Snacks.bufdelete()
+            end,
+            desc = "close buffer",
+        },
+        {
+            "<leader>wa",
+            function()
+                Snacks.zen.zoom()
+            end,
+            desc = "Toggle Zoom",
+        },
+        {
+            "<leader>to",
+            function()
+                Snacks.lazygit {
+                    win = {
+                        style = "terminal",
                         border = Adev.ui.border,
-                        width = 0.9,
-                        height = 0.9,
-                        wo = {
-                            spell = false,
-                            wrap = false,
-                            signcolumn = "yes",
-                            statuscolumn = " ",
-                            conceallevel = 3,
-                        },
-                    }
-                end,
-            },
-        })
-        return keys
-    end)(),
+                    },
+                }
+            end,
+            desc = "lazygit",
+        },
+        {
+            "<leader>N",
+            desc = "Neovim News",
+            function()
+                Snacks.win {
+                    file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
+                    border = Adev.ui.border,
+                    width = 0.9,
+                    height = 0.9,
+                    wo = {
+                        spell = false,
+                        wrap = false,
+                        signcolumn = "yes",
+                        statuscolumn = " ",
+                        conceallevel = 3,
+                    },
+                }
+            end,
+        },
+    },
     opts = {
         explorer = {
             enabled = true,
             replace_netrw = true,
-        },
-        picker = {
-            sources = {
-                explorer = {},
-            },
         },
         input = { enabled = true },
         lazygit = { enabled = true },

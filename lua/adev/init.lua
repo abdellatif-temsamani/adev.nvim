@@ -12,8 +12,6 @@ function M.setup(opts)
     vim.g.mapleader = opts.mapleader
     vim.g.maplocalleader = opts.mapleader
 
-    --- NOTE: fixes layout shifts
-    vim.o.winbar = " "
     vim.o.winborder = opts.ui.border
 
     ---@type Adev
@@ -47,10 +45,6 @@ function M.setup(opts)
 
     if opts.lsp.enable then
         require("adev.lsp").setup()
-    end
-
-    if opts.flags.experimental_adev_files then
-        require("adev-files").setup()
     end
 
     if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then

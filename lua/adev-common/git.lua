@@ -59,4 +59,12 @@ function M.get_available_versions(callback)
     end
 end
 
+function M.delete_branch(branch, callback)
+    M.git({ "branch", "-D", branch }, function(res)
+        if callback then
+            callback(res and res.code == 0)
+        end
+    end)
+end
+
 return M

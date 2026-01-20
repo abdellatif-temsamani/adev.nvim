@@ -18,25 +18,17 @@ return {
         options = {
             theme = "auto",
             globalstatus = true,
-            disabled_filetypes = { "NvimTree" },
+            disabled_filetypes = { "NvimTree", "adev_files" },
             always_divide_middle = true,
-            component_separators = { left = "", right = "" },
-            section_separators = { left = "", right = "" },
         },
         sections = {
-            lualine_a = { "mode", "branch" },
+            lualine_a = { "mode" },
             lualine_b = { macro_recording },
-            lualine_c = { "diff", "diagnostics" },
-            lualine_x = { "selectioncount", "encoding", "filetype" },
-            lualine_z = { "filesize", "location", "progress" },
-        },
-        winbar = {
-            lualine_b = {
-                "filename",
-            },
-            lualine_y = {
-                "filetype",
-            },
+            lualine_c = { "branch", "diff", "diagnostics" },
+
+            lualine_x = { "selectioncount", "encoding", "filetype", "filesize", "fileformat" },
+            lualine_y = {},
+            lualine_z = { "location", "progress" },
         },
         tabline = {
             lualine_a = {
@@ -45,6 +37,14 @@ return {
                     mode = 0,
                 },
             },
+            lualine_b = {},
+            lualine_c = {
+                {
+                    "windows",
+                    disabled_buftypes = { "quickfix", "prompt" },
+                },
+            },
+            lualine_x = { "lsp_status" },
             lualine_z = { adev_nvim },
         },
         extensions = {},
