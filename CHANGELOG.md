@@ -12,6 +12,37 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [2.0.4] - 2026-01-20
+
+### 🚀 Features
+
+- _(update_manager)_ [**breaking**] New update method
+- _(blink.cmp)_ Enhance completion with mini.icons and add JS/TS snippets
+- Add custom vscode snippets support
+
+### 🐛 Bug Fixes
+
+- _(update_manager)_ Update
+- _(update_manager)_ Fetch remote tags
+- _(blink)_ Sorting
+- _(mini-files)_ Opens in current buf's dir
+
+### 🚜 Refactor
+
+- _(lualine)_ [**breaking**] Replace winbar with tabline.windows
+- _(lualine)_ Change placing of lsp status
+- _(core-plugin)_ Re-structure adev core plugins
+- Simplify file explorer configuration and remove telescope dependency
+
+### 📚 Documentation
+
+- _(adev.txt)_ Refactor docs
+- Update README and help to use :ADConfig for configuration
+
+### ◀️ Revert
+
+- Disable ghost_line
+
 ## [2.0.3] - 2026-01-11
 
 ### 🚀 Features
@@ -127,28 +158,29 @@ curated plugins and settings.
 
 ### 🚀 Features
 
-- Lazy laoding
-- Nvim-cmp -> blink-cmp
-- Mini.nvim && cleaning plugins
-- Config to distro
-- _(snacks)_ Add image support
-- _(lsp)_ Diagonistic vertual line [expermental]
-- _(config)_ Mv config to lua/abdellatifdev/config
-- _(git-worktree)_ [**breaking**] Rm plugins
-- _(health)_ Healthcheck adev
-- _(blink-cmp)_ Conventional-commits
-- _(blink-cmp)_ Ghostline cmdline
-- _(noice)_ Override defaults
-- _(lsp)_ Tailwindcss config
-- _(blink.nvim)_ [**breaking**] Removing providers
-- _(cmp)_ [**breaking**] Blink-cmp -> nvim-cmp
-- Godot linting
-- Gdformat use spaces
-- Auto check for update
-- _(autocmd)_ Gdscript space
-- _(cmp)_ Back to blink.cmp v1.3.1
-- _(lua)_ Vim highlight as builtin
-- [**breaking**] Lua_ls hints
+- Add treesitter auto-start configuration and update project release name
+- Temp implementation of ADConfig
+
+### 🐛 Bug Fixes
+
+- _(gitsigns)_ Lazyloading
+- Add assertion for LSP defaults in lsp.lua
+- Treesitter config
+
+### 📚 Documentation
+
+- Update CHANGELOG.md
+- Update documentation to reflect codebase changes
+- Update documentation to reflect codebase changes
+
+### ⚙️ Miscellaneous Tasks
+
+- Auto publish
+
+## [1.5.0] - 2025-10-19
+
+### 🚀 Features
+
 - More info
 - New utils function
 - Opts "git"
@@ -157,26 +189,9 @@ curated plugins and settings.
 - _(null-ls)_ Added stylua
 - _(new-plugin)_ [**breaking**] Augment
 - _(set)_ More options
-- Add treesitter auto-start configuration and update project release name
-- Temp implementation of ADConfig
 
 ### 🐛 Bug Fixes
 
-- Readme
-- Snacks
-- Lsp keymaps
-- _(blink.cmp)_ Temp fix
-- _(theme)_ Align with telescope and snacks
-- _(lualine)_ Winbar now displays "Adev.nvim" instead of "abdellatif dev"
-- _(blink.cmp)_ Downgrade to "v1.3.1"
-- _(crates.nvim)_ Add event for lazy loading
-- _(treesitter)_ Plugin event
-- _(telescope)_ Border style
-- _(laravel)_ Missing deps
-- Better notifications
-- _(laravel)_ [**breaking**] Fix commands
-- [**breaking**] Cmp
-- Sets config
 - _(blink.cmp)_ Config
 - Version
 - Check update
@@ -195,9 +210,105 @@ curated plugins and settings.
 - _(plugins)_ Event loading
 - _(treesitter)_ Not loading
 - _(plugins)_ Lazy loading conditions
-- _(gitsigns)_ Lazyloading
-- Add assertion for LSP defaults in lsp.lua
-- Treesitter config
+
+### 🚜 Refactor
+
+- _(core)_ Changing code structure
+- [**breaking**] Internal structure
+- _(events)_ Rewrite Event handler
+- _(core)_ Refactoring vim.g.adev
+- _(core)_ Refactoring vim.g.adev
+
+### 📚 Documentation
+
+- Fix plugin struture
+- Update adev.txt
+- _(adev.txt)_ Update
+- Update README
+
+### 🎨 Styling
+
+- Unify code formatting
+- Stylua toml
+- _(stylua)_ Formatting
+- Linting
+
+### ⚙️ Miscellaneous Tasks
+
+- Todo.md
+
+## [1.4.0] - 2025-10-08
+
+### 🚀 Features
+
+- _(cmp)_ [**breaking**] Blink-cmp -> nvim-cmp
+- Godot linting
+- Gdformat use spaces
+- Auto check for update
+- _(autocmd)_ Gdscript space
+- _(cmp)_ Back to blink.cmp v1.3.1
+- _(lua)_ Vim highlight as builtin
+- [**breaking**] Lua_ls hints
+
+### 🐛 Bug Fixes
+
+- [**breaking**] Cmp
+- Sets config
+
+### 📚 Documentation
+
+- Cleaning docs
+
+## [1.3.1] - 2025-09-15
+
+### 🚀 Features
+
+- _(health)_ Healthcheck adev
+- _(blink-cmp)_ Conventional-commits
+- _(blink-cmp)_ Ghostline cmdline
+- _(noice)_ Override defaults
+- _(lsp)_ Tailwindcss config
+- _(blink.nvim)_ [**breaking**] Removing providers
+
+### 🐛 Bug Fixes
+
+- _(treesitter)_ Plugin event
+- _(telescope)_ Border style
+- _(laravel)_ Missing deps
+- Better notifications
+- _(laravel)_ [**breaking**] Fix commands
+
+### 🚜 Refactor
+
+- _(plugins)_ Structure
+
+### 📚 Documentation
+
+- _(adev)_ Vim docs
+
+### 🧪 Testing
+
+- _(checkhealth)_ Improve checkhealth
+
+### ⚙️ Miscellaneous Tasks
+
+- _(version)_ Minor update
+
+## [1.2.0] - 2025-08-02
+
+### 🚀 Features
+
+- _(snacks)_ Add image support
+- _(lsp)_ Diagonistic vertual line [expermental]
+- _(config)_ Mv config to lua/abdellatifdev/config
+- _(git-worktree)_ [**breaking**] Rm plugins
+
+### 🐛 Bug Fixes
+
+- _(theme)_ Align with telescope and snacks
+- _(lualine)_ Winbar now displays "Adev.nvim" instead of "abdellatif dev"
+- _(blink.cmp)_ Downgrade to "v1.3.1"
+- _(crates.nvim)_ Add event for lazy loading
 
 ### 🚜 Refactor
 
@@ -210,37 +321,11 @@ curated plugins and settings.
 - _(plugins)_ Lazy loading
 - _(config)_ Lua/abdellatifdev -> lua/adev
 - _(plugins)_ Cleaning plugins
-- _(plugins)_ Structure
-- _(core)_ Changing code structure
-- [**breaking**] Internal structure
-- _(events)_ Rewrite Event handler
-- _(core)_ Refactoring vim.g.adev
-- _(core)_ Refactoring vim.g.adev
 
 ### 📚 Documentation
 
 - Add contributing and PR guidelines (#1)
 - Add contributing and PR guidelines
-- _(adev)_ Vim docs
-- Cleaning docs
-- Fix plugin struture
-- Update adev.txt
-- _(adev.txt)_ Update
-- Update README
-- Update CHANGELOG.md
-- Update documentation to reflect codebase changes
-- Update documentation to reflect codebase changes
-
-### 🎨 Styling
-
-- Unify code formatting
-- Stylua toml
-- _(stylua)_ Formatting
-- Linting
-
-### 🧪 Testing
-
-- _(checkhealth)_ Improve checkhealth
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -251,9 +336,22 @@ curated plugins and settings.
 - _(todo)_ Todo comment to github issues
 - _(version)_ 1.2.0
 - _(github)_ Pull request template
-- _(version)_ Minor update
-- Todo.md
-- Auto publish
+
+## [1.1.0] - 2025-07-30
+
+### 🚀 Features
+
+- Lazy laoding
+- Nvim-cmp -> blink-cmp
+- Mini.nvim && cleaning plugins
+- Config to distro
+
+### 🐛 Bug Fixes
+
+- Readme
+- Snacks
+- Lsp keymaps
+- _(blink.cmp)_ Temp fix
 
 ---
 

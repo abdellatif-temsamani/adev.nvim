@@ -1,4 +1,4 @@
-*adev.txt*	Adev.nvim Documentation
+*adev.txt*	Adev.nvim Documentation                                 v2.0.4
 
 		     A D E V . N V I M    R E F E R E N C E    M A N U A L
 

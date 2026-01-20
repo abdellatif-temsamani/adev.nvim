@@ -8,7 +8,12 @@
 
 > The over-engineered Neovim distribution for developers who want everything
 
-[![Version](https://img.shields.io/badge/version-2.0.3-blue.svg)](https://github.com/abdellatif-temsamani/adev.nvim)
+![GitHub Release](https://img.shields.io/github/v/release/abdellatif-temsamani/adev.nvim?display_name=tag&style=flat-square&color=blue)
+![GitHub top language](https://img.shields.io/github/languages/top/abdellatif-temsamani/adev.nvim?style=flat-square&color=blue)
+![GitHub Release Date](https://img.shields.io/github/release-date-pre/abdellatif-temsamani/adev.nvim?display_date=published_at&style=flat-square&color=blue)
+![Static Badge](https://img.shields.io/badge/Neovim-v0.11.5-blue?style=flat-square&logo=neovim)
+![GitHub License](https://img.shields.io/github/license/abdellatif-temsamani/adev.nvim?style=flat-square&color=blue)
+
 
 Adev.nvim is a feature-rich Neovim configuration that provides a complete
 development environment out of the box. Built with modern Neovim features and
