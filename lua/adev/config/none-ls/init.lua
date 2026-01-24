@@ -39,7 +39,7 @@ return function()
             formatting.pretty_php,
             gdformat,
             formatting.asmfmt,
-            formatting.rustywind,
+            -- NOTE: moving from formatting.rustywind to prettier plugin,
             formatting.djlint,
             formatting.shfmt.with {
                 extra_args = { "-i", "4", "-ci" }, -- change to your dialect
