@@ -16,14 +16,20 @@ return function()
             if client.workspace_folders then
                 local path = client.workspace_folders[1].name
                 if
-                    vim.fn.filereadable(path .. "/.luarc.json")
-                    or vim.fn.filereadable(path .. "/.luarc.jsonc")
+                    path ~= vim.fn.stdpath "config"
+                    and (
+                        vim.uv.fs_stat(path .. "/.luarc.json")
+                        or vim.uv.fs_stat(path .. "/.luarc.jsonc")
+                    )
                 then
                     return
                 end
             end
+
             client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
-                runtime = { version = "LuaJIT" },
+                runtime = {
+                    version = "LuaJIT",
+                },
                 workspace = {
                     checkThirdParty = false,
                     library = {
@@ -31,6 +37,8 @@ return function()
                         "${3rd}/luv/library",
                         "${3rd}/busted/library",
                     },
+                    -- NOTE: may switch to it later
+                    -- library = vim.api.nvim_get_runtime_file("", true),
                 },
             })
         end,
@@ -38,7 +46,7 @@ return function()
             Lua = {
                 hint = {
                     enable = true,
-                    setType = false,
+                    setType = true,
                 },
             },
         },
@@ -52,7 +60,7 @@ return function()
                         -- cva("…")
                         { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
                         -- cn("…")
-                        { "cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]" },
+                        { "cn\\(([^)]*)\\)",  "[\"'`]([^\"'`]*)[\"'`]" },
                     },
                 },
             },
