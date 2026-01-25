@@ -3,6 +3,7 @@ local utils = require "adev-common.utils"
 
 ---@param input? string
 ---@return nil
+---@deprecated
 local function on_create(input)
     if not input or input == "" then
         utils.notify("No file/dir to create", vim.log.levels.ERROR)
@@ -57,6 +58,7 @@ local function on_create(input)
     end
 end
 
+---@deprecated
 return function()
     local dir = utils.files.get_dirname() or ""
     ui.input("Create a file/dir [trailing / for dir]", on_create, {
