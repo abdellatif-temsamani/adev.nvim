@@ -77,7 +77,7 @@ function M.show_changelog(args)
 
     ui.window.floating_window {
         buf = buf,
-        title = "Adev.nvim Changelog - " .. (args and args.args or git.get_version() or "Unknown"),
+        title = "Adev.nvim Changelog - " .. (git.get_version() or "Unknown"),
         border = Adev.ui.border,
         width = 0.8,
         height = 0.8,
