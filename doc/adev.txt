@@ -23,9 +23,9 @@ INSTALLATION AND SETUP					*adev-installation*
 
 REQUIREMENTS						*adev-requirements*
 
-- Neovim 0.9.0 or higher
-- Git 2.0+
-- Node.js 16+ (for LSP servers and tools)
+- Neovim 0.11.0 or higher
+- Git
+- Node.js 20+ (for LSP servers and tools)
 - Modern terminal with true color support
 - Linux/macOS (Windows support experimental)
 
