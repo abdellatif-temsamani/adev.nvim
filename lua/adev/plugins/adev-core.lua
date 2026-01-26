@@ -10,13 +10,8 @@ return {
     keys = {
         {
             "<leader>nl",
-            require("adev-files.actions").list,
+            require("adev-files").open,
             desc = "list files in cwd",
-        },
-        {
-            "<leader>na",
-            require("adev-files.actions").create,
-            desc = "create a file/dir",
         },
     },
 }
