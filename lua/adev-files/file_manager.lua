@@ -1,12 +1,10 @@
 local ui = require "adev-common.ui"
 local utils = require "adev-common.utils"
 
-local M = { buf = -1 }
-
 --- create a popup window to list files
 ---@param buf integer buffer id
 ---@param height integer height of window
-function M.create_win(buf, height)
+local function create_win(buf, height)
     ui.window.floating_window {
         title = "Adev Files [q: quit]",
         buf = buf,
@@ -22,7 +20,7 @@ end
 
 ---@param a string
 ---@param b string
-function M.sort_files(a, b)
+local function sort_files(a, b)
     -- root: first
     if a:sub(1, 5) == "root:" and b:sub(1, 5) ~= "root:" then
         return true
@@ -51,7 +49,7 @@ function M.sort_files(a, b)
     return a_name < b_name
 end
 
-function M.open()
+local function open()
     local pwd = utils.files.get_dirname()
     local files = vim.fs.dir(pwd)
 
@@ -59,7 +57,7 @@ function M.open()
     for name, type in files do
         table.insert(current_files, string.format("%s: %s", type, name))
     end
-    table.sort(current_files, M.sort_files)
+    table.sort(current_files, sort_files)
 
     local buf = utils.buffers.create(current_files, {
         scratch = true,
@@ -71,7 +69,9 @@ function M.open()
         },
     })
 
-    M.create_win(buf, #current_files)
+    require("adev-files.events").register(buf)
+
+    create_win(buf, #current_files)
 end
 
-return M
+return { open = open }

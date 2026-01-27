@@ -14,7 +14,7 @@ M.floating_defaults = {
 function M.floating_window(opts)
     ---@type snacks.win.Config
     opts = vim.tbl_deep_extend("force", {}, M.floating_defaults, opts or {})
-    vim.keymap.set({ "n", "v" }, "q", "<cmd>bwipeout<CR>", { buffer = opts.buf })
+    vim.keymap.set("", "q", "<cmd>bwipeout<CR>", { buffer = opts.buf })
 
     if Snacks then
         Snacks.win(opts)
