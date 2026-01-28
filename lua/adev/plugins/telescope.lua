@@ -23,6 +23,17 @@ return {
             desc = "grep files",
         },
         {
+            "<leader>fc",
+            function()
+                require("telescope.builtin").find_files {
+                    cwd = vim.fn.expand "%:p:h",
+                    hidden = true,
+                    prompt_title = "search files in current buffer dir",
+                }
+            end,
+            desc = "colorscheme",
+        },
+        {
             "<leader>fb",
             function()
                 require("telescope.builtin").buffers()
@@ -49,20 +60,6 @@ return {
                 require("telescope.builtin").commands()
             end,
             desc = "commands",
-        },
-        {
-            "<leader>fc",
-            function()
-                require("telescope.builtin").colorscheme()
-            end,
-            desc = "colorscheme",
-        },
-        {
-            "<leader>fa",
-            function()
-                require("telescope.builtin").treesitter()
-            end,
-            desc = "treesitter",
         },
     },
 
