@@ -20,6 +20,11 @@ function M.attach(buf)
     set_keymap("n", "<cr>", function()
         nav.open_or_enter(buf)
     end)
+
+    set_keymap("n", "K", function() end)
+    set_keymap("n", "J", function() end)
+    set_keymap("n", "<leader>bq", function() end)
+
     set_keymap("n", "L", function()
         nav.open_or_enter(buf)
     end)
