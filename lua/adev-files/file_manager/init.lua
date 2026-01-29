@@ -1,9 +1,9 @@
 local M = {}
 
-local roots = require "adev-files.file_manager.roots"
 local listing = require "adev-files.file_manager.listing"
-local render = require "adev-files.file_manager.render"
 local open = require "adev-files.file_manager.open"
+local render = require "adev-files.file_manager.render"
+local roots = require "adev-files.file_manager.roots"
 
 M.normalize_root = roots.normalize_root
 M.child_root = roots.child_root

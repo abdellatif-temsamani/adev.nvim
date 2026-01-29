@@ -1,7 +1,6 @@
 return function()
     local null_setup = require("null-ls").setup
     local builtins = require "null-ls.builtins"
-    local h = require "null-ls.helpers"
 
     local code_actions = builtins.code_actions
 

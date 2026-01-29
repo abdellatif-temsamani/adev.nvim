@@ -1,7 +1,7 @@
 local clipboard = require "adev-files.events.clipboard"
 local delete = require "adev-files.events.delete"
-local nav = require "adev-files.events.navigation"
 local help = require "adev-files.help"
+local nav = require "adev-files.events.navigation"
 local parse = require "adev-files.parse"
 local utils = require "adev-common.utils"
 

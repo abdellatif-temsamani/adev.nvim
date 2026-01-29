@@ -100,7 +100,10 @@ function M.plan_ops(buf)
                 return nil, string.format("line %d: %s", i, err)
             end
             if entry then
-                table.insert(ops, { type = "create", kind = entry.kind, path = join(st.root, entry.fs_name) })
+                table.insert(
+                    ops,
+                    { type = "create", kind = entry.kind, path = join(st.root, entry.fs_name) }
+                )
             end
         end
     end

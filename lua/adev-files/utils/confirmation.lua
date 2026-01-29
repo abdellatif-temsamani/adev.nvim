@@ -62,13 +62,13 @@ function M.open(lines, opts, cb)
         finish(false)
     end, { buffer = buf })
 
-    window.floating_window({
+    window.floating_window {
         buf = buf,
         title = opts.title or "adev-files",
         width = opts.width or 80,
         height = opts.height or math.min(#content + 2, 20),
         wo = { wrap = true },
-    })
+    }
 end
 
 return M

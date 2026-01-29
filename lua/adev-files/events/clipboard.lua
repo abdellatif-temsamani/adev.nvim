@@ -27,7 +27,11 @@ function M.set_clipboard(buf, mode)
         return
     end
     clipboard.set(mode, items)
-    utils.notify(string.format("%s %d item(s)", mode == "copy" and "Copied" or "Cut", #items), vim.log.levels.INFO, "adev-files")
+    utils.notify(
+        string.format("%s %d item(s)", mode == "copy" and "Copied" or "Cut", #items),
+        vim.log.levels.INFO,
+        "adev-files"
+    )
     refresh_keep_cursor(buf)
 end
 

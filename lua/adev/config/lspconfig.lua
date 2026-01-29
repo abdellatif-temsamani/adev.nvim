@@ -12,6 +12,10 @@ return function()
     })
 
     vim.lsp.config("lua_ls", {
+        on_attach = function(client)
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+        end,
         on_init = function(client)
             if client.workspace_folders then
                 local path = client.workspace_folders[1].name

@@ -99,7 +99,7 @@ local function apply_ops(ops)
         end
 
         local err_s = tostring(err or "")
-        if not err_s:match("EXDEV") and not err_s:match("cross%-device") then
+        if not err_s:match "EXDEV" and not err_s:match "cross%-device" then
             return false, err
         end
 

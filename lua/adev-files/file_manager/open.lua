@@ -1,7 +1,7 @@
 local utils = require "adev-common.utils"
 
-local roots = require "adev-files.file_manager.roots"
 local listing = require "adev-files.file_manager.listing"
+local roots = require "adev-files.file_manager.roots"
 local win = require "adev-files.file_manager.window"
 
 local M = {}

@@ -1,5 +1,5 @@
-local uv = require "adev-files.utils.fs.uv"
 local stat = require "adev-files.utils.fs.stat"
+local uv = require "adev-files.utils.fs.uv"
 
 local M = {}
 

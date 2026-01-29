@@ -11,10 +11,10 @@ function M.validate_rel_dir(s)
     if s:sub(1, 1) == "/" then
         return false, "path must be relative"
     end
-    if s:find("\\", 1, true) or s:find("%z") or s:find("//", 1, true) then
+    if s:find("\\", 1, true) or s:find "%z" or s:find("//", 1, true) then
         return false, "invalid path"
     end
-    for seg in s:gmatch("[^/]+") do
+    for seg in s:gmatch "[^/]+" do
         if seg == "." or seg == ".." then
             return false, "invalid segment: " .. seg
         end

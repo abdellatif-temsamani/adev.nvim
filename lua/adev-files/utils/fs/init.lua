@@ -1,7 +1,7 @@
 local M = {}
 
-local copy_file = require "adev-files.utils.fs.copy_file"
 local copy_dir = require "adev-files.utils.fs.copy_dir"
+local copy_file = require "adev-files.utils.fs.copy_file"
 local mkdir = require "adev-files.utils.fs.mkdir"
 local stat = require "adev-files.utils.fs.stat"
 

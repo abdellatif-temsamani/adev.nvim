@@ -1,6 +1,6 @@
-local roots = require "adev-files.file_manager.roots"
-local render = require "adev-files.file_manager.render"
 local index = require "adev-files.sync.index"
+local render = require "adev-files.file_manager.render"
+local roots = require "adev-files.file_manager.roots"
 local state = require "adev-files.state"
 
 local M = {}

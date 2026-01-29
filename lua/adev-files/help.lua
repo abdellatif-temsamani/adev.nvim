@@ -54,13 +54,13 @@ function M.open()
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
 
-    window.floating_window({
+    window.floating_window {
         buf = buf,
         title = "adev-files help [q: close]",
         width = 64,
         height = math.min(#lines + 2, 28),
         wo = { wrap = false },
-    })
+    }
 
     vim.keymap.set("n", "<esc>", "<cmd>bwipeout<CR>", { buffer = buf })
 end

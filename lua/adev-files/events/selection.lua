@@ -31,7 +31,7 @@ function M.collect_entries(buf)
         if a > b then
             a, b = b, a
         end
-        vim.cmd("normal! \\<Esc>")
+        vim.cmd "normal! \\<Esc>"
         local lines = vim.api.nvim_buf_get_lines(buf, a - 1, b, false)
         for _, l in ipairs(lines) do
             push(l)

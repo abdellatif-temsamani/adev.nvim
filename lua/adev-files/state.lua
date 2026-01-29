@@ -1,6 +1,6 @@
 local M = {}
 
-local NS = vim.api.nvim_create_namespace("adev-files")
+local NS = vim.api.nvim_create_namespace "adev-files"
 
 ---@class AdevFilesMark
 ---@field kind 'file'|'directory'

@@ -1,9 +1,9 @@
 local M = {}
 
-local view = require "adev-files.sync.view"
-local plan = require "adev-files.sync.plan"
 local apply = require "adev-files.sync.apply"
 local attach = require "adev-files.sync.attach"
+local plan = require "adev-files.sync.plan"
+local view = require "adev-files.sync.view"
 
 M.refresh = view.refresh
 M.set_root = view.set_root

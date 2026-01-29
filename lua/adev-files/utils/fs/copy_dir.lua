@@ -1,9 +1,9 @@
-local uv = require "adev-files.utils.fs.uv"
+local copy_file = require "adev-files.utils.fs.copy_file"
 local mkdir = require "adev-files.utils.fs.mkdir"
 local path = require "adev-files.utils.fs.path"
 local stat = require "adev-files.utils.fs.stat"
 local symlink = require "adev-files.utils.fs.symlink"
-local copy_file = require "adev-files.utils.fs.copy_file"
+local uv = require "adev-files.utils.fs.uv"
 
 local M = {}
 

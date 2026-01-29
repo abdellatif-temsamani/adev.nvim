@@ -18,7 +18,7 @@ function M.parse_line(line)
     end
 
     -- Check for root: prefix (skip these lines)
-    local prefix, rest = line:match("^(%a+)%s*:%s*(.*)$")
+    local prefix, rest = line:match "^(%a+)%s*:%s*(.*)$"
     if prefix == "root" then
         return nil, nil
     end
@@ -61,7 +61,8 @@ function M.parse_line(line)
         name = name,
         fs_name = fs_name,
         display = name,
-    }, nil
+    },
+        nil
 end
 
 return M
