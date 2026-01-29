@@ -54,6 +54,11 @@ return {
             enabled = true,
             replace_netrw = true,
         },
+        picker = {
+            sources = {
+                explorer = {},
+            },
+        },
         input = { enabled = true },
         lazygit = { enabled = true },
         image = { enabled = true },

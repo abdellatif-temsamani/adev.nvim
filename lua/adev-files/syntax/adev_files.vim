@@ -4,54 +4,46 @@ endif
 
 " ============================================================
 " Adev Files Syntax Highlighting
-" Format: root: <path> | file: <name> | directory: <name>
+" Format: help | ==== | root: <path> | name (directories end with /)
 " ============================================================
 
-" Keywords - separate colors for file and directory
-syntax keyword adevFilesFile file
-syntax keyword adevFilesDirectory directory
+" Help line (first line with keybindings)
+syntax match adevFilesHelp "^<CR>.*$"
 
-" Root title line (distinct from directories)
+" Separator line (====)
+syntax match adevFilesSeparator "^=\+$"
+
+" Directories - lines ending with / (defined first so root: can override)
+syntax match adevFilesDirValue "^.\+/$"
+
+" Root title line (defined after to take precedence over directory match)
 syntax match adevFilesTitle "^root:.*$"
 
-" Colon operator for key-value separator
-syntax match adevFilesSeparator contained ":\s*"
-
-" Values after keywords (after the colon and optional whitespace)
-syntax match adevFilesFileValue "file:\s*.*" contains=adevFilesSeparator,adevFilesQuote,adevFilesSpecial
-syntax match adevFilesDirValue "directory:\s*.*" contains=adevFilesSeparator,adevFilesQuote,adevFilesSpecial
-
-" Special characters in paths (/, \, ., -, _, space, etc.)
-syntax match adevFilesSpecial contained "[/\\._-]"
-
-" Quoted strings (for paths with special characters)
-syntax region adevFilesQuote start=+"+ end=+"+ contained
-syntax region adevFilesQuote start=+'+ end=+'+ contained
+" Files - lines NOT starting with root: and NOT ending with /
+syntax match adevFilesFileValue "^[^r].*[^/]$"
+syntax match adevFilesFileValue "^r[^o].*[^/]$"
+syntax match adevFilesFileValue "^ro[^o].*[^/]$"
+syntax match adevFilesFileValue "^roo[^t].*[^/]$"
+syntax match adevFilesFileValue "^root[^:].*[^/]$"
 
 " ============================================================
 " Highlight Groups
 " ============================================================
 
-" Keywords - different colors for file vs directory
-highlight link adevFilesFile Function
-highlight link adevFilesDirectory Comment
+" Help line - subtle color
+highlight link adevFilesHelp Comment
+
+" Separator - subtle
+highlight link adevFilesSeparator Comment
 
 " Root title - distinct bold color for visibility
 highlight default link adevFilesTitle Type
 highlight default adevFilesTitle gui=bold cterm=bold
 
-" Separator - colon operator
-highlight link adevFilesSeparator Operator
+" Directories - using Function for visibility
+highlight link adevFilesDirValue Function
 
-" Values - strings for paths/filenames
-highlight link adevFilesFileValue String
-highlight link adevFilesDirValue String
-
-" Special characters - subtle differentiation in paths
-highlight link adevFilesSpecial Special
-
-" Quoted strings - same as values but explicit
-highlight link adevFilesQuote String
+" Files - using Normal (default text color)
+highlight link adevFilesFileValue Normal
 
 let b:current_syntax = "adev_files"
-

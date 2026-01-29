@@ -20,16 +20,31 @@ function M.floating_window(opts)
         Snacks.win(opts)
     else
         -- fallback
+        local ui = vim.api.nvim_list_uis()[1]
+        local width = opts.width or 60
+        local height = opts.height or 2
+        if ui then
+            width = math.min(width, ui.width)
+            height = math.min(height, ui.height)
+        end
+
         local win_opts = {
             relative = "editor", -- Relative to the whole editor
-            width = 60,
-            height = 2,
-            row = (vim.api.nvim_list_uis()[1].height - 2) / 2,
-            col = (vim.api.nvim_list_uis()[1].width - 60) / 2,
+            width = width,
+            height = height,
+            row = ui and math.floor((ui.height - height) / 2) or 0,
+            col = ui and math.floor((ui.width - width) / 2) or 0,
             border = opts.border,
             title = opts.title,
             -- you can also customize colors with winhl
         }
+
+        if win_opts.row < 0 then
+            win_opts.row = 0
+        end
+        if win_opts.col < 0 then
+            win_opts.col = 0
+        end
 
         vim.api.nvim_open_win(opts.buf, true, win_opts)
     end
