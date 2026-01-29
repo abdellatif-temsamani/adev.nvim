@@ -41,7 +41,7 @@ function M.build_lines(root)
 
     -- Start with help content
     local lines = help.compact_content()
-    table.insert(lines, string.rep("=", 80))
+    table.insert(lines, string.rep("=", #lines[1]))
 
     -- Add root line
     table.insert(lines, "root: " .. root)

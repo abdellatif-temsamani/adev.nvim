@@ -5,9 +5,8 @@ local M = {}
 --- create a popup window to list files with help integrated
 ---@param buf integer buffer id
 ---@param height integer height of window
-function M.create_win(buf, height)
-    local width = 80
-
+---@param width integer width of window
+function M.create_win(buf, height, width)
     ui.window.floating_window {
         buf = buf,
         title = "Adev Files [?: help, q: quit]",

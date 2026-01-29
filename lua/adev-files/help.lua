@@ -6,7 +6,7 @@ local M = {}
 ---@return string[]
 function M.compact_content()
     return {
-        "<CR> enter/open | H parent | yy copy | dd cut | P paste | x del | ? help | q quit",
+        "[  <CR>/L open  | H parent | yy copy | dd cut | P paste | x delete  ]",
     }
 end
 
