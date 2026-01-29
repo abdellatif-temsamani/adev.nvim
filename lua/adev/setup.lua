@@ -35,7 +35,14 @@ function M.setup(opts)
 
     require("adev.commands"):setup()
     if opts.auto_update_check then
-        update_manager.check_update()
+        vim.api.nvim_create_autocmd("VimEnter", {
+            once = true,
+            callback = function()
+                vim.defer_fn(function()
+                    update_manager.check_update()
+                end, 100)
+            end,
+        })
     end
 
     require "adev.lazy" {

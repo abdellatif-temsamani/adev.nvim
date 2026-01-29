@@ -8,7 +8,9 @@ local utils = require "adev-common.utils"
 autocmd(events.vim.startup, {
     group = onbarding_group,
     callback = function()
-        onboarding:onboarding()
+        vim.defer_fn(function()
+            onboarding:onboarding()
+        end, 50)
     end,
 })
 
