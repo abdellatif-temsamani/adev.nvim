@@ -1,4 +1,5 @@
 local help = require "adev-files.help"
+local icons = require "adev-files.icon"
 
 local M = {}
 
@@ -57,7 +58,7 @@ function M.build_lines(root)
 
     table.sort(entries, sort_files)
     for _, entry in ipairs(entries) do
-        table.insert(lines, entry)
+        table.insert(lines, icons.decorate_entry(entry))
     end
 
     return lines
