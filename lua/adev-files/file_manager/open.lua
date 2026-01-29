@@ -7,6 +7,7 @@ local win = require "adev-files.file_manager.window"
 local M = {}
 
 function M.open()
+    local prev_win = vim.api.nvim_get_current_win()
     local root = utils.files.get_dirname()
     root = roots.normalize_root(root)
     local lines = listing.build_lines(root)
@@ -33,6 +34,10 @@ function M.open()
     local max_height = math.max(3, vim.o.lines - 4)
     local height = math.min(math.max(#lines, 12), max_height)
     win.create_win(buf, height)
+
+    local manager_win = vim.api.nvim_get_current_win()
+    pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_win", prev_win)
+    pcall(vim.api.nvim_buf_set_var, buf, "adev_files_win", manager_win)
 end
 
 return M

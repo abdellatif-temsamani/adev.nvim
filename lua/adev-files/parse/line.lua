@@ -23,9 +23,20 @@ function M.parse_line(line)
         return nil, nil
     end
 
-    -- No prefix parsing needed - just use the line as name
-    -- (trailing / determines if it's a directory)
     local name = trim.trim(line)
+    local stripped = name:match "^%S+%s+(.+)$"
+    if stripped then
+        local candidate = trim.trim(stripped)
+        if candidate ~= "" then
+            local candidate_fs = candidate
+            if candidate:sub(-1) == "/" then
+                candidate_fs = candidate:sub(1, -2)
+            end
+            if validate.is_valid_rel_path(candidate_fs) then
+                name = candidate
+            end
+        end
+    end
     if name == "" then
         return nil, nil
     end

@@ -6,7 +6,7 @@ local M = {}
 ---@return string[]
 function M.compact_content()
     return {
-        "<CR> enter | H parent | yy copy | dd cut | P paste | x del | ? help | q quit",
+        "<CR> enter/open | H parent | yy copy | dd cut | P paste | x del | ? help | q quit",
     }
 end
 
@@ -16,7 +16,7 @@ local function content()
         "adev-files",
         "",
         "Navigation",
-        "  <CR>/L/<Right>   enter directory",
+        "  <CR>/L/<Right>   enter directory / open file",
         "  H/<Left>/<BS>    parent directory",
         "  q               quit",
         "",
