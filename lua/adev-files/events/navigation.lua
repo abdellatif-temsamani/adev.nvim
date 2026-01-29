@@ -3,7 +3,7 @@ local utils = require "adev-common.utils"
 local confirm = require "adev-files.events.confirm"
 local config = require "adev-files"
 local parse = require "adev-files.parse"
-local roots = require "adev-files.file_manager.roots"
+local roots = require "adev-files.root"
 local state = require "adev-files.state"
 local sync = require "adev-files.sync"
 

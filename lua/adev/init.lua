@@ -1,56 +1,10 @@
-local defaults = require "adev.defaults"
-local update_manager = require "adev.update_manager"
-local err_notify = require("adev-common.utils").err_notify
+local setup = require "adev.setup"
 
 local M = {}
 
 ---@param opts SetupOpts
 function M.setup(opts)
-    ---@type SetupOpts
-    opts = vim.tbl_deep_extend("force", {}, defaults, opts or {})
-
-    vim.g.mapleader = opts.mapleader
-    vim.g.maplocalleader = opts.mapleader
-
-    vim.o.winborder = opts.ui.border
-
-    ---@type Adev
-    _G.Adev = {
-        git = opts.git,
-        ai_assistant = opts.ai_assistant,
-        catppuccin = opts.catppuccin,
-        ui = opts.ui,
-        flags = opts.flags,
-    }
-
-    if vim.fn.executable(opts.git) == 0 then
-        err_notify "git is not installed"
-        err_notify "Install git"
-        err_notify "And set git path in init.lua"
-        err_notify 'in require "adev.".setup'
-        err_notify '{ git = "/path/to/git" }'
-
-        return
-    end
-
-    require("adev.commands"):setup()
-    if opts.auto_update_check then
-        update_manager.check_update()
-    end
-
-    require "adev.lazy" {
-        git = opts.git,
-        lazy = opts.lazy,
-    }
-
-    if opts.lsp.enable then
-        require("adev.lsp").setup()
-    end
-
-    if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then
-        opts.colorscheme = "default"
-    end
-    vim.cmd(string.format("colorscheme %s", opts.colorscheme))
+    setup.setup(opts)
 end
 
 return M
