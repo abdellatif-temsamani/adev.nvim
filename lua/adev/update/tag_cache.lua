@@ -6,6 +6,7 @@ local cache = { tag = nil, timestamp = nil }
 local CACHE_TTL = 300000
 
 function M.get_cached(now)
+    now = now or vim.uv.now()
     if cache.tag and (now - cache.timestamp) < CACHE_TTL then
         return cache.tag
     end

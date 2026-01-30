@@ -1,3 +1,3 @@
 return function()
-    require("adev.lsp.servers").setup()
+    require("adev.lsp").setup_servers()
 end

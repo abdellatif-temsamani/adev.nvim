@@ -5,7 +5,11 @@ local M = {}
 ---@return string
 local function relpath(root, abs)
     if abs:sub(1, #root) == root then
-        return abs:sub(#root + 1)
+        local rel = abs:sub(#root + 1)
+        if rel:sub(1, 1) == "/" then
+            rel = rel:sub(2)
+        end
+        return rel
     end
     return abs
 end
