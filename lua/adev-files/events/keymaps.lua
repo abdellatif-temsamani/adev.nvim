@@ -21,10 +21,11 @@ function M.attach(buf)
         nav.open_or_enter(buf)
     end)
 
-    set_keymap("n", "K", function() end)
-    set_keymap("n", "J", function() end)
-    set_keymap("n", "<leader>bq", function() end)
-    set_keymap("n", "<leader>n", function() end)
+    -- TODO: may need to disable more keybinds
+    set_keymap("n", "K", "<nop>")
+    set_keymap("n", "J", "<nop>")
+    set_keymap("n", "<leader>bq", "<nop>")
+    set_keymap("n", "<leader>n", "<nop>")
 
     set_keymap("n", "L", function()
         nav.open_or_enter(buf)
