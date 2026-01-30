@@ -1,7 +1,6 @@
 return function()
     local null_setup = require("null-ls").setup
     local builtins = require "null-ls.builtins"
-    local h = require "null-ls.helpers"
 
     local code_actions = builtins.code_actions
 
@@ -39,7 +38,7 @@ return function()
             formatting.pretty_php,
             gdformat,
             formatting.asmfmt,
-            formatting.rustywind,
+            -- NOTE: moving from formatting.rustywind to prettier plugin,
             formatting.djlint,
             formatting.shfmt.with {
                 extra_args = { "-i", "4", "-ci" }, -- change to your dialect

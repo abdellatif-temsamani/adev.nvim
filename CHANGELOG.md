@@ -12,6 +12,47 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
+## [2.0.5] - 2026-01-30
+
+### 🚀 Features
+
+- _(plugins)_ Mdx filetype support
+- _(adev-files)_ Structuring core plugin
+- _(adev)_ Major refactor of file manager and UI infrastructure
+- Adev-files
+- _(adev-files)_ Mini-icons support
+- _(adev-files)_ Opening files
+- _(core)_ Lazy laoding
+
+### 🐛 Bug Fixes
+
+- _(changelog)_ Version display in the title
+- _(lspconfig)_ Lua_ls load
+- Conflict lua_ls x stylua on code formatting
+- _(adev-files)_ Window sizing
+
+### 💼 Other
+
+- _(telescope)_ Changing keymaps
+
+### 🚜 Refactor
+
+- Restructure file manager and remove deprecated code
+- _(core)_ Big refactor
+
+### 📚 Documentation
+
+- _(requirement)_ Update min version of deps
+
+### ⚙️ Plugins
+
+- _(none-ls)_ Disabled rustywind
+- _(adev-files)_ Disable some keymaps
+
+### ⚙️ Miscellaneous Tasks
+
+- Update cliff.toml
+
 ## [2.0.4] - 2026-01-20
 
 ### 🚀 Features

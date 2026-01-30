@@ -9,14 +9,9 @@ return {
     cond = Adev.flags.experimental_adev_files,
     keys = {
         {
-            "<leader>nl",
-            require("adev-files.actions").list,
+            "<leader>n",
+            require("adev-files").open,
             desc = "list files in cwd",
-        },
-        {
-            "<leader>na",
-            require("adev-files.actions").create,
-            desc = "create a file/dir",
         },
     },
 }

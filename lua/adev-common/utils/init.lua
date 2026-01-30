@@ -13,6 +13,7 @@ local Utils = {
         "lazy-lock.json",
     },
     files = require "adev-common.utils.files",
+    buffers = require "adev-common.utils.buffers",
 }
 
 ---@param msg string
@@ -73,6 +74,22 @@ end
 ---@param delay number? Delay in milliseconds `default = 2000`
 function Utils.restart_neovim(delay)
     delay = delay or 2000
+
+    local ui = require "adev-common.ui"
+    local buf = Utils.buffers.create({ "# adev.nvim", "## updated configuration" }, {
+        bo = {
+            bufhidden = "wipe",
+            filetype = "markdown",
+            modifiable = true,
+        },
+    })
+
+    ui.window.floating_window {
+        buf = buf,
+        title = "Adev.nvim",
+        width = 0.2,
+        height = 0.1,
+    }
 
     Utils.notify("restarting neovim in " .. delay .. "ms", vim.log.levels.TRACE)
     vim.defer_fn(function()

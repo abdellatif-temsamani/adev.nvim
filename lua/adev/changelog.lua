@@ -66,19 +66,19 @@ function M.show_changelog(args)
         return
     end
 
-    local buf = ui.window.create_buf(vim.split(changelog, "\n"), {
+    local buf = utils.buffers.create(vim.split(changelog, "\n"), {
         listed = false,
         scratch = true,
         bo = {
             modifiable = false,
             filetype = "markdown",
+            bufhidden = "wipe",
         },
     })
 
     ui.window.floating_window {
         buf = buf,
-        title = "Adev.nvim Changelog - " .. (args and args.args or git.get_version() or "Unknown"),
-        border = Adev.ui.border,
+        title = "Adev.nvim Changelog - " .. (git.get_version() or "Unknown"),
         width = 0.8,
         height = 0.8,
         wo = {
@@ -106,19 +106,19 @@ function M.get_info()
         "- `URL`: [github](https://github.com/abdellatif-temsamani/adev.nvim/)",
     }
 
-    local buf = ui.window.create_buf(message, {
+    local buf = utils.buffers.create(message, {
         listed = false,
         scratch = true,
         bo = {
             modifiable = false,
             filetype = "markdown",
+            bufhidden = "wipe",
         },
     })
 
     ui.window.floating_window {
         buf = buf,
         title = "Adev.nvim Info",
-        border = Adev.ui.border,
         width = 0.3,
         height = 0.3,
         wo = {
