@@ -1,5 +1,4 @@
 local help = require "adev-files.help"
-local icons = require "adev-files.icon"
 
 local M = {}
 
@@ -34,18 +33,25 @@ local function sort_files(a, b)
     return a_name < b_name
 end
 
+--- Build header lines for virtual text display
+--- Returns a list of {text, highlight_group} pairs for each line
+---@param root string
+---@return table[] header_lines Each item is {text, hl_group}
+function M.build_header(root)
+    local help_line = help.compact_content()[1]
+    return {
+        { help_line, "Comment" },
+        { string.rep("=", #help_line), "Comment" },
+        { "root: " .. root, "Directory" },
+        { "", "Normal" },
+    }
+end
+
+--- Build file entry lines (without icons - icons are virtual text)
 ---@param root string
 ---@return string[]
 function M.build_lines(root)
     local files = vim.fs.dir(root)
-
-    -- Start with help content
-    local lines = help.compact_content()
-    table.insert(lines, string.rep("=", #lines[1]))
-
-    -- Add root line
-    table.insert(lines, "root: " .. root)
-    table.insert(lines, "")
 
     -- Collect file entries
     local entries = {}
@@ -57,11 +63,7 @@ function M.build_lines(root)
     end
 
     table.sort(entries, sort_files)
-    for _, entry in ipairs(entries) do
-        table.insert(lines, icons.decorate_entry(entry))
-    end
-
-    return lines
+    return entries
 end
 
 return M
