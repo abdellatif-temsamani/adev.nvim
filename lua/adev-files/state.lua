@@ -1,6 +1,7 @@
 local M = {}
 
 local NS = vim.api.nvim_create_namespace "adev-files"
+local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
 
 ---@class AdevFilesMark
 ---@field kind 'file'|'directory'
@@ -18,6 +19,10 @@ local states = {}
 
 function M.ns()
     return NS
+end
+
+function M.display_ns()
+    return DISPLAY_NS
 end
 
 ---@param buf integer

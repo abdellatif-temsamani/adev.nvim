@@ -7,18 +7,34 @@ local M = {}
 function M.check_update()
     local now = vim.uv.now()
     local cached = cache.get_cached(now)
-    if cached then
-        utils.notify("adev.nvim: " .. cached)
-        return
+
+    local function check(current, latest)
+        if current == latest then
+            utils.notify "adev.nvim is up to date"
+        else
+            utils.notify("adev.nvim: Update available " .. current .. " -> " .. latest)
+        end
     end
 
-    cache.fetch_latest(function(tag)
-        if not tag then
-            utils.notify("adev.nvim: Unable to check updates", vim.log.levels.WARN)
+    git.get_version(function(current)
+        if not current then
+            utils.notify("adev.nvim: Unable to get current version", vim.log.levels.WARN)
             return
         end
-        utils.notify("adev.nvim: " .. tag)
-    end, now)
+
+        if cached then
+            check(current, cached)
+            return
+        end
+
+        cache.fetch_latest(function(tag)
+            if not tag then
+                utils.notify("adev.nvim: Unable to check updates", vim.log.levels.WARN)
+                return
+            end
+            check(current, tag)
+        end, now)
+    end)
 end
 
 function M.update()
