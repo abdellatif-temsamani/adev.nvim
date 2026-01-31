@@ -57,10 +57,11 @@ function M.plan_ops(buf)
     local ops = {}
 
     -- Detect creates: entries in current but not in original
+    local create_ops = {}
     for path, info in pairs(current_entries_by_path) do
         if not original_paths[path] then
             -- This path didn't exist before, it's a create
-            table.insert(ops, {
+            table.insert(create_ops, {
                 type = "create",
                 kind = info.entry.kind,
                 path = path,
@@ -77,6 +78,7 @@ function M.plan_ops(buf)
     end
 
     -- Handle entries at extmark positions (potential renames or unchanged)
+    local rename_dsts = {}
     for _, m in ipairs(extmarks) do
         local id, row = m[1], m[2]
         local orig = st.marks[id]
@@ -95,16 +97,25 @@ function M.plan_ops(buf)
                     -- Check if the original file still exists elsewhere
                     if not current_entries_by_path[orig.abs_path] then
                         -- Original doesn't exist elsewhere, so this is a rename
+                        local dst = join(st.root, entry.fs_name)
                         table.insert(ops, {
                             type = "rename",
                             kind = orig.kind,
                             src = orig.abs_path,
-                            dst = join(st.root, entry.fs_name),
+                            dst = dst,
                         })
+                        rename_dsts[dst] = true
                     end
                     -- If original does exist elsewhere, the create was already added above
                 end
             end
+        end
+    end
+
+    -- Add creates that are not rename destinations
+    for _, op in ipairs(create_ops) do
+        if not rename_dsts[op.path] then
+            table.insert(ops, op)
         end
     end
 
