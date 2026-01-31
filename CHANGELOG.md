@@ -12,7 +12,7 @@ Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
 Dev, featuring a modern and efficient development environment with carefully
 curated plugins and settings.
 
-## [2.0.5] - 2026-01-31
+## [2.0.5-1] - 2026-01-31
 
 ### 🚀 Features
 
