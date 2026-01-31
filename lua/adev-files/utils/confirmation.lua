@@ -9,6 +9,8 @@ local M = {}
 ---@field height? integer
 ---@field footer? string
 
+local CONFIRM_NS = vim.api.nvim_create_namespace "adev_files_confirm"
+
 ---@param lines string[]
 ---@param opts? AdevFilesConfirmOpts
 ---@param cb fun(confirmed: boolean): nil
@@ -18,8 +20,7 @@ function M.open(lines, opts, cb)
     for _, l in ipairs(lines or {}) do
         table.insert(content, l)
     end
-    table.insert(content, "")
-    table.insert(content, opts.footer or "y/<CR>: apply    n/q/<Esc>: cancel")
+    -- Footer is now virtual text, not real buffer content
 
     local buf = buffers.create(content, {
         scratch = true,
@@ -30,6 +31,17 @@ function M.open(lines, opts, cb)
             bufhidden = "wipe",
             filetype = "adev_files_confirm",
         },
+    })
+
+    -- Add footer as virtual text below the content
+    local footer = opts.footer or "y/<CR>: apply    n/q/<Esc>: cancel"
+    local last_line = math.max(0, #content - 1)
+    vim.api.nvim_buf_set_extmark(buf, CONFIRM_NS, last_line, 0, {
+        virt_lines = {
+            { { "", "Normal" } },
+            { { footer, "Comment" } },
+        },
+        virt_lines_above = false,
     })
 
     local finished = false

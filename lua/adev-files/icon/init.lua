@@ -1,8 +1,9 @@
-local file_icons = require "adev-files.icon.file"
 local directory_icons = require "adev-files.icon.directory"
+local file_icons = require "adev-files.icon.file"
 
 local M = {}
 
+--- Get icon and highlight group for an entry
 ---@param entry string
 ---@return string icon
 ---@return string hl

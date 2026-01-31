@@ -1,6 +1,7 @@
 local utils = require "adev-common.utils"
 
 local listing = require "adev-files.file_manager.listing"
+local render = require "adev-files.file_manager.render"
 local roots = require "adev-files.file_manager.roots"
 local win = require "adev-files.file_manager.window"
 
@@ -24,6 +25,9 @@ function M.open()
         },
     })
 
+    -- Add virtual text for header and icons
+    render.add_virtual_text(buf, root)
+
     -- avoid E32 and make buffer identity stable
     vim.api.nvim_buf_set_name(buf, "adev-files://" .. root)
 
@@ -38,6 +42,9 @@ function M.open()
     local manager_win = vim.api.nvim_get_current_win()
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_win", prev_win)
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_win", manager_win)
+
+    -- Position cursor at first file entry (line 1)
+    pcall(vim.api.nvim_win_set_cursor, 0, { 1, 0 })
 end
 
 return M
