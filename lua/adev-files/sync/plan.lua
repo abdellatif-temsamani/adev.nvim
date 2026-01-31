@@ -90,9 +90,6 @@ function M.plan_ops(buf)
                 -- Row is empty or unparsable - mark for deletion
                 -- (will be handled in deletes section if path not found elsewhere)
             else
-                if entry.kind ~= orig.kind then
-                    return nil, string.format("line %d: cannot change kind", row + 1)
-                end
                 if entry.fs_name ~= orig.fs_name then
                     -- Different name at this extmark's row
                     -- Check if the original file still exists elsewhere
