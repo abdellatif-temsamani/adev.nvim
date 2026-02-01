@@ -100,4 +100,38 @@ function M.go_parent(buf)
     end)
 end
 
+--- quit file manager
+---@param buf integer
+function M.quit(buf)
+    local st = state.get(buf)
+    if not st or st.applying then
+        return
+    end
+
+    confirm.confirm_discard_if_modified(buf, function(ok)
+        if not ok then
+            return
+        end
+
+        local ok_var, manager_win = pcall(vim.api.nvim_buf_get_var, buf, "adev_files_win")
+        if ok_var and manager_win then
+            local ok_win, is_valid = pcall(vim.api.nvim_win_is_valid, manager_win)
+            if ok_win and is_valid then
+                pcall(vim.api.nvim_win_close, manager_win, true)
+            end
+        end
+
+        for _, win_id in ipairs(vim.fn.win_findbuf(buf)) do
+            if manager_win and win_id == manager_win then
+                goto continue
+            end
+            local ok_win, is_valid = pcall(vim.api.nvim_win_is_valid, win_id)
+            if ok_win and is_valid then
+                pcall(vim.api.nvim_win_close, win_id, true)
+            end
+            ::continue::
+        end
+    end)
+end
+
 return M

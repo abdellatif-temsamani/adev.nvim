@@ -49,7 +49,7 @@ function M.plan_ops(buf)
 
     -- Build set of original paths for quick lookup
     local original_paths = {}
-    for _, mark in pairs(st.marks) do
+    for _, mark in pairs(st.original_marks or {}) do
         original_paths[mark.abs_path] = mark
     end
 
@@ -81,7 +81,7 @@ function M.plan_ops(buf)
     local rename_dsts = {}
     for _, m in ipairs(extmarks) do
         local id, row = m[1], m[2]
-        local orig = st.marks[id]
+        local orig = (st.original_marks or {})[id]
         if orig then
             local line = lines[row + 1] or ""
             local entry, err = parse.parse_line(line)
@@ -120,7 +120,7 @@ function M.plan_ops(buf)
     end
 
     -- Detect deletes: original entries not found in current
-    for _, orig in pairs(st.marks) do
+    for _, orig in pairs(st.original_marks or {}) do
         if not current_entries_by_path[orig.abs_path] then
             -- Check if this original was renamed (has a rename op from it)
             local was_renamed = false

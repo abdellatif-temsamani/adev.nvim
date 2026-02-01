@@ -11,13 +11,14 @@ local function join(root, fs_name)
 end
 
 ---@param buf integer
-function M.reindex(buf)
+---@param ns integer
+---@return table<integer, AdevFilesMark>
+local function build_marks(buf, ns, right_gravity)
     local st = state.get(buf)
     if not st then
-        return
+        return {}
     end
 
-    local ns = state.ns()
     vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
 
     local marks = {}
@@ -28,7 +29,7 @@ function M.reindex(buf)
             -- leave the line untracked; we never want to do destructive ops
             -- when we can't parse an existing entry.
         elseif entry then
-            local id = vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, { right_gravity = false })
+            local id = vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, { right_gravity = right_gravity == true })
             marks[id] = {
                 kind = entry.kind,
                 name = entry.name,
@@ -38,7 +39,29 @@ function M.reindex(buf)
         end
     end
 
-    state.set_marks(buf, marks)
+    return marks
+end
+
+---@param buf integer
+function M.index_original(buf)
+    local st = state.get(buf)
+    if not st then
+        return
+    end
+
+    local marks = build_marks(buf, state.ns(), true)
+    state.set_original_marks(buf, marks)
+end
+
+---@param buf integer
+function M.reindex(buf)
+    local st = state.get(buf)
+    if not st then
+        return
+    end
+
+    local marks = build_marks(buf, state.live_ns(), false)
+    state.set_live_marks(buf, marks)
 end
 
 return M

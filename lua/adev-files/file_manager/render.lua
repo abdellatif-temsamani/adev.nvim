@@ -2,6 +2,7 @@ local M = {}
 
 local icons = require "adev-files.icon"
 local listing = require "adev-files.file_manager.listing"
+local parse = require "adev-files.parse"
 local state = require "adev-files.state"
 
 --- Add virtual text header and icons to buffer
@@ -10,7 +11,28 @@ local state = require "adev-files.state"
 ---@param lines string[]
 local function add_virtual_text(buf, root, lines)
     local ns = state.display_ns()
+    local mark_ns = state.ns()
+    local st = state.get(buf)
+    local marks_by_row = {}
+    local current_paths = {}
     vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+
+    if st then
+        for _, line in ipairs(lines) do
+            local parsed = select(1, parse.parse_line(line))
+            if parsed then
+                current_paths[st.root .. parsed.fs_name] = true
+            end
+        end
+    end
+
+    if st and st.original_marks then
+        local extmarks = vim.api.nvim_buf_get_extmarks(buf, mark_ns, 0, -1, {})
+        for _, m in ipairs(extmarks) do
+            local id, row = m[1], m[2]
+            marks_by_row[row] = st.original_marks[id]
+        end
+    end
 
     -- Build virtual header lines
     local header = listing.build_header(root)
@@ -44,6 +66,31 @@ local function add_virtual_text(buf, root, lines)
             virt_text = { { prefix, hl ~= "" and hl or "Normal" } },
             virt_text_pos = "inline",
         })
+
+        local mark = marks_by_row[i - 1]
+        local parsed = select(1, parse.parse_line(entry))
+        if parsed then
+            if mark then
+                if parsed.fs_name ~= mark.fs_name then
+                    if not current_paths[mark.abs_path] then
+                        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
+                            virt_text = { { "  R rename", "DiffChange" } },
+                            virt_text_pos = "eol",
+                        })
+                    else
+                        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
+                            virt_text = { { "  + create", "DiffAdd" } },
+                            virt_text_pos = "eol",
+                        })
+                    end
+                end
+            else
+                vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
+                    virt_text = { { "  + create", "DiffAdd" } },
+                    virt_text_pos = "eol",
+                })
+            end
+        end
     end
 end
 
