@@ -6,7 +6,7 @@ local M = {}
 ---@return string[]
 function M.compact_content()
     return {
-        "[  <CR>/L open  | H parent | yy copy | dd cut | P paste | x delete  ]",
+        "[  <CR>/L open | H parent | yy copy | dd cut | P paste | X delete | q quit  ]",
     }
 end
 
@@ -30,7 +30,7 @@ local function content()
         "  Edit entries in-place, then :write to apply",
         "",
         "Delete",
-        "  x               delete (normal/visual)",
+        "  X               delete (normal/visual)",
         "",
         "Confirm",
         "  y/<CR>           confirm",
@@ -62,6 +62,7 @@ function M.open()
         wo = { wrap = false },
     }
 
+    vim.keymap.set("n", "q", "<cmd>bwipeout<CR>", { buffer = buf })
     vim.keymap.set("n", "<esc>", "<cmd>bwipeout<CR>", { buffer = buf })
 end
 

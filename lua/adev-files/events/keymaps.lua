@@ -43,6 +43,10 @@ function M.attach(buf)
         nav.go_parent(buf)
     end)
 
+    set_keymap("n", "q", function()
+        nav.quit(buf)
+    end)
+
     set_keymap({ "n", "x" }, "yy", function()
         clipboard.set_clipboard(buf, "copy")
     end)

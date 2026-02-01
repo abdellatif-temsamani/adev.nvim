@@ -1,6 +1,7 @@
 local M = {}
 
 local NS = vim.api.nvim_create_namespace "adev-files"
+local LIVE_NS = vim.api.nvim_create_namespace "adev_files_live"
 local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
 
 ---@class AdevFilesMark
@@ -11,7 +12,8 @@ local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
 
 ---@class AdevFilesState
 ---@field root string
----@field marks table<integer, AdevFilesMark>
+---@field original_marks table<integer, AdevFilesMark>
+---@field live_marks table<integer, AdevFilesMark>
 ---@field applying boolean
 
 ---@type table<integer, AdevFilesState>
@@ -25,13 +27,18 @@ function M.display_ns()
     return DISPLAY_NS
 end
 
+function M.live_ns()
+    return LIVE_NS
+end
+
 ---@param buf integer
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, marks = {}, applying = false }
+    states[buf] = states[buf] or { root = root, original_marks = {}, live_marks = {}, applying = false }
     states[buf].root = root
-    states[buf].marks = {}
+    states[buf].original_marks = {}
+    states[buf].live_marks = {}
     states[buf].applying = false
     return states[buf]
 end
@@ -44,11 +51,20 @@ end
 
 ---@param buf integer
 ---@param marks table<integer, AdevFilesMark>
-function M.set_marks(buf, marks)
+function M.set_original_marks(buf, marks)
     if not states[buf] then
         return
     end
-    states[buf].marks = marks
+    states[buf].original_marks = marks
+end
+
+---@param buf integer
+---@param marks table<integer, AdevFilesMark>
+function M.set_live_marks(buf, marks)
+    if not states[buf] then
+        return
+    end
+    states[buf].live_marks = marks
 end
 
 ---@param buf integer

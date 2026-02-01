@@ -12,18 +12,22 @@ end
 ---@return string icon
 ---@return string hl
 function M.get_icon(name)
+    local fallback_icon, fallback_hl = "f", "MiniFilesFile"
     local ft = detect_filetype(name)
     if not ft then
-        return "", ""
+        return fallback_icon, fallback_hl
     end
 
     local ok, mini_icons = pcall(require, "mini.icons")
     if not ok then
-        return "", ""
+        return fallback_icon, fallback_hl
     end
 
     local icon, hl = mini_icons.get("filetype", ft)
-    return icon or "", hl or ""
+    if not icon or icon == "" then
+        return fallback_icon, fallback_hl
+    end
+    return icon, hl or fallback_hl
 end
 
 return M

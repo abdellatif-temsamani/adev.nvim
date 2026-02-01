@@ -300,15 +300,16 @@ alternative to external file explorers with deeper Neovim integration.
 
 FEATURES						*adev-files-features*
 
-Current MVP features:
-- Create new files and directories
-- List files and directories with filtering
+Current features:
+- Floating file manager for the current directory
+- Navigate directories and open files
+- Create/rename/move/copy/delete files and directories
+- Multi-selection operations via visual mode
+- Apply edits with confirmation dialog
 
 Planned features:
 - Respect git ignored files
 - Integration with LSP rename operations
-- Move/copy/delete files and directories
-- Multi-file selection and operations
 
 ENABLING ADEV-FILES					*adev-files-enable*
 
@@ -328,18 +329,30 @@ KEYMAPS							*adev-files-keymaps*
 
 | Mapping    | Description              |
 |------------|--------------------------|
-| <leader>na | Create new file/directory |
-| <leader>nl | List files in directory   |
+| <leader>n  | Open Adev Files           |
+
+In-buffer mappings:
+
+| Mapping         | Description                              |
+|----------------|------------------------------------------|
+| <CR>/L/<Right>  | Enter directory / open file               |
+| H/<Left>/<BS>   | Parent directory                          |
+| yy              | Copy selection (normal/visual)            |
+| dd              | Cut/move selection (normal/visual)        |
+| P               | Paste into current dir / dir under cursor |
+| yc              | Clear clipboard                           |
+| X               | Delete selection (normal/visual)          |
+| ?               | Help                                      |
+| q               | Quit                                      |
 
 USAGE							*adev-files-usage*
 
-Creating files: >
-:lua require('adev-files').create()
+Open the file manager: >
+:lua require('adev-files').open()
 <
 
-Listing files: >
-:lua require('adev-files').list()
-<
+Create, rename, or delete entries by editing lines in the buffer, then apply
+changes with `:write` and confirm when prompted.
 
 The system is designed to work seamlessly with Neovim's buffer management and
 provides a more integrated experience than traditional file explorers.

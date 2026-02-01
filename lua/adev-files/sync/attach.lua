@@ -3,6 +3,7 @@ local utils = require "adev-common.utils"
 local apply = require "adev-files.sync.apply"
 local index = require "adev-files.sync.index"
 local plan = require "adev-files.sync.plan"
+local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
 
 local M = {}
@@ -11,6 +12,7 @@ local M = {}
 ---@param root string
 function M.attach(buf, root)
     local st = state.init(buf, root)
+    index.index_original(buf)
     index.reindex(buf)
 
     local group = vim.api.nvim_create_augroup("adev_files_" .. buf, { clear = true })
@@ -53,6 +55,30 @@ function M.attach(buf, root)
         buffer = buf,
         callback = function(args)
             state.clear(args.buf)
+        end,
+    })
+
+    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
+        group = group,
+        buffer = buf,
+        callback = function(args)
+            local b = args.buf
+            local s = state.get(b)
+            if not s or s.applying then
+                return
+            end
+
+            vim.schedule(function()
+                if not vim.api.nvim_buf_is_valid(b) then
+                    return
+                end
+                local s0 = state.get(b)
+                if not s0 or s0.applying then
+                    return
+                end
+                index.reindex(b)
+                render.add_virtual_text(b, s0.root)
+            end)
         end,
     })
 

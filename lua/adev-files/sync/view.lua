@@ -13,6 +13,7 @@ function M.refresh(buf)
     end
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. (st.root or "./"))
     render.render(buf, st.root)
+    index.index_original(buf)
     index.reindex(buf)
 end
 
@@ -26,6 +27,7 @@ function M.set_root(buf, root)
     st.root = roots.normalize_root(root)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. st.root)
     render.render(buf, st.root)
+    index.index_original(buf)
     index.reindex(buf)
 end
 
