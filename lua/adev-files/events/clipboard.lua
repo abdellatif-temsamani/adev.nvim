@@ -4,6 +4,8 @@ local clipboard = require "adev-files.clipboard"
 local selection = require "adev-files.events.selection"
 local parse = require "adev-files.parse"
 local state = require "adev-files.state"
+local marks = require "adev-files.core.marks"
+local path = require "adev-files.utils.fs.path"
 local sync = require "adev-files.sync"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
@@ -21,19 +23,6 @@ local function split_name_ext(name)
     return name:sub(1, dot - 1), name:sub(dot)
 end
 
----@param root string
----@param abs string
----@return string
-local function relpath(root, abs)
-    if abs:sub(1, #root) == root then
-        local rel = abs:sub(#root + 1)
-        if rel:sub(1, 1) == "/" then
-            rel = rel:sub(2)
-        end
-        return rel
-    end
-    return abs
-end
 
 ---@param buf integer
 ---@param root string
@@ -64,7 +53,7 @@ local function build_row_by_abs(buf, root)
         if not is_deleted then
             local entry = select(1, parse.parse_line(clean))
             if entry then
-                rows[root .. entry.fs_name] = i - 1
+                rows[vim.fn.fnamemodify(root .. entry.fs_name, ":p")] = i - 1
             end
         end
     end
@@ -107,9 +96,22 @@ end
 ---@param buf integer
 ---@param mode 'copy'|'move'
 function M.set_clipboard(buf, mode)
-    local items = selection.collect_entries(buf)
+    local items, skipped = selection.collect_entries(buf)
     if #items == 0 then
+        if skipped and skipped > 0 then
+            utils.err_notify(
+                string.format("Cannot %s non-existent entries", mode == "copy" and "copy" or "move"),
+                "adev-files"
+            )
+        end
         return
+    end
+    if skipped and skipped > 0 then
+        utils.notify(
+            string.format("Skipped %d non-existent entr%s", skipped, skipped == 1 and "y" or "ies"),
+            vim.log.levels.INFO,
+            "adev-files"
+        )
     end
     clipboard.set(mode, items)
     utils.notify(
@@ -148,11 +150,45 @@ function M.paste(buf, rel_dir)
         dest_root = dest_root .. cleaned
     end
 
+    local items = clip.items
+    if clip.mode == "move" then
+        local dest_root_abs = vim.fn.fnamemodify(dest_root, ":p")
+        if dest_root_abs:sub(-1) ~= "/" then
+            dest_root_abs = dest_root_abs .. "/"
+        end
+        local filtered = {}
+        local skipped = 0
+        for _, item in ipairs(items) do
+            local src = (item.src or ""):gsub("/+$", "")
+            local parent = vim.fn.fnamemodify(src, ":h")
+            if parent:sub(-1) ~= "/" then
+                parent = parent .. "/"
+            end
+            if parent == dest_root_abs then
+                skipped = skipped + 1
+            else
+                table.insert(filtered, item)
+            end
+        end
+        if #filtered == 0 then
+            utils.err_notify("Cannot move into same directory", "adev-files")
+            return
+        end
+        if skipped > 0 then
+            utils.notify(
+                string.format("Skipped %d same-directory entr%s", skipped, skipped == 1 and "y" or "ies"),
+                vim.log.levels.INFO,
+                "adev-files"
+            )
+        end
+        items = filtered
+    end
+
     local ops = {}
     local row_by_abs = build_row_by_abs(buf, st.root)
     local mark_rows = {}
     if clip.mode == "move" then
-        for _, item in ipairs(clip.items) do
+        for _, item in ipairs(items) do
             local row = row_by_abs[item.src]
             if row ~= nil then
                 mark_rows[row] = true
@@ -167,23 +203,22 @@ function M.paste(buf, rel_dir)
     end
 
     local existing_abs = build_existing_abs(buf, st.root)
-    local pending_ns = state.pending_ns()
     local insert_at = vim.api.nvim_buf_line_count(buf)
-    for _, item in ipairs(clip.items) do
+    for _, item in ipairs(items) do
         local src = (item.src or ""):gsub("/+$", "")
         local base = vim.fs.basename(src)
         local dst = unique_dest(dest_root, base, existing_abs)
 
-        local rel = relpath(st.root, dst)
+        local rel = path.relpath(st.root, dst)
         if item.kind == "directory" and rel:sub(-1) ~= "/" then
             rel = rel .. "/"
         end
         vim.api.nvim_buf_set_lines(buf, insert_at, insert_at, false, { rel })
-        local mark_id = vim.api.nvim_buf_set_extmark(buf, pending_ns, insert_at, 0, { right_gravity = false })
+        local dst_id = marks.ensure_row(buf, insert_at)
         insert_at = insert_at + 1
 
         existing_abs[dst] = true
-        table.insert(ops, { type = clip.mode, src = item.src, dst = dst, mark_id = mark_id })
+        table.insert(ops, { type = clip.mode, src = item.src, dst = dst, dst_id = dst_id, kind = item.kind })
     end
 
     if #ops == 0 then

@@ -15,6 +15,7 @@ function M.attach(buf, root)
     local st = state.init(buf, root)
     index.index_original(buf)
     index.reindex(buf)
+    render.add_virtual_text(buf, root)
 
     local group = vim.api.nvim_create_augroup("adev_files_" .. buf, { clear = true })
 
@@ -46,22 +47,15 @@ function M.attach(buf, root)
                     return
                 end
 
-                local merged = {}
                 local has_move = false
-                for _, op in ipairs(state.get_pending_ops(b)) do
-                    table.insert(merged, op)
-                    if op.type == "move" then
-                        has_move = true
-                    end
-                end
                 for _, op in ipairs(ops0) do
-                    table.insert(merged, op)
                     if op.type == "move" then
                         has_move = true
+                        break
                     end
                 end
 
-                apply.apply_ops_with_confirm(b, merged, {
+                apply.apply_ops_with_confirm(b, ops0, {
                     title = "adev-files",
                     on_success = function()
                         state.clear_pending_ops(b)

@@ -1,48 +1,27 @@
 local parse = require "adev-files.parse"
 local state = require "adev-files.state"
+local view = require "adev-files.core.view"
+local marks = require "adev-files.core.marks"
 
 local M = {}
 
 ---@param buf integer
----@return table<integer, AdevFilesMark>, AdevFilesState|nil
-local function build_marks_by_row(buf)
-    local st = state.get(buf)
-    if not st or not st.original_marks then
-        return {}, st
-    end
-
-    local mark_ns = state.ns()
-    local marks_by_row = {}
-    local extmarks = vim.api.nvim_buf_get_extmarks(buf, mark_ns, 0, -1, {})
-    for _, m in ipairs(extmarks) do
-        local id, row = m[1], m[2]
-        marks_by_row[row] = st.original_marks[id]
-    end
-
-    return marks_by_row, st
-end
-
----@param buf integer
----@param row integer
+---@param node_id integer|nil
+---@param abs_path string|nil
 ---@return AdevFilesOp[]
-local function remove_pending_ops_at_row(buf, row)
+local function remove_pending_ops_at_row(buf, node_id, abs_path)
     local pending = state.get_pending_ops(buf)
     if not pending or #pending == 0 then
         return {}
     end
 
-    local pending_ns = state.pending_ns()
     local updated = {}
     local removed = {}
     for _, op in ipairs(pending) do
-        if (op.type == "copy" or op.type == "move") and op.mark_id then
-            local pos = vim.api.nvim_buf_get_extmark_by_id(buf, pending_ns, op.mark_id, {})
-            if pos and #pos > 0 and pos[1] == row then
-                table.insert(removed, op)
-                pcall(vim.api.nvim_buf_del_extmark, buf, pending_ns, op.mark_id)
-            else
-                table.insert(updated, op)
-            end
+        if (op.type == "copy" or op.type == "move") and (
+            (node_id and op.dst_id == node_id) or (abs_path and op.dst == abs_path)
+        ) then
+            table.insert(removed, op)
         else
             table.insert(updated, op)
         end
@@ -94,12 +73,27 @@ function M.revert_current_line(buf)
     local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
     local clean, is_deleted = parse.strip_delete_marker(line)
 
-    local marks_by_row, st = build_marks_by_row(buf)
+    local st = state.get(buf)
     if not st then
         return
     end
 
-    local removed_ops = remove_pending_ops_at_row(buf, row)
+    local entries, err = view.parse_buffer(buf)
+    if err then
+        return
+    end
+    local row_to_id = marks.sync(buf, entries)
+    local node_id = row_to_id[row]
+    local row_entry = nil
+    for _, item in ipairs(entries) do
+        if item.row == row then
+            row_entry = item.entry
+            break
+        end
+    end
+    local abs_path = row_entry and (st.root .. row_entry.fs_name) or nil
+
+    local removed_ops = remove_pending_ops_at_row(buf, node_id, abs_path)
     if #removed_ops > 0 then
         vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
         restore_move_sources(buf, st, removed_ops)
@@ -111,11 +105,15 @@ function M.revert_current_line(buf)
         return
     end
 
-    local mark = marks_by_row[row]
-    if mark then
+    local original = node_id and st.model and st.model.original_by_id[node_id] or nil
+    if original then
         local entry = select(1, parse.parse_line(clean))
-        if entry and entry.fs_name ~= mark.fs_name then
-            vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { mark.name })
+        if entry and entry.fs_name ~= original.fs_name then
+            local display = original.fs_name
+            if original.kind == "directory" then
+                display = original.fs_name .. "/"
+            end
+            vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { display })
         end
         return
     end
