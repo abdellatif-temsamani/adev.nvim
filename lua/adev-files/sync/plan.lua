@@ -3,6 +3,18 @@ local state = require "adev-files.state"
 
 local M = {}
 
+---@param op AdevFilesOp
+---@return string
+local function op_key(op)
+    if op.type == "delete" or op.type == "create" then
+        return string.format("%s:%s", op.type, op.path or "")
+    end
+    if op.type == "rename" or op.type == "copy" or op.type == "move" then
+        return string.format("%s:%s->%s", op.type, op.src or "", op.dst or "")
+    end
+    return "unknown"
+end
+
 ---@class AdevFilesOp
 ---@field type 'create'|'delete'|'rename'|'copy'|'move'
 ---@field kind? 'file'|'directory'
@@ -28,10 +40,55 @@ function M.plan_ops(buf)
     local ns = state.ns()
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
 
+    local pending_dsts = {}
+    local pending_move_srcs = {}
+    local pending_ops = state.get_pending_ops(buf)
+    if #pending_ops > 0 then
+        local pending_ns = state.pending_ns()
+        local updated_pending = {}
+        for _, op in ipairs(pending_ops) do
+            if op.type == "copy" or op.type == "move" then
+                if op.mark_id then
+                    local pos = vim.api.nvim_buf_get_extmark_by_id(buf, pending_ns, op.mark_id, {})
+                    if pos and #pos > 0 then
+                        local row = pos[1]
+                        local line = lines[row + 1] or ""
+                        local entry, err = parse.parse_line(line)
+                        if err then
+                            return nil, string.format("line %d: %s", row + 1, err)
+                        end
+                        if entry then
+                            op.dst = join(st.root, entry.fs_name)
+                            pending_dsts[op.dst] = true
+                            if op.type == "move" and op.src then
+                                pending_move_srcs[op.src] = true
+                            end
+                            table.insert(updated_pending, op)
+                        end
+                    end
+                else
+                    if op.dst then
+                        pending_dsts[op.dst] = true
+                    end
+                    if op.type == "move" and op.src then
+                        pending_move_srcs[op.src] = true
+                    end
+                    table.insert(updated_pending, op)
+                end
+            end
+        end
+        state.set_pending_ops(buf, updated_pending)
+    end
+
     -- Build map of current entries by their absolute path
     local current_entries_by_path = {}
     for i = 1, #lines do
-        local entry, err = parse.parse_line(lines[i])
+        local clean, is_deleted = parse.strip_delete_marker(lines[i])
+        if is_deleted then
+            goto continue
+        end
+
+        local entry, err = parse.parse_line(clean)
         if err then
             return nil, string.format("line %d: %s", i, err)
         end
@@ -45,6 +102,7 @@ function M.plan_ops(buf)
                 entry = entry,
             }
         end
+        ::continue::
     end
 
     -- Build set of original paths for quick lookup
@@ -59,7 +117,7 @@ function M.plan_ops(buf)
     -- Detect creates: entries in current but not in original
     local create_ops = {}
     for path, info in pairs(current_entries_by_path) do
-        if not original_paths[path] then
+        if not original_paths[path] and not pending_dsts[path] then
             -- This path didn't exist before, it's a create
             table.insert(create_ops, {
                 type = "create",
@@ -84,7 +142,11 @@ function M.plan_ops(buf)
         local orig = (st.original_marks or {})[id]
         if orig then
             local line = lines[row + 1] or ""
-            local entry, err = parse.parse_line(line)
+            local clean, is_deleted = parse.strip_delete_marker(line)
+            if is_deleted then
+                goto extmark_continue
+            end
+            local entry, err = parse.parse_line(clean)
             if err then
                 return nil, string.format("line %d: %s", row + 1, err)
             end
@@ -110,6 +172,7 @@ function M.plan_ops(buf)
                 end
             end
         end
+        ::extmark_continue::
     end
 
     -- Add creates that are not rename destinations
@@ -121,7 +184,7 @@ function M.plan_ops(buf)
 
     -- Detect deletes: original entries not found in current
     for _, orig in pairs(st.original_marks or {}) do
-        if not current_entries_by_path[orig.abs_path] then
+        if not current_entries_by_path[orig.abs_path] and not pending_move_srcs[orig.abs_path] then
             -- Check if this original was renamed (has a rename op from it)
             local was_renamed = false
             for _, op in ipairs(ops) do
@@ -142,6 +205,36 @@ function M.plan_ops(buf)
     end
 
     return ops, nil
+end
+
+---@param buf integer
+---@param ops AdevFilesOp[]
+function M.stage_ops(buf, ops)
+    local st = state.get(buf)
+    if not st or not ops or #ops == 0 then
+        return
+    end
+
+    local pending = state.get_pending_ops(buf)
+    local new_keys = {}
+    for _, op in ipairs(ops) do
+        new_keys[op_key(op)] = true
+    end
+
+    local merged = {}
+    for _, op in ipairs(pending) do
+        if not new_keys[op_key(op)] then
+            table.insert(merged, op)
+        end
+    end
+    for _, op in ipairs(ops) do
+        table.insert(merged, op)
+    end
+
+    state.set_pending_ops(buf, merged)
+    if vim.api.nvim_buf_is_valid(buf) then
+        vim.bo[buf].modified = true
+    end
 end
 
 return M

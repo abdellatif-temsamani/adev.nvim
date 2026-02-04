@@ -3,6 +3,7 @@ local M = {}
 local NS = vim.api.nvim_create_namespace "adev-files"
 local LIVE_NS = vim.api.nvim_create_namespace "adev_files_live"
 local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
+local PENDING_NS = vim.api.nvim_create_namespace "adev_files_pending"
 
 ---@class AdevFilesMark
 ---@field kind 'file'|'directory'
@@ -15,6 +16,7 @@ local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
 ---@field original_marks table<integer, AdevFilesMark>
 ---@field live_marks table<integer, AdevFilesMark>
 ---@field applying boolean
+---@field pending_ops AdevFilesOp[]
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -27,6 +29,10 @@ function M.display_ns()
     return DISPLAY_NS
 end
 
+function M.pending_ns()
+    return PENDING_NS
+end
+
 function M.live_ns()
     return LIVE_NS
 end
@@ -35,11 +41,13 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, original_marks = {}, live_marks = {}, applying = false }
+    states[buf] = states[buf]
+        or { root = root, original_marks = {}, live_marks = {}, applying = false, pending_ops = {} }
     states[buf].root = root
     states[buf].original_marks = {}
     states[buf].live_marks = {}
     states[buf].applying = false
+    states[buf].pending_ops = {}
     return states[buf]
 end
 
@@ -65,6 +73,33 @@ function M.set_live_marks(buf, marks)
         return
     end
     states[buf].live_marks = marks
+end
+
+---@param buf integer
+---@return AdevFilesOp[]
+function M.get_pending_ops(buf)
+    local st = states[buf]
+    if not st then
+        return {}
+    end
+    return st.pending_ops or {}
+end
+
+---@param buf integer
+---@param ops AdevFilesOp[]
+function M.set_pending_ops(buf, ops)
+    if not states[buf] then
+        return
+    end
+    states[buf].pending_ops = ops or {}
+end
+
+---@param buf integer
+function M.clear_pending_ops(buf)
+    if not states[buf] then
+        return
+    end
+    states[buf].pending_ops = {}
 end
 
 ---@param buf integer

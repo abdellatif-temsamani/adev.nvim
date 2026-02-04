@@ -6,7 +6,7 @@ local M = {}
 ---@return string[]
 function M.compact_content()
     return {
-        "[  <CR>/L open | H parent | yy copy | dd cut | P paste | X delete | q quit  ]",
+        "[  <CR>/L open | H parent | yy copy | dd cut | P paste | D delete  ]",
     }
 end
 
@@ -28,9 +28,11 @@ local function content()
         "",
         "Edits",
         "  Edit entries in-place, then :write to apply",
+        "  u               undo edit",
+        "  U               revert current line",
         "",
         "Delete",
-        "  X               delete (normal/visual)",
+        "  D               delete (normal/visual)",
         "",
         "Confirm",
         "  y/<CR>           confirm",

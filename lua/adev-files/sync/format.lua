@@ -45,9 +45,13 @@ function M.format_ops(st, ops)
             end
             table.insert(lines, string.format("rename: %s -> %s", src, dst))
         elseif op.type == "copy" then
-            table.insert(lines, string.format("copy: %s -> %s", op.src, op.dst))
+            local src = relpath(st.root, op.src)
+            local dst = relpath(st.root, op.dst)
+            table.insert(lines, string.format("copy: %s -> %s", src, dst))
         elseif op.type == "move" then
-            table.insert(lines, string.format("move: %s -> %s", op.src, op.dst))
+            local src = relpath(st.root, op.src)
+            local dst = relpath(st.root, op.dst)
+            table.insert(lines, string.format("move: %s -> %s", src, dst))
         end
     end
 

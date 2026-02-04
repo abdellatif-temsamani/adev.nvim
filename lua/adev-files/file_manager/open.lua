@@ -25,8 +25,8 @@ function M.open()
         },
     })
 
-    -- Add virtual text for header and icons
-    render.add_virtual_text(buf, root)
+    -- Render header + entries on first open
+    render.render(buf, root)
 
     -- avoid E32 and make buffer identity stable
     vim.api.nvim_buf_set_name(buf, "adev-files://" .. root)
@@ -37,7 +37,7 @@ function M.open()
     -- Prefer a taller window to allow editing/adding many entries.
     local max_height = math.max(3, vim.o.lines - 4)
     local height = math.min(math.max(#lines, 12), max_height)
-    win.create_win(buf, height, 72)
+    win.create_win(buf, height, 72, root)
 
     local manager_win = vim.api.nvim_get_current_win()
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_win", prev_win)

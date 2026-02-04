@@ -1,5 +1,6 @@
 local clipboard = require "adev-files.events.clipboard"
 local delete = require "adev-files.events.delete"
+local revert = require "adev-files.events.revert"
 local help = require "adev-files.help"
 local nav = require "adev-files.events.navigation"
 local parse = require "adev-files.parse"
@@ -53,8 +54,12 @@ function M.attach(buf)
     set_keymap({ "n", "x" }, "dd", function()
         clipboard.set_clipboard(buf, "move")
     end)
-    set_keymap({ "n", "x" }, "X", function()
+    set_keymap({ "n", "x" }, "D", function()
         delete.delete_selected(buf)
+    end)
+
+    set_keymap("n", "U", function()
+        revert.revert_current_line(buf)
     end)
 
     set_keymap("n", "?", function()

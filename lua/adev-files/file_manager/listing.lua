@@ -33,17 +33,16 @@ local function sort_files(a, b)
     return a_name < b_name
 end
 
---- Build header lines for virtual text display
---- Returns a list of {text, highlight_group} pairs for each line
+--- Build header lines for display
 ---@param root string
----@return table[] header_lines Each item is {text, hl_group}
+---@return string[]
 function M.build_header(root)
     local help_line = help.compact_content()[1]
     return {
-        { help_line, "Comment" },
-        { string.rep("=", #help_line), "Comment" },
-        { "root: " .. root, "Directory" },
-        { "", "Normal" },
+        help_line,
+        string.rep("=", #help_line),
+        "root: " .. root,
+        "",
     }
 end
 

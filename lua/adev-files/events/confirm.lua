@@ -2,6 +2,7 @@ local utils = require "adev-common.utils"
 
 local confirmation = require "adev-files.utils.confirmation"
 local sync = require "adev-files.sync"
+local state = require "adev-files.state"
 
 local M = {}
 
@@ -17,6 +18,7 @@ function M.confirm_discard_if_modified(buf, cb)
     if ops and #ops == 0 then
         -- Some edits can flip the modified flag but don't translate into
         -- filesystem operations. Treat those as safe to discard and reset view.
+        state.clear_pending_ops(buf)
         sync.refresh(buf)
         cb(true)
         return
@@ -39,6 +41,7 @@ function M.confirm_discard_if_modified(buf, cb)
             if confirmed then
                 -- User explicitly chose to discard pending edits; reset immediately
                 -- so we don't keep prompting for the same modified buffer.
+                state.clear_pending_ops(buf)
                 sync.refresh(buf)
             end
             cb(confirmed)

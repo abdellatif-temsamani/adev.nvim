@@ -1,6 +1,7 @@
 local utils = require "adev-common.utils"
 
 local apply = require "adev-files.sync.apply"
+local clipboard = require "adev-files.clipboard"
 local index = require "adev-files.sync.index"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
@@ -45,7 +46,33 @@ function M.attach(buf, root)
                     return
                 end
 
-                apply.apply_ops_with_confirm(b, ops0, { title = "adev-files" })
+                local merged = {}
+                local has_move = false
+                for _, op in ipairs(state.get_pending_ops(b)) do
+                    table.insert(merged, op)
+                    if op.type == "move" then
+                        has_move = true
+                    end
+                end
+                for _, op in ipairs(ops0) do
+                    table.insert(merged, op)
+                    if op.type == "move" then
+                        has_move = true
+                    end
+                end
+
+                apply.apply_ops_with_confirm(b, merged, {
+                    title = "adev-files",
+                    on_success = function()
+                        state.clear_pending_ops(b)
+                        if has_move then
+                            local clip = clipboard.get()
+                            if clip and clip.mode == "move" then
+                                clipboard.clear()
+                            end
+                        end
+                    end,
+                })
             end)
         end,
     })
