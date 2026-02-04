@@ -75,6 +75,20 @@ return {
             desc = "Make Picker",
         },
         {
+            "<leader>lCn",
+            function()
+                Laravel.commands.run "env:configure"
+            end,
+            desc = "configure project",
+        },
+        {
+            "<leader>lCo",
+            function()
+                Laravel.commands.run "env:configure:open"
+            end,
+            desc = "open project configurations",
+        },
+        {
             "<leader>lc",
             function()
                 Laravel.pickers.commands()
