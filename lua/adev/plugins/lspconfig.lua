@@ -13,7 +13,8 @@ return {
         {
             "<leader>gl",
             function()
-                vim.lsp.buf.format()
+                -- NOTE: a super high timeout is set thanks to prettier being blazingly fast
+                vim.lsp.buf.format { timeout_ms = 10000 }
             end,
             desc = "lint buffer",
             mode = { "v", "n" },
