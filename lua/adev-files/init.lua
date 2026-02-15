@@ -10,7 +10,7 @@ local M = {}
 ---@type FilesProps
 M.defaults = {
     open_files = {
-        enabled = true,
+        enabled = false,
         method = "edit",
     },
 }
