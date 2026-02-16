@@ -11,7 +11,6 @@ return {
         "saghen/blink.cmp",
         -- optional: provides snippets for the snippet source
         dependencies = {
-            "joelazar/blink-calc",
             "L3MON4D3/LuaSnip",
             "nvim-mini/mini.icons",
         },
@@ -83,7 +82,7 @@ return {
                                 highlight = function(ctx)
                                     local ok, icons = pcall(require, "mini.icons")
                                     if not ok then
-                                        return nil
+                                        return "Comment"
                                     end
                                     return select(2, icons.get("lsp", ctx.kind))
                                 end,
@@ -93,7 +92,7 @@ return {
                                 highlight = function(ctx)
                                     local ok, icons = pcall(require, "mini.icons")
                                     if not ok then
-                                        return nil
+                                        return "Comment"
                                     end
                                     return select(2, icons.get("lsp", ctx.kind))
                                 end,
@@ -104,13 +103,7 @@ return {
             },
 
             sources = {
-                default = { "lsp", "path", "snippets", "buffer", "calc" },
-                providers = {
-                    calc = {
-                        name = "Calc",
-                        module = "blink-calc",
-                    },
-                },
+                default = { "lsp", "path", "snippets", "buffer" },
             },
 
             snippets = { preset = "luasnip" },
