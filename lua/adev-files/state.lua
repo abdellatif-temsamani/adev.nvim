@@ -1,6 +1,7 @@
 local M = {}
 
 local NS = vim.api.nvim_create_namespace "adev-files"
+local LIVE_NS = vim.api.nvim_create_namespace "adev_files_live"
 local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
 
 local model = require "adev-files.core.model"
@@ -21,6 +22,10 @@ end
 
 function M.display_ns()
     return DISPLAY_NS
+end
+
+function M.live_ns()
+    return LIVE_NS
 end
 
 ---@param buf integer
