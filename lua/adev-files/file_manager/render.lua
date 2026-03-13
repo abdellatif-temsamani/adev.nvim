@@ -1,92 +1,111 @@
 local M = {}
 
 local icons = require "adev-files.icon"
-local listing = require "adev-files.file_manager.listing"
-local parse = require "adev-files.parse"
 local state = require "adev-files.state"
+local view = require "adev-files.core.view"
+local marks = require "adev-files.core.marks"
+local model = require "adev-files.core.model"
+local path = require "adev-files.utils.fs.path"
 
---- Add virtual text header and icons to buffer
+--- Add virtual text icons to buffer
 ---@param buf integer
 ---@param root string
----@param lines string[]
-local function add_virtual_text(buf, root, lines)
+local function add_virtual_text(buf, root)
     local ns = state.display_ns()
-    local mark_ns = state.ns()
     local st = state.get(buf)
-    local marks_by_row = {}
-    local current_paths = {}
     vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
 
-    if st then
-        for _, line in ipairs(lines) do
-            local parsed = select(1, parse.parse_line(line))
-            if parsed then
-                current_paths[st.root .. parsed.fs_name] = true
+    if not st then
+        return
+    end
+
+    local entries, err = view.parse_buffer(buf)
+    if err then
+        return
+    end
+    local row_to_id = marks.sync(buf, entries)
+    local current_model = st.model or model.new(root)
+    local projection = model.project(current_model, entries, row_to_id)
+    state.set_view(buf, projection)
+
+    local pending_delete = {}
+    local pending_by_id = {}
+    local pending_by_path = {}
+    if st.pending_ops then
+        for _, op in ipairs(st.pending_ops) do
+            if op.type == "delete" and op.path then
+                pending_delete[op.path] = true
+            elseif (op.type == "copy" or op.type == "move") and op.src then
+                if op.dst_id then
+                    pending_by_id[op.dst_id] = pending_by_id[op.dst_id] or {}
+                    table.insert(pending_by_id[op.dst_id], op)
+                elseif op.dst then
+                    pending_by_path[op.dst] = pending_by_path[op.dst] or {}
+                    table.insert(pending_by_path[op.dst], op)
+                end
             end
         end
     end
 
-    if st and st.original_marks then
-        local extmarks = vim.api.nvim_buf_get_extmarks(buf, mark_ns, 0, -1, {})
-        for _, m in ipairs(extmarks) do
-            local id, row = m[1], m[2]
-            marks_by_row[row] = st.original_marks[id]
-        end
-    end
-
-    -- Build virtual header lines
-    local header = listing.build_header(root)
-    local virt_lines = {}
-    for _, item in ipairs(header) do
-        table.insert(virt_lines, { { item[1], item[2] } })
-    end
-
-    -- Add header as virtual lines above first line
-    if #lines > 0 then
-        vim.api.nvim_buf_set_extmark(buf, ns, 0, 0, {
-            virt_lines = virt_lines,
-            virt_lines_above = true,
-        })
-    else
-        -- Empty directory - still show header but on a placeholder line
-        vim.bo[buf].modifiable = true
-        vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
-        vim.bo[buf].modified = false
-        vim.api.nvim_buf_set_extmark(buf, ns, 0, 0, {
-            virt_lines = virt_lines,
-            virt_lines_above = true,
-        })
-    end
-
     -- Add icon virtual text for each entry
-    for i, entry in ipairs(lines) do
-        local icon, hl = icons.get_entry_icon(entry)
-        local prefix = icon ~= "" and (icon .. " ") or "  "
-        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
-            virt_text = { { prefix, hl ~= "" and hl or "Normal" } },
-            virt_text_pos = "inline",
-        })
-
-        local mark = marks_by_row[i - 1]
-        local parsed = select(1, parse.parse_line(entry))
+    for _, item in ipairs(entries) do
+        local parsed = item.entry
+        local row = item.row
+        local is_deleted = item.deleted
         if parsed then
-            if mark then
-                if parsed.fs_name ~= mark.fs_name then
-                    if not current_paths[mark.abs_path] then
-                        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
-                            virt_text = { { "  R rename", "DiffChange" } },
-                            virt_text_pos = "eol",
-                        })
-                    else
-                        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
-                            virt_text = { { "  + create", "DiffAdd" } },
-                            virt_text_pos = "eol",
-                        })
+            local icon, hl = icons.get_entry_icon(parsed.name)
+            local prefix = icon ~= "" and (icon .. " ") or "  "
+            vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+                virt_text = { { prefix, hl ~= "" and hl or "Normal" } },
+                virt_text_pos = "inline",
+            })
+
+            local suffix = {}
+            local node_id = row_to_id[row]
+            local pending_ops = node_id and pending_by_id[node_id] or nil
+            local is_pending = pending_ops and #pending_ops > 0
+            local abs_path = st.root .. parsed.fs_name
+            if not pending_ops then
+                pending_ops = pending_by_path[abs_path]
+                is_pending = pending_ops and #pending_ops > 0
+            end
+            local deleted = is_deleted or pending_delete[abs_path]
+            local original = node_id and current_model.original_by_id[node_id] or nil
+            if not original then
+                local original_id = current_model.original_by_path[abs_path]
+                original = original_id and current_model.original_by_id[original_id] or nil
+            end
+
+            if not deleted then
+                if original then
+                    if parsed.fs_name ~= original.fs_name then
+                        if not projection.current_by_path[original.abs_path] then
+                            table.insert(suffix, { "  R rename", "DiffChange" })
+                        else
+                            table.insert(suffix, { "  + create", "DiffAdd" })
+                        end
                     end
+                elseif not is_pending then
+                    table.insert(suffix, { "  + create", "DiffAdd" })
                 end
-            else
-                vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
-                    virt_text = { { "  + create", "DiffAdd" } },
+            end
+
+            if deleted then
+                table.insert(suffix, { "  D delete", "adevFilesPendingDelete" })
+            end
+
+            if st and pending_ops and #pending_ops > 0 then
+                for _, op in ipairs(pending_ops) do
+                    local src_rel = path.relpath(st.root, op.src or "")
+                    local label = op.type == "move" and "  moved from " or "  copied from "
+                    local hl = op.type == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy"
+                    table.insert(suffix, { label .. src_rel, hl })
+                end
+            end
+
+            if #suffix > 0 then
+                vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+                    virt_text = suffix,
                     virt_text_pos = "eol",
                 })
             end
@@ -98,20 +117,13 @@ end
 ---@param buf integer
 ---@param root string
 function M.add_virtual_text(buf, root)
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    add_virtual_text(buf, root, lines)
+    add_virtual_text(buf, root)
 end
 
 ---@param buf integer
 ---@param root string
 function M.render(buf, root)
-    local lines = listing.build_lines(root)
-
-    vim.bo[buf].modifiable = true
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-    vim.bo[buf].modified = false
-
-    add_virtual_text(buf, root, lines)
+    view.render(buf, root)
 end
 
 return M

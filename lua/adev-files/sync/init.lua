@@ -7,6 +7,7 @@ local view = require "adev-files.sync.view"
 
 M.refresh = view.refresh
 M.set_root = view.set_root
+M.discard_reset = view.discard_reset
 
 M.plan_ops = plan.plan_ops
 M.apply_ops_with_confirm = apply.apply_ops_with_confirm

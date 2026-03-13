@@ -1,63 +1,105 @@
 # Changelog
 
-All notable changes to Adev.nvim (the over-engineered nvim distro) will be
-documented in this file.
+All notable changes to Adev.nvim (the over-engineered nvim distro) will be documented in this file.
 
-This changelog is automatically generated using
-[git-cliff](https://git-cliff.org).
+This changelog is automatically generated using [git-cliff](https://git-cliff.org).
 
 ## About
 
-Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif
-Dev, featuring a modern and efficient development environment with carefully
-curated plugins and settings.
+Adev.nvim is an over-engineered Neovim distribution maintained by Abdellatif Dev, featuring a modern and efficient development environment with carefully curated plugins and settings.
+
+## [2.0.6] - 2026-03-13
+
+### 🚀 Features
+
+- *(laravel)* Improve plugin config
+
+### 🐛 Bug Fixes
+
+- *(adev-files)* File sync
+- Harden window close handling in navigation quit
+- *(snacks)* Disable file-manager
+- *(mason)* Add missing package
+- *(blink-cmp)* Remove blink-calc
+- Theme defaults
+
+### 💼 Other
+
+- Adev-files (#14)
+
+### 🚜 Refactor
+
+- *(adev-files)* Unify sync
+- *(adev-files)* Rewrite
+- *(adev-files)* Sensible defaults
+
+### ⚙️ Plugins
+
+- *("markdown")* Add render-markdown
+- *(lspconfig)* Add timeout to vim format
+- *(markdown)* Switched tj present
+- *(snacks)* Disable image preview
 
 ## [2.0.5-1] - 2026-01-31
 
 ### 🚀 Features
 
-- _(plugins)_ Mdx filetype support
-- _(adev-files)_ Structuring core plugin
-- _(adev)_ Major refactor of file manager and UI infrastructure
-- Adev-files
-- _(adev-files)_ Mini-icons support
-- _(adev-files)_ Opening files
-- _(core)_ Lazy laoding
 - Implement virtual text for file manager UI
 
 ### 🐛 Bug Fixes
 
-- _(changelog)_ Version display in the title
-- _(lspconfig)_ Lua_ls load
-- Conflict lua_ls x stylua on code formatting
-- _(adev-files)_ Window sizing
 - Compare current version with latest in check_update
-- _(adev-files)_ Create new file
-- _(adev-files)_ Rename
+- *(adev-files)* Create new file
+- *(adev-files)* Rename
 
 ### 💼 Other
 
-- _(telescope)_ Changing keymaps
 - Adev-files
 - Adev-files
 
 ### 🚜 Refactor
 
-- Restructure file manager and remove deprecated code
-- _(core)_ Big refactor
-- _(adev-files)_ Change keymap to <leader>n
-- _(adev-files)_ Index by filename instead of line number
+- *(adev-files)* Index by filename instead of line number
 - Consolidate utilities and add feature flags system (#8)
-- _(adev-files)_ Use <nop> to disable keymaps
+- *(adev-files)* Use <nop> to disable keymaps
+
+## [2.0.5] - 2026-01-30
+
+### 🚀 Features
+
+- *(plugins)* Mdx filetype support
+- *(adev-files)* Structuring core plugin
+- *(adev)* Major refactor of file manager and UI infrastructure
+- Adev-files
+- *(adev-files)* Mini-icons support
+- *(adev-files)* Opening files
+- *(core)* Lazy laoding
+
+### 🐛 Bug Fixes
+
+- *(changelog)* Version display in the title
+- *(lspconfig)* Lua_ls load
+- Conflict lua_ls x stylua on code formatting
+- *(adev-files)* Window sizing
+
+### 💼 Other
+
+- *(telescope)* Changing keymaps
+
+### 🚜 Refactor
+
+- Restructure file manager and remove deprecated code
+- *(core)* Big refactor
+- *(adev-files)* Change keymap to <leader>n
 
 ### 📚 Documentation
 
-- _(requirement)_ Update min version of deps
+- *(requirement)* Update min version of deps
 
 ### ⚙️ Plugins
 
-- _(none-ls)_ Disabled rustywind
-- _(adev-files)_ Disable some keymaps
+- *(none-ls)* Disabled rustywind
+- *(adev-files)* Disable some keymaps
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -68,27 +110,27 @@ curated plugins and settings.
 
 ### 🚀 Features
 
-- _(update_manager)_ [**breaking**] New update method
-- _(blink.cmp)_ Enhance completion with mini.icons and add JS/TS snippets
+- *(update_manager)* [**breaking**] New update method
+- *(blink.cmp)* Enhance completion with mini.icons and add JS/TS snippets
 - Add custom vscode snippets support
 
 ### 🐛 Bug Fixes
 
-- _(update_manager)_ Update
-- _(update_manager)_ Fetch remote tags
-- _(blink)_ Sorting
-- _(mini-files)_ Opens in current buf's dir
+- *(update_manager)* Update
+- *(update_manager)* Fetch remote tags
+- *(blink)* Sorting
+- *(mini-files)* Opens in current buf's dir
 
 ### 🚜 Refactor
 
-- _(lualine)_ [**breaking**] Replace winbar with tabline.windows
-- _(lualine)_ Change placing of lsp status
-- _(core-plugin)_ Re-structure adev core plugins
+- *(lualine)* [**breaking**] Replace winbar with tabline.windows
+- *(lualine)* Change placing of lsp status
+- *(core-plugin)* Re-structure adev core plugins
 - Simplify file explorer configuration and remove telescope dependency
 
 ### 📚 Documentation
 
-- _(adev.txt)_ Refactor docs
+- *(adev.txt)* Refactor docs
 - Update README and help to use :ADConfig for configuration
 
 ### ◀️ Revert
@@ -110,16 +152,16 @@ curated plugins and settings.
 - Improve onboarding module structure
 - Consolidate update_manager into single module
 - Extract git utilities to common module
-- _(utils)_ Restart_nvim to nvim
+- *(utils)* Restart_nvim to nvim
 - Unify window and buffer creation API
-- _(utils)_ Restart neovim take 2000ms instead of 1500ms
-- _(blink)_ Start on CmdEnter
+- *(utils)* Restart neovim take 2000ms instead of 1500ms
+- *(blink)* Start on CmdEnter
 - Consolidate types and improve error handling
 
 ### ⚙️ Miscellaneous Tasks
 
 - Fix dupe @return
-- _(coderabbit)_ Added .coderabbit.yaml
+- *(coderabbit)* Added .coderabbit.yaml
 
 ## [2.0.2] - 2026-01-09
 
@@ -128,59 +170,59 @@ curated plugins and settings.
 - Add build command for Catppuccin theme
 - Update treesitter
 - Adev-files
-- _(core)_ Spliting to adev, adev-common
-- _(adev-files)_ List files
+- *(core)* Spliting to adev, adev-common
+- *(adev-files)* List files
 - Add build command for Catppuccin theme
 - Update treesitter
 - Adev-files
-- _(core)_ Spliting to adev, adev-common
-- _(adev-files)_ List files
+- *(core)* Spliting to adev, adev-common
+- *(adev-files)* List files
 - Add feature flags system
 
 ### 🐛 Bug Fixes
 
-- _(treesitter)_ Add ipkg to ignore_install list
+- *(treesitter)* Add ipkg to ignore_install list
 - Remove those annoying arg auto fill snippets
-- _(blink)_ Cmdline completions
-- _(onboarding)_ If init.lua exist but init-opts.lua not found edge case
-- _(core)_ Fix onboarding
+- *(blink)* Cmdline completions
+- *(onboarding)* If init.lua exist but init-opts.lua not found edge case
+- *(core)* Fix onboarding
 - Get_dirname
-- _(blink)_ Completions
+- *(blink)* Completions
 - Spelling
-- _(treesitter)_ Add ipkg to ignore_install list
+- *(treesitter)* Add ipkg to ignore_install list
 - Treesitter
 - Remove those annoying arg auto fill snippets
-- _(blink)_ Cmdline completions
-- _(onboarding)_ If init.lua exist but init-opts.lua not found edge case
-- _(core)_ Fix onboarding
+- *(blink)* Cmdline completions
+- *(onboarding)* If init.lua exist but init-opts.lua not found edge case
+- *(core)* Fix onboarding
 - Get_dirname
-- _(blink)_ Completions
+- *(blink)* Completions
 - Spelling
 - Refactor config merging to properly handle user-only keys
-- _(typo)_ Lua/adev-common/utils/files.lua
+- *(typo)* Lua/adev-common/utils/files.lua
 - Docs
-- _(adev-files)_ Expand paths consistently before file operations
+- *(adev-files)* Expand paths consistently before file operations
 
 ### 🚜 Refactor
 
-- _(onboarding)_ ADConfig hot-reloads nvim
-- _(plugins)_ Changing plugins configs
-- _(mini)_ Move to standalone mini.nvim plugins
-- _(adev-files)_ Common-utils
+- *(onboarding)* ADConfig hot-reloads nvim
+- *(plugins)* Changing plugins configs
+- *(mini)* Move to standalone mini.nvim plugins
+- *(adev-files)* Common-utils
 - Simplify mini plugin spec nesting and update UI structure
 - Improve neovim config utilities and plugin settings
-- _(adev-files)_ Refactor list files to open in a floating window
-- _(adev-files)_ List files improve highlighting
+- *(adev-files)* Refactor list files to open in a floating window
+- *(adev-files)* List files improve highlighting
 - Improve input UI signature and centralize file operations
 - Improve code structure and error handling
-- _(onboarding)_ ADConfig hot-reloads nvim
-- _(plugins)_ Changing plugins configs
-- _(mini)_ Move to standalone mini.nvim plugins
-- _(adev-files)_ Common-utils
+- *(onboarding)* ADConfig hot-reloads nvim
+- *(plugins)* Changing plugins configs
+- *(mini)* Move to standalone mini.nvim plugins
+- *(adev-files)* Common-utils
 - Simplify mini plugin spec nesting and update UI structure
 - Improve neovim config utilities and plugin settings
-- _(adev-files)_ Refactor list files to open in a floating window
-- _(adev-files)_ List files improve highlighting
+- *(adev-files)* Refactor list files to open in a floating window
+- *(adev-files)* List files improve highlighting
 - Improve input UI signature and centralize file operations
 - Improve code structure and error handling
 - Restructure adev-files actions
@@ -199,14 +241,197 @@ curated plugins and settings.
 
 ### ⚙️ Miscellaneous Tasks
 
-- _(laravel)_ Switch to laravel
-- _(adev-files)_ List files help index
+- *(laravel)* Switch to laravel
+- *(adev-files)* List files help index
 - Add project-specific git attributes for neovim config
-- _(laravel)_ Switch to laravel
-- _(adev-files)_ List files help index
+- *(laravel)* Switch to laravel
+- *(adev-files)* List files help index
 - Add project-specific git attributes for neovim config
 
 ## [2.0.1] - 2025-12-23
+
+### 🚀 Features
+
+- Add treesitter auto-start configuration and update project release name
+- Temp implementation of ADConfig
+
+### 🐛 Bug Fixes
+
+- *(gitsigns)* Lazyloading
+- Add assertion for LSP defaults in lsp.lua
+- Treesitter config
+
+### 📚 Documentation
+
+- Update CHANGELOG.md
+- Update documentation to reflect codebase changes
+- Update documentation to reflect codebase changes
+
+### ⚙️ Miscellaneous Tasks
+
+- Auto publish
+
+## [1.5.0] - 2025-10-19
+
+### 🚀 Features
+
+- More info
+- New utils function
+- Opts "git"
+- Opts "colorscheme"
+- *(blink-cmp)* Calc source
+- *(null-ls)* Added stylua
+- *(new-plugin)* [**breaking**] Augment
+- *(set)* More options
+
+### 🐛 Bug Fixes
+
+- *(blink.cmp)* Config
+- Version
+- Check update
+- *(laravel)* Fix lazyloading
+- Lazy loading
+- Lazyloading
+- Luadocs
+- Queries
+- *(comments)* Lazyloading conditions
+- *(mason)* Lazyloading
+- *(mason)* Plugin not loading
+- [**breaking**] Lazy loading condition
+- *(mason-lspconfig)* Origin
+- Config
+- *(options)* Border = 'single'
+- *(plugins)* Event loading
+- *(treesitter)* Not loading
+- *(plugins)* Lazy loading conditions
+
+### 🚜 Refactor
+
+- *(core)* Changing code structure
+- [**breaking**] Internal structure
+- *(events)* Rewrite Event handler
+- *(core)* Refactoring vim.g.adev
+- *(core)* Refactoring vim.g.adev
+
+### 📚 Documentation
+
+- Fix plugin struture
+- Update adev.txt
+- *(adev.txt)* Update
+- Update README
+
+### 🎨 Styling
+
+- Unify code formatting
+- Stylua toml
+- *(stylua)* Formatting
+- Linting
+
+### ⚙️ Miscellaneous Tasks
+
+- Todo.md
+
+## [1.4.0] - 2025-10-08
+
+### 🚀 Features
+
+- *(cmp)* [**breaking**] Blink-cmp -> nvim-cmp
+- Godot linting
+- Gdformat use spaces
+- Auto check for update
+- *(autocmd)* Gdscript space
+- *(cmp)* Back to blink.cmp v1.3.1
+- *(lua)* Vim highlight as builtin
+- [**breaking**] Lua_ls hints
+
+### 🐛 Bug Fixes
+
+- [**breaking**] Cmp
+- Sets config
+
+### 📚 Documentation
+
+- Cleaning docs
+
+## [1.3.1] - 2025-09-15
+
+### 🚀 Features
+
+- *(health)* Healthcheck adev
+- *(blink-cmp)* Conventional-commits
+- *(blink-cmp)* Ghostline cmdline
+- *(noice)* Override defaults
+- *(lsp)* Tailwindcss config
+- *(blink.nvim)* [**breaking**] Removing providers
+
+### 🐛 Bug Fixes
+
+- *(treesitter)* Plugin event
+- *(telescope)* Border style
+- *(laravel)* Missing deps
+- Better notifications
+- *(laravel)* [**breaking**] Fix commands
+
+### 🚜 Refactor
+
+- *(plugins)* Structure
+
+### 📚 Documentation
+
+- *(adev)* Vim docs
+
+### 🧪 Testing
+
+- *(checkhealth)* Improve checkhealth
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Minor update
+
+## [1.2.0] - 2025-08-02
+
+### 🚀 Features
+
+- *(snacks)* Add image support
+- *(lsp)* Diagonistic vertual line [expermental]
+- *(config)* Mv config to lua/abdellatifdev/config
+- *(git-worktree)* [**breaking**] Rm plugins
+
+### 🐛 Bug Fixes
+
+- *(theme)* Align with telescope and snacks
+- *(lualine)* Winbar now displays "Adev.nvim" instead of "abdellatif dev"
+- *(blink.cmp)* Downgrade to "v1.3.1"
+- *(crates.nvim)* Add event for lazy loading
+
+### 🚜 Refactor
+
+- *(notification)* Changes notification handling
+- *(theme)* Optimize opts
+- *(theme)* Optimize config
+- *(plugins)* Lazy = true as default value
+- *(comments)* Change config
+- *(ui)* Border styles
+- *(plugins)* Lazy loading
+- *(config)* Lua/abdellatifdev -> lua/adev
+- *(plugins)* Cleaning plugins
+
+### 📚 Documentation
+
+- Add contributing and PR guidelines (#1)
+- Add contributing and PR guidelines
+
+### ⚙️ Miscellaneous Tasks
+
+- Updates docs
+- Adding humanity
+- *(issue templates)* Refine templates (#2)
+- *(issue templates)* Refine templates
+- *(todo)* Todo comment to github issues
+- *(version)* 1.2.0
+- *(github)* Pull request template
+
+## [1.1.0] - 2025-07-30
 
 ### 🚀 Features
 
@@ -214,136 +439,19 @@ curated plugins and settings.
 - Nvim-cmp -> blink-cmp
 - Mini.nvim && cleaning plugins
 - Config to distro
-- _(snacks)_ Add image support
-- _(lsp)_ Diagonistic vertual line [expermental]
-- _(config)_ Mv config to lua/abdellatifdev/config
-- _(git-worktree)_ [**breaking**] Rm plugins
-- _(health)_ Healthcheck adev
-- _(blink-cmp)_ Conventional-commits
-- _(blink-cmp)_ Ghostline cmdline
-- _(noice)_ Override defaults
-- _(lsp)_ Tailwindcss config
-- _(blink.nvim)_ [**breaking**] Removing providers
-- _(cmp)_ [**breaking**] Blink-cmp -> nvim-cmp
-- Godot linting
-- Gdformat use spaces
-- Auto check for update
-- _(autocmd)_ Gdscript space
-- _(cmp)_ Back to blink.cmp v1.3.1
-- _(lua)_ Vim highlight as builtin
-- [**breaking**] Lua_ls hints
-- More info
-- New utils function
-- Opts "git"
-- Opts "colorscheme"
-- _(blink-cmp)_ Calc source
-- _(null-ls)_ Added stylua
-- _(new-plugin)_ [**breaking**] Augment
-- _(set)_ More options
-- Add treesitter auto-start configuration and update project release name
-- Temp implementation of ADConfig
 
 ### 🐛 Bug Fixes
 
 - Readme
 - Snacks
 - Lsp keymaps
-- _(blink.cmp)_ Temp fix
-- _(theme)_ Align with telescope and snacks
-- _(lualine)_ Winbar now displays "Adev.nvim" instead of "abdellatif dev"
-- _(blink.cmp)_ Downgrade to "v1.3.1"
-- _(crates.nvim)_ Add event for lazy loading
-- _(treesitter)_ Plugin event
-- _(telescope)_ Border style
-- _(laravel)_ Missing deps
-- Better notifications
-- _(laravel)_ [**breaking**] Fix commands
-- [**breaking**] Cmp
-- Sets config
-- _(blink.cmp)_ Config
-- Version
-- Check update
-- _(laravel)_ Fix lazyloading
-- Lazy loading
-- Lazyloading
-- Luadocs
-- Queries
-- _(comments)_ Lazyloading conditions
-- _(mason)_ Lazyloading
-- _(mason)_ Plugin not loading
-- [**breaking**] Lazy loading condition
-- _(mason-lspconfig)_ Origin
-- Config
-- _(options)_ Border = 'single'
-- _(plugins)_ Event loading
-- _(treesitter)_ Not loading
-- _(plugins)_ Lazy loading conditions
-- _(gitsigns)_ Lazyloading
-- Add assertion for LSP defaults in lsp.lua
-- Treesitter config
-
-### 🚜 Refactor
-
-- _(notification)_ Changes notification handling
-- _(theme)_ Optimize opts
-- _(theme)_ Optimize config
-- _(plugins)_ Lazy = true as default value
-- _(comments)_ Change config
-- _(ui)_ Border styles
-- _(plugins)_ Lazy loading
-- _(config)_ Lua/abdellatifdev -> lua/adev
-- _(plugins)_ Cleaning plugins
-- _(plugins)_ Structure
-- _(core)_ Changing code structure
-- [**breaking**] Internal structure
-- _(events)_ Rewrite Event handler
-- _(core)_ Refactoring vim.g.adev
-- _(core)_ Refactoring vim.g.adev
-
-### 📚 Documentation
-
-- Add contributing and PR guidelines (#1)
-- Add contributing and PR guidelines
-- _(adev)_ Vim docs
-- Cleaning docs
-- Fix plugin struture
-- Update adev.txt
-- _(adev.txt)_ Update
-- Update README
-- Update CHANGELOG.md
-- Update documentation to reflect codebase changes
-- Update documentation to reflect codebase changes
-
-### 🎨 Styling
-
-- Unify code formatting
-- Stylua toml
-- _(stylua)_ Formatting
-- Linting
-
-### 🧪 Testing
-
-- _(checkhealth)_ Improve checkhealth
-
-### ⚙️ Miscellaneous Tasks
-
-- Updates docs
-- Adding humanity
-- _(issue templates)_ Refine templates (#2)
-- _(issue templates)_ Refine templates
-- _(todo)_ Todo comment to github issues
-- _(version)_ 1.2.0
-- _(github)_ Pull request template
-- _(version)_ Minor update
-- Todo.md
-- Auto publish
+- *(blink.cmp)* Temp fix
 
 ---
 
 ## Support
 
 If you find Adev.nvim helpful, consider:
-
 - ⭐ Starring the repository
 - 🐛 Reporting issues
 - 💡 Suggesting improvements
@@ -351,10 +459,8 @@ If you find Adev.nvim helpful, consider:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
-for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-_Generated by [git-cliff](https://git-cliff.org) for Adev.nvim (the
-over-engineered nvim distro)_
+*Generated by [git-cliff](https://git-cliff.org) for Adev.nvim (the over-engineered nvim distro)*

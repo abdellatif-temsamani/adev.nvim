@@ -1,67 +1,48 @@
-local parse = require "adev-files.parse"
 local state = require "adev-files.state"
+local model = require "adev-files.core.model"
+local marks = require "adev-files.core.marks"
+local view = require "adev-files.core.view"
 
 local M = {}
 
----@param root string
----@param fs_name string
----@return string
-local function join(root, fs_name)
-    return root .. fs_name
-end
-
 ---@param buf integer
----@param ns integer
----@return table<integer, AdevFilesMark>
-local function build_marks(buf, ns, right_gravity)
-    local st = state.get(buf)
-    if not st then
-        return {}
-    end
-
-    vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
-
-    local marks = {}
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    for i = 1, #lines do
-        local entry, err = parse.parse_line(lines[i])
-        if err then
-            -- leave the line untracked; we never want to do destructive ops
-            -- when we can't parse an existing entry.
-        elseif entry then
-            local id = vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, { right_gravity = right_gravity == true })
-            marks[id] = {
-                kind = entry.kind,
-                name = entry.name,
-                fs_name = entry.fs_name,
-                abs_path = join(st.root, entry.fs_name),
-            }
-        end
-    end
-
-    return marks
-end
-
----@param buf integer
+---@return boolean, string?
 function M.index_original(buf)
     local st = state.get(buf)
     if not st then
-        return
+        return false, "missing state"
     end
 
-    local marks = build_marks(buf, state.ns(), true)
-    state.set_original_marks(buf, marks)
+    marks.clear(buf)
+    local entries, err = view.parse_buffer(buf)
+    if err then
+        return false, err
+    end
+    local row_to_id = marks.sync(buf, entries)
+
+    local next_model = model.new(st.root)
+    model.snapshot(next_model, entries, row_to_id)
+    state.set_model(buf, next_model)
+    state.set_view(buf, model.project(next_model, entries, row_to_id))
+    return true
 end
 
 ---@param buf integer
+---@return boolean, string?
 function M.reindex(buf)
     local st = state.get(buf)
     if not st then
-        return
+        return false, "missing state"
     end
 
-    local marks = build_marks(buf, state.live_ns(), false)
-    state.set_live_marks(buf, marks)
+    local entries, err = view.parse_buffer(buf)
+    if err then
+        return false, err
+    end
+    local row_to_id = marks.sync(buf, entries)
+    local current_model = st.model or model.new(st.root)
+    state.set_view(buf, model.project(current_model, entries, row_to_id))
+    return true
 end
 
 return M

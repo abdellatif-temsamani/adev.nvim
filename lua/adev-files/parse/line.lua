@@ -3,6 +3,48 @@ local validate = require "adev-files.parse.validate"
 
 local M = {}
 
+local DELETE_MARK = "  #del"
+
+---@param line string
+---@return string, boolean
+function M.strip_delete_marker(line)
+    if not line or line == "" then
+        return line or "", false
+    end
+    if #line >= #DELETE_MARK and line:sub(-#DELETE_MARK) == DELETE_MARK then
+        return line:sub(1, -#DELETE_MARK - 1), true
+    end
+    return line, false
+end
+
+---@param line string
+---@return string, boolean
+function M.toggle_delete_marker(line)
+    local stripped, marked = M.strip_delete_marker(line)
+    if marked then
+        return stripped, false
+    end
+    local trimmed = trim.trim(stripped or "")
+    if trimmed == "" then
+        return line or "", false
+    end
+    return trimmed .. DELETE_MARK, true
+end
+
+---@param line string
+---@return string
+function M.mark_delete(line)
+    local stripped, marked = M.strip_delete_marker(line)
+    if marked then
+        return stripped .. DELETE_MARK
+    end
+    local trimmed = trim.trim(stripped or "")
+    if trimmed == "" then
+        return line or ""
+    end
+    return trimmed .. DELETE_MARK
+end
+
 ---@class AdevFilesEntry
 ---@field kind 'file'|'directory'
 ---@field name string     -- display name (directories end with '/')
@@ -12,8 +54,16 @@ local M = {}
 ---@param line string
 ---@return AdevFilesEntry|nil, string|nil
 function M.parse_line(line)
+    line = M.strip_delete_marker(line)
     line = trim.trim(line or "")
     if line == "" then
+        return nil, nil
+    end
+
+    if line:sub(1, 1) == "[" and line:sub(-1) == "]" then
+        return nil, nil
+    end
+    if line:match "^=+$" then
         return nil, nil
     end
 

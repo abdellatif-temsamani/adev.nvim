@@ -4,17 +4,14 @@ local NS = vim.api.nvim_create_namespace "adev-files"
 local LIVE_NS = vim.api.nvim_create_namespace "adev_files_live"
 local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
 
----@class AdevFilesMark
----@field kind 'file'|'directory'
----@field name string        -- display name (directories end with '/')
----@field fs_name string     -- filesystem name (no trailing '/')
----@field abs_path string
+local model = require "adev-files.core.model"
 
 ---@class AdevFilesState
 ---@field root string
----@field original_marks table<integer, AdevFilesMark>
----@field live_marks table<integer, AdevFilesMark>
+---@field model AdevFilesModel
+---@field view AdevFilesProjection|nil
 ---@field applying boolean
+---@field pending_ops AdevFilesOp[]
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -35,11 +32,12 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, original_marks = {}, live_marks = {}, applying = false }
+    states[buf] = states[buf] or { root = root, model = model.new(root), view = nil, applying = false, pending_ops = {} }
     states[buf].root = root
-    states[buf].original_marks = {}
-    states[buf].live_marks = {}
+    states[buf].model = model.new(root)
+    states[buf].view = nil
     states[buf].applying = false
+    states[buf].pending_ops = {}
     return states[buf]
 end
 
@@ -50,21 +48,68 @@ function M.get(buf)
 end
 
 ---@param buf integer
----@param marks table<integer, AdevFilesMark>
-function M.set_original_marks(buf, marks)
+---@param next_model AdevFilesModel
+function M.set_model(buf, next_model)
     if not states[buf] then
         return
     end
-    states[buf].original_marks = marks
+    states[buf].model = next_model
 end
 
 ---@param buf integer
----@param marks table<integer, AdevFilesMark>
-function M.set_live_marks(buf, marks)
+---@return AdevFilesModel|nil
+function M.get_model(buf)
+    local st = states[buf]
+    if not st then
+        return nil
+    end
+    return st.model
+end
+
+---@param buf integer
+---@param view AdevFilesProjection|nil
+function M.set_view(buf, view)
     if not states[buf] then
         return
     end
-    states[buf].live_marks = marks
+    states[buf].view = view
+end
+
+---@param buf integer
+---@return AdevFilesProjection|nil
+function M.get_view(buf)
+    local st = states[buf]
+    if not st then
+        return nil
+    end
+    return st.view
+end
+
+---@param buf integer
+---@return AdevFilesOp[]
+function M.get_pending_ops(buf)
+    local st = states[buf]
+    if not st then
+        return {}
+    end
+    return st.pending_ops or {}
+end
+
+---@param buf integer
+---@param ops AdevFilesOp[]
+function M.set_pending_ops(buf, ops)
+    if not states[buf] then
+        return
+    end
+    states[buf].pending_ops = ops or {}
+end
+
+---@param buf integer
+function M.clear_pending_ops(buf)
+    if not states[buf] then
+        return
+    end
+    states[buf].pending_ops = {}
 end
 
 ---@param buf integer

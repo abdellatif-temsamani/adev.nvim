@@ -51,7 +51,7 @@ return {
     },
     opts = {
         explorer = {
-            enabled = true,
+            enabled = false,
             replace_netrw = true,
         },
         picker = {
@@ -61,7 +61,6 @@ return {
         },
         input = { enabled = true },
         lazygit = { enabled = true },
-        image = { enabled = true },
         statuscolumn = {
             enabled = true,
             left = { "mark", "sign" },

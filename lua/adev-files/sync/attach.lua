@@ -1,6 +1,7 @@
 local utils = require "adev-common.utils"
 
 local apply = require "adev-files.sync.apply"
+local clipboard = require "adev-files.clipboard"
 local index = require "adev-files.sync.index"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
@@ -14,6 +15,7 @@ function M.attach(buf, root)
     local st = state.init(buf, root)
     index.index_original(buf)
     index.reindex(buf)
+    render.add_virtual_text(buf, root)
 
     local group = vim.api.nvim_create_augroup("adev_files_" .. buf, { clear = true })
 
@@ -45,7 +47,26 @@ function M.attach(buf, root)
                     return
                 end
 
-                apply.apply_ops_with_confirm(b, ops0, { title = "adev-files" })
+                local has_move = false
+                for _, op in ipairs(ops0) do
+                    if op.type == "move" then
+                        has_move = true
+                        break
+                    end
+                end
+
+                apply.apply_ops_with_confirm(b, ops0, {
+                    title = "adev-files",
+                    on_success = function()
+                        state.clear_pending_ops(b)
+                        if has_move then
+                            local clip = clipboard.get()
+                            if clip and clip.mode == "move" then
+                                clipboard.clear()
+                            end
+                        end
+                    end,
+                })
             end)
         end,
     })

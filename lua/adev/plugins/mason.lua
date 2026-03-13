@@ -27,6 +27,7 @@ return {
                 "cfn_lint",
                 "checkmake",
                 "hadolint",
+                "ruff",
                 "yamllint",
                 "djlint",
                 "duster",
