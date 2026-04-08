@@ -1,5 +1,5 @@
 local defaults = require "adev.defaults"
-local update_manager = require "adev.update_manager"
+local update_manager = require "adev.update"
 local err_notify = require("adev-common.utils").err_notify
 
 local M = {}

@@ -1,6 +1,6 @@
 local changelog = require "adev.changelog"
 local onboarding = require "adev.onboarding"
-local update_manager = require "adev.update_manager"
+local update_manager = require "adev.update"
 
 local M = {
     commands = {
