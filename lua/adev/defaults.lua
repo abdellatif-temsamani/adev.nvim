@@ -9,6 +9,14 @@ local defaults = {
         flavour = "mocha",
         transparent = false,
     },
+    core_plugins = {
+        adev_files = {
+            open_files = {
+                enabled = false,
+                method = "edit",
+            },
+        },
+    },
     ui = {
         border = "single",
     },

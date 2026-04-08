@@ -9,6 +9,10 @@
 ---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
 ---@field ui UiOpts?  UI options
 ---@field flags AdevFlags feature flags
+---@field core_plugins AdevPlugins
+
+---@class AdevPlugins
+---@field adev_files FilesProps
 
 ---@alias CatppuccinFlavor "macchiato" | "frappe" | "latte" | "mocha"
 ---@alias BorderStyle "double"|"single"|"shadow"|"rounded"|"solid"|"none"

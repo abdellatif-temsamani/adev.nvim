@@ -21,6 +21,7 @@ function M.setup(opts)
         catppuccin = opts.catppuccin,
         ui = opts.ui,
         flags = opts.flags,
+        core_plugins = opts.core_plugins,
     }
 
     if vim.fn.executable(opts.git) == 0 then

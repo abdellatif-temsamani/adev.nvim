@@ -2,7 +2,6 @@ local file_manager = require "adev-files.file_manager"
 local M = {}
 
 ---@class FilesProps
-
 ---@class FilesOpenFilesProps
 ---@field enabled boolean
 ---@field method 'edit'|'split'|'vsplit'|'tabedit'

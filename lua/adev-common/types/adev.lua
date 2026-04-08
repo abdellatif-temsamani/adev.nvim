@@ -4,3 +4,4 @@
 ---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
 ---@field ui UiOpts?  UI options
 ---@field flags AdevFlags  Feature flags
+---@field core_plugins AdevPlugins
