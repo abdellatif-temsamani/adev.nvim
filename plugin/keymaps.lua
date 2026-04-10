@@ -2,13 +2,13 @@ local keymap_set = vim.keymap.set
 
 keymap_set(
     "n",
-    "<leader>u",
+    "<leader>J",
     "<cmd>m .+1<cr>==",
     { noremap = true, silent = true, desc = "move 1 line down" }
 )
 keymap_set(
     "n",
-    "<leader>i",
+    "<leader>K",
     "<cmd>m .-2<cr>==",
     { noremap = true, silent = true, desc = "move 1 line up" }
 )
