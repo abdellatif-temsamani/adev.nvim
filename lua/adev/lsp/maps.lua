@@ -39,7 +39,7 @@ return {
     dockerls = { "dockerfile" },
     docker_compose_language_service = { "yaml.docker-compose" },
     cmake = { "cmake" },
-    vue = { "vue_ls" },
+    vue_ls = { "vue" },
     emmet_ls = {
         "astro",
         "css",

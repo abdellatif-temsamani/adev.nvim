@@ -59,7 +59,7 @@ end
 --- open a file
 ---@param path string
 function M.open_file(path)
-    vim.cmd("edit " .. path)
+    vim.cmd.edit(vim.fn.fnameescape(path))
 end
 
 return M
