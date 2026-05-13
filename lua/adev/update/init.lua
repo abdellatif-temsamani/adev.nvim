@@ -1,6 +1,6 @@
+local cache = require "adev.update.tag_cache"
 local git = require "adev-common.git"
 local utils = require "adev-common.utils"
-local cache = require "adev.update.tag_cache"
 
 local M = {}
 
@@ -58,16 +58,22 @@ function M.update()
                     vim.schedule(function()
                         require("adev.onboarding"):onboarding()
                     end)
-                    git.git({ "branch", "--list", "update/*" }, function(branch_res)
-                        if branch_res and branch_res.code == 0 and branch_res.stdout then
-                            for old_branch in vim.gsplit(branch_res.stdout, "\n", { plain = true }) do
-                                old_branch = vim.trim(old_branch)
-                                if old_branch ~= "" and old_branch ~= update_branch then
-                                    git.delete_branch(old_branch)
+                    git.git(
+                        { "branch", "--list", "update/*", "--format=%(refname:short)" },
+                        function(branch_res)
+                            if branch_res and branch_res.code == 0 and branch_res.stdout then
+                                for old_branch in
+                                    vim.gsplit(branch_res.stdout, "\n", { plain = true })
+                                do
+                                    old_branch = vim.trim(old_branch)
+                                    old_branch = old_branch:gsub("^%*%s*", "")
+                                    if old_branch ~= "" and old_branch ~= update_branch then
+                                        git.delete_branch(old_branch)
+                                    end
                                 end
                             end
                         end
-                    end)
+                    )
                 else
                     utils.err_notify("Failed to update to " .. tag)
                 end
