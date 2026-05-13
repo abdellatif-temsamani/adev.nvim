@@ -1,3 +1,4 @@
+local keymaps = require "adev-common.utils.keymaps"
 local window = require "adev-common.ui.window"
 
 local M = {}
@@ -64,8 +65,9 @@ function M.open()
         wo = { wrap = false },
     }
 
-    vim.keymap.set("n", "q", "<cmd>bwipeout<CR>", { buffer = buf })
-    vim.keymap.set("n", "<esc>", "<cmd>bwipeout<CR>", { buffer = buf })
+    local set_keymap = keymaps.buffer(buf)
+    set_keymap("n", "q", "<cmd>bwipeout<CR>")
+    set_keymap("n", "<esc>", "<cmd>bwipeout<CR>")
 end
 
 return M

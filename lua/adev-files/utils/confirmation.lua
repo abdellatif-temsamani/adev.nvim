@@ -1,4 +1,5 @@
 local buffers = require "adev-common.utils.buffers"
+local keymaps = require "adev-common.utils.keymaps"
 local window = require "adev-common.ui.window"
 
 local M = {}
@@ -58,21 +59,22 @@ function M.open(lines, opts, cb)
         end
     end
 
-    vim.keymap.set("n", "y", function()
+    local set_keymap = keymaps.buffer(buf)
+    set_keymap("n", "y", function()
         finish(true)
-    end, { buffer = buf })
-    vim.keymap.set("n", "<cr>", function()
+    end)
+    set_keymap("n", "<cr>", function()
         finish(true)
-    end, { buffer = buf })
-    vim.keymap.set("n", "n", function()
+    end)
+    set_keymap("n", "n", function()
         finish(false)
-    end, { buffer = buf })
-    vim.keymap.set("n", "q", function()
+    end)
+    set_keymap("n", "q", function()
         finish(false)
-    end, { buffer = buf })
-    vim.keymap.set("n", "<esc>", function()
+    end)
+    set_keymap("n", "<esc>", function()
         finish(false)
-    end, { buffer = buf })
+    end)
 
     window.floating_window {
         buf = buf,

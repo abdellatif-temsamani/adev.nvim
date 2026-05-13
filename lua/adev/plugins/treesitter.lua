@@ -1,4 +1,5 @@
 local events = require "adev-common.utils.events"
+local plugin = require "adev-common.plugin"
 
 return {
     {
@@ -8,7 +9,7 @@ return {
         dependencies = {
             {
                 "nvim-treesitter/nvim-treesitter-context",
-                event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
+                event = plugin.file_events(),
                 opts = {
                     enable = true,
                     max_lines = 2,
@@ -18,7 +19,7 @@ return {
             {
                 "windwp/nvim-ts-autotag",
 
-                event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
+                event = plugin.file_events(),
                 opts = {
                     per_filetype = {
                         ["blade"] = {

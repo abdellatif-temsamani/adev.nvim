@@ -1,4 +1,5 @@
 local M = {}
+local icons = require "adev-common.icons"
 
 local function detect_filetype(name)
     local ok, ft = pcall(vim.filetype.match, { filename = name })
@@ -18,16 +19,7 @@ function M.get_icon(name)
         return fallback_icon, fallback_hl
     end
 
-    local ok, mini_icons = pcall(require, "mini.icons")
-    if not ok then
-        return fallback_icon, fallback_hl
-    end
-
-    local icon, hl = mini_icons.get("filetype", ft)
-    if not icon or icon == "" then
-        return fallback_icon, fallback_hl
-    end
-    return icon, hl or fallback_hl
+    return icons.get("filetype", ft, fallback_icon, fallback_hl)
 end
 
 return M

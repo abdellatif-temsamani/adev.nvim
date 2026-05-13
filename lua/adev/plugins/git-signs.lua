@@ -1,9 +1,8 @@
+local plugin = require "adev-common.plugin"
+
 return {
     "lewis6991/gitsigns.nvim",
-    cond = function()
-        return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "")
-            == "true"
-    end,
+    cond = plugin.is_git_worktree,
     lazy = false,
     keys = {
         {

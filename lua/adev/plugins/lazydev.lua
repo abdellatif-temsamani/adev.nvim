@@ -1,8 +1,8 @@
-local events = require "adev-common.utils.events"
+local plugin = require "adev-common.plugin"
 
 return {
     "folke/lazydev.nvim",
-    event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
+    event = plugin.file_events(),
     cond = function()
         return vim.fn.filereadable "init.lua" ~= 0 or vim.fn.isdirectory "lua" ~= 0
     end,

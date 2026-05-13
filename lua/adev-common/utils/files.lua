@@ -23,7 +23,6 @@ function M.write_file(path, content, mode)
 end
 
 --- get a file in adev config
---- get a file in adev config
 ---@param relative_path string example `"/init.lua"`
 ---@return string
 function M:get_config_file(relative_path)

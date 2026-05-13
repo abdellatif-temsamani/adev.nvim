@@ -10,13 +10,7 @@ local M = {}
 
 ---@param buf integer
 function M.attach(buf)
-    ---Set a the buffer local keymap.
-    ---@param modes string|string[] Mode(s) in which the mapping applies.
-    ---@param lhs string            Left-hand side of the mapping (key sequence).
-    ---@param rhs string|function   Right-hand side action or callback.
-    local set_keymap = function(modes, lhs, rhs)
-        vim.keymap.set(modes, lhs, rhs, { buffer = buf })
-    end
+    local set_keymap = utils.keymaps.buffer(buf)
 
     set_keymap("n", "<cr>", function()
         nav.open_or_enter(buf)

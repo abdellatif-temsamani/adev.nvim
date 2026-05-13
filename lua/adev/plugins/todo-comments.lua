@@ -1,4 +1,4 @@
-local events = require "adev-common.utils.events"
+local plugin = require "adev-common.plugin"
 
 local alts = {
     FIX = { "FIXME", "BUG", "FIXIT", "ISSUE", "ERROR" },
@@ -12,7 +12,7 @@ local alts = {
 
 return {
     "folke/todo-comments.nvim",
-    event = { events.buffer.new_file, events.buffer.read_pre, events.file.read_pre },
+    event = plugin.file_events(),
     dependencies = { "nvim-telescope/telescope.nvim" },
     cmd = { "TodoTelescope" },
     keys = {

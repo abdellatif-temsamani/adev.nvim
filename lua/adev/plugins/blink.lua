@@ -1,4 +1,5 @@
 local events = require "adev-common.utils.events"
+local icons = require "adev-common.icons"
 
 return {
     {
@@ -73,28 +74,16 @@ return {
                         components = {
                             kind_icon = {
                                 text = function(ctx)
-                                    local ok, icons = pcall(require, "mini.icons")
-                                    if not ok then
-                                        return ""
-                                    end
                                     return select(1, icons.get("lsp", ctx.kind))
                                 end,
                                 highlight = function(ctx)
-                                    local ok, icons = pcall(require, "mini.icons")
-                                    if not ok then
-                                        return "Comment"
-                                    end
-                                    return select(2, icons.get("lsp", ctx.kind))
+                                    return select(2, icons.get("lsp", ctx.kind, "", "Comment"))
                                 end,
                             },
 
                             kind = {
                                 highlight = function(ctx)
-                                    local ok, icons = pcall(require, "mini.icons")
-                                    if not ok then
-                                        return "Comment"
-                                    end
-                                    return select(2, icons.get("lsp", ctx.kind))
+                                    return select(2, icons.get("lsp", ctx.kind, "", "Comment"))
                                 end,
                             },
                         },

@@ -1,12 +1,10 @@
-return function()
-    vim.lsp.config("html", {
-        filetypes = {
-            "astro",
-            "eruby",
-            "html",
-            "htmldjango",
-            "templ",
-            "blade",
-        },
-    })
-end
+return require("adev.lsp.servers.configure").server("html", {
+    filetypes = {
+        "astro",
+        "eruby",
+        "html",
+        "htmldjango",
+        "templ",
+        "blade",
+    },
+})

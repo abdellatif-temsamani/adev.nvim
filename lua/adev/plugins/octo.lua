@@ -1,3 +1,5 @@
+local plugin = require "adev-common.plugin"
+
 return {
     "pwntester/octo.nvim",
     dependencies = {
@@ -7,10 +9,7 @@ return {
     keys = {
         { "<leader>tc", "<CMD>Octo<CR>", desc = "Octo commands", mode = "n" },
     },
-    cond = function()
-        return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null"):gsub("\n", "")
-            == "true"
-    end,
+    cond = plugin.is_git_worktree,
     opts = {
         enable_builtin = true,
     },

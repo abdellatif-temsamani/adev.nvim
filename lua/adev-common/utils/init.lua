@@ -14,6 +14,7 @@ local Utils = {
     },
     files = require "adev-common.utils.files",
     buffers = require "adev-common.utils.buffers",
+    keymaps = require "adev-common.utils.keymaps",
 }
 
 ---@param msg string
