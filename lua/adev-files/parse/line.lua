@@ -74,24 +74,6 @@ function M.parse_line(line)
     end
 
     local name = trim.trim(line)
-
-    local function is_icon_prefix(prefix)
-        return prefix:find("[%w%._%-]") == nil
-    end
-
-    local prefix, rest = name:match "^(%S+)%s+(.+)$"
-    if prefix and rest and is_icon_prefix(prefix) then
-        local candidate = trim.trim(rest)
-        if candidate ~= "" then
-            local candidate_fs = candidate
-            if candidate:sub(-1) == "/" then
-                candidate_fs = candidate:sub(1, -2)
-            end
-            if validate.is_valid_rel_path(candidate_fs) then
-                name = candidate
-            end
-        end
-    end
     if name == "" then
         return nil, nil
     end

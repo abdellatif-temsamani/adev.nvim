@@ -1,11 +1,12 @@
 local fs = require "adev-files.utils.fs"
 local fs_ops = require "adev-files.sync.fs_ops"
+local path = require "adev-files.utils.fs.path"
 local stat = require "adev-files.utils.fs.stat"
 
 local M = {}
 
 local function parent_dir(path)
-    return path:match("^(.*)/[^/]+/?$") or ""
+    return path:match "^(.*)/[^/]+/?$" or ""
 end
 
 local function ensure_parent(path)
@@ -19,6 +20,19 @@ end
 local function ensure_available(path)
     if stat.exists(path) then
         return false, "target exists: " .. path
+    end
+    return true
+end
+
+local function ensure_not_self_descendant(op)
+    if op.kind ~= "directory" then
+        return true
+    end
+    if not op.src or not op.dst then
+        return true
+    end
+    if path.is_same_or_subpath(op.src, op.dst) then
+        return false, "cannot copy or move a directory into itself: " .. op.dst
     end
     return true
 end
@@ -67,6 +81,10 @@ function M.apply_ops(ops)
         end
     end
     for _, op in ipairs(copies) do
+        local ok0, err0 = ensure_not_self_descendant(op)
+        if not ok0 then
+            return false, err0
+        end
         local ok, err = ensure_parent(op.dst)
         if not ok then
             return false, err
@@ -77,6 +95,10 @@ function M.apply_ops(ops)
         end
     end
     for _, op in ipairs(moves) do
+        local ok0, err0 = ensure_not_self_descendant(op)
+        if not ok0 then
+            return false, err0
+        end
         local ok, err = ensure_parent(op.dst)
         if not ok then
             return false, err

@@ -1,11 +1,11 @@
 local M = {}
 
 local icons = require "adev-files.icon"
-local state = require "adev-files.state"
-local view = require "adev-files.core.view"
 local marks = require "adev-files.core.marks"
 local model = require "adev-files.core.model"
 local path = require "adev-files.utils.fs.path"
+local state = require "adev-files.state"
+local view = require "adev-files.core.view"
 
 --- Add virtual text icons to buffer
 ---@param buf integer
@@ -40,8 +40,9 @@ local function add_virtual_text(buf, root)
                     pending_by_id[op.dst_id] = pending_by_id[op.dst_id] or {}
                     table.insert(pending_by_id[op.dst_id], op)
                 elseif op.dst then
-                    pending_by_path[op.dst] = pending_by_path[op.dst] or {}
-                    table.insert(pending_by_path[op.dst], op)
+                    local dst = path.abs(op.dst)
+                    pending_by_path[dst] = pending_by_path[dst] or {}
+                    table.insert(pending_by_path[dst], op)
                 end
             end
         end
@@ -64,7 +65,7 @@ local function add_virtual_text(buf, root)
             local node_id = row_to_id[row]
             local pending_ops = node_id and pending_by_id[node_id] or nil
             local is_pending = pending_ops and #pending_ops > 0
-            local abs_path = st.root .. parsed.fs_name
+            local abs_path = path.join_abs(st.root, parsed.fs_name)
             if not pending_ops then
                 pending_ops = pending_by_path[abs_path]
                 is_pending = pending_ops and #pending_ops > 0
@@ -98,7 +99,8 @@ local function add_virtual_text(buf, root)
                 for _, op in ipairs(pending_ops) do
                     local src_rel = path.relpath(st.root, op.src or "")
                     local label = op.type == "move" and "  moved from " or "  copied from "
-                    local hl = op.type == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy"
+                    local hl = op.type == "move" and "adevFilesPendingMove"
+                        or "adevFilesPendingCopy"
                     table.insert(suffix, { label .. src_rel, hl })
                 end
             end

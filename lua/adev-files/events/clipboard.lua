@@ -1,14 +1,14 @@
 local utils = require "adev-common.utils"
 
 local clipboard = require "adev-files.clipboard"
-local selection = require "adev-files.events.selection"
-local parse = require "adev-files.parse"
-local state = require "adev-files.state"
 local marks = require "adev-files.core.marks"
+local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
-local sync = require "adev-files.sync"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
+local selection = require "adev-files.events.selection"
+local state = require "adev-files.state"
+local sync = require "adev-files.sync"
 local validate = require "adev-files.events.validate"
 
 local M = {}
@@ -16,13 +16,12 @@ local M = {}
 ---@param name string
 ---@return string, string
 local function split_name_ext(name)
-    local dot = name:match("^.*()%.")
+    local dot = name:match "^.*()%."
     if not dot or dot == 1 then
         return name, ""
     end
     return name:sub(1, dot - 1), name:sub(dot)
 end
-
 
 ---@param buf integer
 ---@param root string
@@ -35,7 +34,7 @@ local function build_existing_abs(buf, root)
         if not is_deleted then
             local entry = select(1, parse.parse_line(clean))
             if entry then
-                existing[root .. entry.fs_name] = true
+                existing[path.join_abs(root, entry.fs_name)] = true
             end
         end
     end
@@ -53,7 +52,7 @@ local function build_row_by_abs(buf, root)
         if not is_deleted then
             local entry = select(1, parse.parse_line(clean))
             if entry then
-                rows[vim.fn.fnamemodify(root .. entry.fs_name, ":p")] = i - 1
+                rows[path.join_abs(root, entry.fs_name)] = i - 1
             end
         end
     end
@@ -65,7 +64,7 @@ end
 ---@param existing_abs table<string, boolean>
 ---@return string
 local function unique_dest(dest_root, base, existing_abs)
-    local candidate = dest_root .. base
+    local candidate = path.join_abs(dest_root, base)
     if not utils.files.file_exists(candidate) and not existing_abs[candidate] then
         return candidate
     end
@@ -74,7 +73,7 @@ local function unique_dest(dest_root, base, existing_abs)
     local i = 1
     while true do
         local next_base = string.format("%s_%d%s", name, i, ext)
-        local next_dst = dest_root .. next_base
+        local next_dst = path.join_abs(dest_root, next_base)
         if not utils.files.file_exists(next_dst) and not existing_abs[next_dst] then
             return next_dst
         end
@@ -152,14 +151,11 @@ function M.paste(buf, rel_dir)
 
     local items = clip.items
     if clip.mode == "move" then
-        local dest_root_abs = vim.fn.fnamemodify(dest_root, ":p")
-        if dest_root_abs:sub(-1) ~= "/" then
-            dest_root_abs = dest_root_abs .. "/"
-        end
+        local dest_root_abs = path.abs(dest_root) .. "/"
         local filtered = {}
         local skipped = 0
         for _, item in ipairs(items) do
-            local src = (item.src or ""):gsub("/+$", "")
+            local src = path.abs(item.src or "")
             local parent = vim.fn.fnamemodify(src, ":h")
             if parent:sub(-1) ~= "/" then
                 parent = parent .. "/"
@@ -176,7 +172,11 @@ function M.paste(buf, rel_dir)
         end
         if skipped > 0 then
             utils.notify(
-                string.format("Skipped %d same-directory entr%s", skipped, skipped == 1 and "y" or "ies"),
+                string.format(
+                    "Skipped %d same-directory entr%s",
+                    skipped,
+                    skipped == 1 and "y" or "ies"
+                ),
                 vim.log.levels.INFO,
                 "adev-files"
             )
@@ -205,7 +205,7 @@ function M.paste(buf, rel_dir)
     local existing_abs = build_existing_abs(buf, st.root)
     local insert_at = vim.api.nvim_buf_line_count(buf)
     for _, item in ipairs(items) do
-        local src = (item.src or ""):gsub("/+$", "")
+        local src = path.abs(item.src or "")
         local base = vim.fs.basename(src)
         local dst = unique_dest(dest_root, base, existing_abs)
 
@@ -218,7 +218,10 @@ function M.paste(buf, rel_dir)
         insert_at = insert_at + 1
 
         existing_abs[dst] = true
-        table.insert(ops, { type = clip.mode, src = item.src, dst = dst, dst_id = dst_id, kind = item.kind })
+        table.insert(
+            ops,
+            { type = clip.mode, src = src, dst = dst, dst_id = dst_id, kind = item.kind }
+        )
     end
 
     if #ops == 0 then

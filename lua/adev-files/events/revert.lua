@@ -1,7 +1,8 @@
+local marks = require "adev-files.core.marks"
 local parse = require "adev-files.parse"
+local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
-local marks = require "adev-files.core.marks"
 
 local M = {}
 
@@ -18,9 +19,11 @@ local function remove_pending_ops_at_row(buf, node_id, abs_path)
     local updated = {}
     local removed = {}
     for _, op in ipairs(pending) do
-        if (op.type == "copy" or op.type == "move") and (
-            (node_id and op.dst_id == node_id) or (abs_path and op.dst == abs_path)
-        ) then
+        local op_dst = op.dst and path.abs(op.dst) or nil
+        if
+            (op.type == "copy" or op.type == "move")
+            and ((node_id and op.dst_id == node_id) or (abs_path and op_dst == abs_path))
+        then
             table.insert(removed, op)
         else
             table.insert(updated, op)
@@ -45,7 +48,7 @@ local function restore_move_sources(buf, st, ops)
     local targets = {}
     for _, op in ipairs(ops) do
         if op.type == "move" and op.src then
-            targets[op.src] = true
+            targets[path.abs(op.src)] = true
         end
     end
     if next(targets) == nil then
@@ -58,7 +61,7 @@ local function restore_move_sources(buf, st, ops)
         if is_deleted then
             local entry = select(1, parse.parse_line(clean))
             if entry then
-                local abs = st.root .. entry.fs_name
+                local abs = path.join_abs(st.root, entry.fs_name)
                 if targets[abs] then
                     vim.api.nvim_buf_set_lines(buf, i - 1, i, false, { clean })
                 end
@@ -91,7 +94,7 @@ function M.revert_current_line(buf)
             break
         end
     end
-    local abs_path = row_entry and (st.root .. row_entry.fs_name) or nil
+    local abs_path = row_entry and path.join_abs(st.root, row_entry.fs_name) or nil
 
     local removed_ops = remove_pending_ops_at_row(buf, node_id, abs_path)
     if #removed_ops > 0 then

@@ -1,4 +1,5 @@
 local parse = require "adev-files.parse"
+local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
 
 local M = {}
@@ -16,7 +17,7 @@ function M.collect_entries(buf)
     local skipped = 0
 
     local function abs_path(root, fs_name)
-        return vim.fn.fnamemodify(root .. fs_name, ":p")
+        return path.join_abs(root, fs_name)
     end
 
     local function exists_in_snapshot(entry)
@@ -24,7 +25,7 @@ function M.collect_entries(buf)
             return false
         end
         local root = st.model.root or st.root
-        return st.model.original_by_path[root .. entry.fs_name] ~= nil
+        return st.model.original_by_path[path.join_abs(root, entry.fs_name)] ~= nil
     end
 
     local push = function(line)
@@ -73,7 +74,7 @@ function M.collect_entries_with_rows(buf)
     local rows = {}
 
     local function abs_path(root, fs_name)
-        return vim.fn.fnamemodify(root .. fs_name, ":p")
+        return path.join_abs(root, fs_name)
     end
 
     local push = function(line, row)

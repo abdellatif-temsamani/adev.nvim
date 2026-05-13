@@ -14,7 +14,7 @@ function M.copy_dir_recursive(src_dir, dst_dir)
     if stat.exists(dst_dir) then
         return false, "target exists: " .. dst_dir
     end
-    if path.is_subpath(src_dir, dst_dir) then
+    if path.is_same_or_subpath(src_dir, dst_dir) then
         return false, "cannot copy a directory into itself: " .. dst_dir
     end
 

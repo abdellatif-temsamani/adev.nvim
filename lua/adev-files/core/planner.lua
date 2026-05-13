@@ -1,4 +1,13 @@
+local path = require "adev-files.utils.fs.path"
+
 local M = {}
+
+local function display_name(entry)
+    if entry.kind == "directory" then
+        return entry.fs_name .. "/"
+    end
+    return entry.fs_name
+end
 
 ---@param projection AdevFilesProjection
 ---@param pending_ops AdevFilesOp[]
@@ -10,6 +19,12 @@ local function normalize_pending(projection, pending_ops)
 
     for _, op in ipairs(pending_ops or {}) do
         if op.type == "copy" or op.type == "move" then
+            if op.src then
+                op.src = path.abs(op.src)
+            end
+            if op.dst then
+                op.dst = path.abs(op.dst)
+            end
             if not op.dst_id and op.dst then
                 op.dst_id = projection.current_by_path[op.dst]
             end
@@ -38,7 +53,8 @@ function M.plan(model, projection, pending_ops)
     end
 
     local ops = {}
-    local pending_by_dst, move_sources, updated_pending = normalize_pending(projection, pending_ops or {})
+    local pending_by_dst, move_sources, updated_pending =
+        normalize_pending(projection, pending_ops or {})
     local original_by_path = model.original_by_path or {}
     local current_by_path = projection.current_by_path or {}
 
@@ -48,10 +64,17 @@ function M.plan(model, projection, pending_ops)
         if not current or deleted then
             if not current_by_path[original.abs_path] then
                 if not move_sources[original.abs_path] then
-                    table.insert(ops, { type = "delete", path = original.abs_path, kind = original.kind })
+                    table.insert(
+                        ops,
+                        { type = "delete", path = original.abs_path, kind = original.kind }
+                    )
                 end
             end
         else
+            if current.abs_path == original.abs_path and current.entry.kind ~= original.kind then
+                return nil,
+                    "cannot change file/directory type in place: " .. display_name(current.entry)
+            end
             if current.entry.fs_name ~= original.fs_name then
                 table.insert(ops, {
                     type = "rename",
@@ -67,7 +90,10 @@ function M.plan(model, projection, pending_ops)
         if not model.original_by_id[id] and not original_by_path[current.abs_path] then
             if not pending_by_dst[id] then
                 if current.entry.kind == "directory" then
-                    table.insert(ops, { type = "create", path = current.abs_path, kind = "directory" })
+                    table.insert(
+                        ops,
+                        { type = "create", path = current.abs_path, kind = "directory" }
+                    )
                 else
                     table.insert(ops, { type = "create", path = current.abs_path, kind = "file" })
                 end

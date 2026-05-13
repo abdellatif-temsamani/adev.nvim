@@ -1,3 +1,4 @@
+local path = require "adev-files.utils.fs.path"
 local root = require "adev-files.root"
 
 local M = {}
@@ -36,7 +37,7 @@ function M.snapshot(model, entries, row_to_id)
         if not item.deleted then
             local id = row_to_id[item.row]
             if id then
-                local abs_path = model.root .. item.entry.fs_name
+                local abs_path = path.join_abs(model.root, item.entry.fs_name)
                 model.original_by_id[id] = {
                     id = id,
                     fs_name = item.entry.fs_name,
@@ -70,7 +71,7 @@ function M.project(model, entries, row_to_id)
     for _, item in ipairs(entries) do
         local id = row_to_id[item.row]
         if id then
-            local abs_path = model.root .. item.entry.fs_name
+            local abs_path = path.join_abs(model.root, item.entry.fs_name)
             if item.deleted then
                 deleted_by_id[id] = { entry = item.entry, abs_path = abs_path }
             else

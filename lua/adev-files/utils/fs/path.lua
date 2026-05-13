@@ -4,12 +4,34 @@ local M = {}
 
 ---@param path string
 ---@return string
+function M.abs(path)
+    local abs = vim.fn.fnamemodify(path, ":p")
+    if abs:sub(-1) == "/" and #abs > 1 then
+        abs = abs:sub(1, -2)
+    end
+    return abs
+end
+
+---@param base string
+---@param rel string
+---@return string
+function M.join_abs(base, rel)
+    base = base or ""
+    rel = rel or ""
+    if base ~= "" and rel ~= "" and base:sub(-1) ~= "/" then
+        base = base .. "/"
+    end
+    return M.abs(base .. rel)
+end
+
+---@param path string
+---@return string
 function M.norm_real(path)
     local rp = uv.fs_realpath(path)
     if not rp or rp == "" then
-        return path
+        return M.abs(path)
     end
-    return rp
+    return M.abs(rp)
 end
 
 ---@param base string
@@ -25,6 +47,16 @@ function M.is_subpath(base, child)
     return child:sub(1, #base) == base
 end
 
+---@param base string
+---@param child string
+---@return boolean
+function M.is_same_or_subpath(base, child)
+    base = M.norm_real(base)
+    child = M.norm_real(child)
+
+    return base == child or M.is_subpath(base, child)
+end
+
 ---@param root string
 ---@param path string
 ---@return string
@@ -33,16 +65,8 @@ function M.relpath(root, path)
         return path
     end
 
-    local function normalize_abs(value)
-        local abs = vim.fn.fnamemodify(value, ":p")
-        if abs:sub(-1) == "/" and #abs > 1 then
-            abs = abs:sub(1, -2)
-        end
-        return abs
-    end
-
-    local root_abs = normalize_abs(root)
-    local path_abs = normalize_abs(path)
+    local root_abs = M.abs(root)
+    local path_abs = M.abs(path)
 
     if vim.fs and vim.fs.relpath then
         local rel = vim.fs.relpath(path_abs, root_abs)
