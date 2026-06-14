@@ -6,7 +6,6 @@ return {
     astro = { "astro" },
     csharp_ls = { "cs" },
     svelte = { "svelte" },
-    pyright = { "python" },
     ruff = { "python" },
     bashls = { "bash", "sh" },
     clangd = { "c", "cpp", "objc", "objcpp", "cuda" },
