@@ -84,6 +84,43 @@ function M.apply_ops_with_confirm(buf, ops, opts)
 
         -- Refresh after clearing `applying`, otherwise refresh is a no-op.
         view.refresh(buf)
+
+        -- Jump cursor to the first newly created entry
+        local create_ops = {}
+        for _, op in ipairs(ops) do
+            if op.type == "create" then
+                table.insert(create_ops, op)
+            end
+        end
+        if #create_ops > 0 then
+            local target_fname = vim.fn.fnamemodify(create_ops[1].path, ":t")
+            if target_fname ~= "" then
+                local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+                local target_row = nil
+                for i, line in ipairs(buf_lines) do
+                    local stripped = line:gsub("/$", "")
+                    if stripped == target_fname then
+                        target_row = i
+                        break
+                    end
+                end
+                if target_row then
+                    -- Find the window displaying this buffer
+                    local win_id = nil
+                    for _, w in ipairs(vim.api.nvim_list_wins()) do
+                        if vim.api.nvim_win_is_valid(w) and vim.api.nvim_win_get_buf(w) == buf then
+                            win_id = w
+                            break
+                        end
+                    end
+                    if win_id then
+                        vim.api.nvim_set_current_win(win_id)
+                        pcall(vim.api.nvim_win_set_cursor, win_id, { target_row, 0 })
+                    end
+                end
+            end
+        end
+
         if opts.on_success then
             opts.on_success()
         end

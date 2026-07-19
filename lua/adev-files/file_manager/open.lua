@@ -43,8 +43,26 @@ function M.open()
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_win", prev_win)
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_win", manager_win)
 
-    -- Position cursor at first file entry (line 1)
-    pcall(vim.api.nvim_win_set_cursor, 0, { 1, 0 })
+    -- Try to position cursor on the file that was active before opening
+    local target_row = 1
+    local ok_prev, prev_buf = pcall(vim.api.nvim_win_get_buf, prev_win)
+    if ok_prev and prev_buf and vim.api.nvim_buf_is_valid(prev_buf) then
+        local buf_name = vim.api.nvim_buf_get_name(prev_buf)
+        if buf_name ~= "" then
+            local fname = vim.fn.fnamemodify(buf_name, ":t")
+            if fname ~= "" then
+                local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+                for i, line in ipairs(buf_lines) do
+                    local stripped = line:gsub("/$", "")
+                    if stripped == fname then
+                        target_row = i
+                        break
+                    end
+                end
+            end
+        end
+    end
+    pcall(vim.api.nvim_win_set_cursor, 0, { target_row, 0 })
 end
 
 return M
