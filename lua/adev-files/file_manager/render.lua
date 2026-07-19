@@ -62,6 +62,12 @@ local function add_virtual_text(buf, root)
     update_title(buf, root, entries)
 
     local original_lines = state.get_original_lines(buf)
+    local original_by_path = {}
+    for _, o in pairs(original_lines) do
+        if o.abs_path then
+            original_by_path[o.abs_path] = o.entry
+        end
+    end
     local clip_sources = build_clipboard_sources()
 
     local pending_delete = {}
@@ -103,13 +109,13 @@ local function add_virtual_text(buf, root)
 
             local suffix = {}
             local abs_path = path.join_abs(root, parsed.fs_name)
-            local original = original_lines[row]
+            local original = original_by_path[abs_path]
             local deleted = pending_delete[abs_path]
             local clip_mode = clip_sources[abs_path]
 
             if not deleted then
                 if original then
-                    if parsed.fs_name ~= original.entry.fs_name then
+                    if parsed.fs_name ~= original.fs_name then
                         table.insert(suffix, { " | renamed |", "adevFilesPendingMark" })
                     end
                 elseif not clip_mode and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0) then
