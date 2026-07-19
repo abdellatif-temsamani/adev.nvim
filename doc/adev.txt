@@ -300,12 +300,14 @@ alternative to external file explorers with deeper Neovim integration.
 
 FEATURES						*adev-files-features*
 
-Current features:
 - Floating file manager for the current directory
 - Navigate directories and open files
 - Create/rename/move/copy/delete files and directories
-- Multi-selection operations via visual mode
-- Apply edits with confirmation dialog
+- Multi-selection via visual mode or normal-mode marks
+- Edit entries in-place with pending-ops and confirm dialog
+- Visual labels for pending operations (| copy |, | move |, | delete |, | new |, | renamed |)
+- Toggle hidden files visibility
+- In-buffer help system
 
 Planned features:
 - Respect git ignored files
@@ -322,28 +324,49 @@ return {
 }
 <
 
-When enabled, adev-files replaces the Snacks file explorer (<leader>n) and
+When enabled, adev-files replaces the Snacks file explorer (`<leader>n`) and
 provides its own file management interface.
 
 KEYMAPS							*adev-files-keymaps*
 
-| Mapping    | Description              |
-|------------|--------------------------|
-| <leader>n  | Open Adev Files           |
+Open Adev Files: >
+
+<leader>no
+<
 
 In-buffer mappings:
 
-| Mapping         | Description                              |
-|----------------|------------------------------------------|
-| <CR>/L/<Right>  | Enter directory / open file               |
-| H/<Left>/<BS>   | Parent directory                          |
-| yy              | Copy selection (normal/visual)            |
-| dd              | Cut/move selection (normal/visual)        |
-| P               | Paste into current dir / dir under cursor |
-| yc              | Clear clipboard                           |
-| X               | Delete selection (normal/visual)          |
-| ?               | Help                                      |
-| q               | Quit                                      |
+| Mapping              | Description                                |
+|----------------------|--------------------------------------------|
+| <CR> / L / <Right>   | Enter directory / open file                 |
+| H / <bs> / <Left>    | Parent directory                            |
+| =                    | Go to initial root                          |
+| <leader>nq           | Quit                                        |
+| <leader>nh           | Toggle hidden files                         |
+|                      |                                             |
+| Selection (multi-file)                         |
+| <TAB>                | Toggle mark on current line                 |
+| <leader>nm           | Clear all marks                             |
+|                      |                                             |
+| Clipboard (normal/visual)                      |
+| <leader>ny           | Copy selection                              |
+| <leader>nx           | Cut/move selection                          |
+| <leader>np           | Paste at cursor / into directory            |
+|                      |                                             |
+| Edits                                         |
+| <leader>nu           | Revert current line                         |
+| <leader>nc           | Reset all (discard changes)                 |
+|                      |                                             |
+| <leader>nd           | Delete (normal/visual)                      |
+| ?                    | Open in-buffer help                         |
+
+Global commands (outside file manager):
+
+| Mapping              | Description                                |
+|----------------------|--------------------------------------------|
+| <leader>na           | Create file (prompt)                        |
+| <leader>nr           | Rename current file (prompt)                |
+| <leader>nd           | Delete current file (confirm)               |
 
 USAGE							*adev-files-usage*
 
@@ -351,8 +374,14 @@ Open the file manager: >
 :lua require('adev-files').open()
 <
 
+Multi-selection can be done either by visual selection or by marking entries
+with `<TAB>` in normal mode. Marked entries show a `●` prefix. Use
+`<leader>ny` (copy) or `<leader>nx` (cut) to operate on all marked entries.
+
 Create, rename, or delete entries by editing lines in the buffer, then apply
-changes with `:write` and confirm when prompted.
+changes with `:write` and confirm when prompted. Pending operations are shown
+as pipe-delimited virtual labels (e.g., `| new |`, `| renamed |`, `| delete |`,
+`| copy |`, `| move |`).
 
 The system is designed to work seamlessly with Neovim's buffer management and
 provides a more integrated experience than traditional file explorers.
