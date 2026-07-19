@@ -8,7 +8,6 @@ local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
 local selection = require "adev-files.events.selection"
 local state = require "adev-files.state"
-local sync = require "adev-files.sync"
 local validate = require "adev-files.events.validate"
 
 local M = {}
@@ -84,13 +83,10 @@ local function unique_dest(dest_root, base, existing_abs)
 end
 
 ---@param buf integer
-local function refresh_keep_cursor(buf)
-    local ok, cur = pcall(vim.api.nvim_win_get_cursor, 0)
-    sync.refresh(buf)
-    if ok and cur and vim.api.nvim_buf_is_valid(buf) then
-        local last = vim.api.nvim_buf_line_count(buf)
-        local row = math.max(1, math.min(cur[1], last))
-        pcall(vim.api.nvim_win_set_cursor, 0, { row, cur[2] })
+local function refresh_virtual_text(buf)
+    local st = state.get(buf)
+    if st then
+        render.add_virtual_text(buf, st.root)
     end
 end
 
@@ -120,7 +116,7 @@ function M.set_clipboard(buf, mode)
         vim.log.levels.INFO,
         "adev-files"
     )
-    refresh_keep_cursor(buf)
+    refresh_virtual_text(buf)
 end
 
 ---@param buf integer
@@ -253,7 +249,7 @@ end
 function M.clear(buf)
     clipboard.clear()
     utils.notify("Clipboard cleared", vim.log.levels.INFO, "adev-files")
-    refresh_keep_cursor(buf)
+    refresh_virtual_text(buf)
 end
 
 return M

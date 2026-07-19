@@ -1,9 +1,26 @@
 local M = {}
 
+local clipboard = require "adev-files.clipboard"
 local icons = require "adev-files.icon"
 local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
+
+--- Build a map of source paths -> mode from the clipboard
+---@return table<string, string>
+local function build_clipboard_sources()
+    local clip = clipboard.get()
+    if not clip or not clip.items then
+        return {}
+    end
+    local sources = {}
+    for _, item in ipairs(clip.items) do
+        if item.src then
+            sources[path.abs(item.src)] = clip.mode
+        end
+    end
+    return sources
+end
 
 --- Add virtual text icons to buffer
 ---@param buf integer
@@ -23,6 +40,7 @@ local function add_virtual_text(buf, root)
     end
 
     local original_lines = state.get_original_lines(buf)
+    local clip_sources = build_clipboard_sources()
 
     local pending_delete = {}
     local pending_by_path = {}
@@ -43,7 +61,6 @@ local function add_virtual_text(buf, root)
     for _, item in ipairs(entries) do
         local parsed = item.entry
         local row = item.row
-        local is_deleted = item.deleted
         if parsed then
             local icon, hl = icons.get_entry_icon(parsed.name)
             local prefix = icon ~= "" and (icon .. " ") or "  "
@@ -55,20 +72,27 @@ local function add_virtual_text(buf, root)
             local suffix = {}
             local abs_path = path.join_abs(root, parsed.fs_name)
             local original = original_lines[row]
-            local deleted = is_deleted or pending_delete[abs_path]
+            local deleted = pending_delete[abs_path]
+            local clip_mode = clip_sources[abs_path]
 
             if not deleted then
                 if original then
                     if parsed.fs_name ~= original.entry.fs_name then
                         table.insert(suffix, { "  R rename", "DiffChange" })
                     end
-                elseif not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0 then
+                elseif not clip_mode and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0) then
                     table.insert(suffix, { "  + create", "DiffAdd" })
                 end
             end
 
             if deleted then
                 table.insert(suffix, { "  D delete", "adevFilesPendingDelete" })
+            end
+
+            if clip_mode then
+                local label = clip_mode == "move" and "  marked for move" or "  marked for copy"
+                local hl_name = clip_mode == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy"
+                table.insert(suffix, { label, hl_name })
             end
 
             local pending_ops = pending_by_path[abs_path]

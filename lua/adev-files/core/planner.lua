@@ -26,8 +26,16 @@ function M.plan(original_lines, current_entries, root, pending_ops, buf)
     local updated_pending = {}
     local pending_dst_paths = {}
     local pending_move_src_paths = {}
+    local pending_delete_paths = {}
     for _, op in ipairs(pending_ops or {}) do
-        if op.type == "copy" or op.type == "move" then
+        if op.type == "delete" then
+            local p = path.abs(op.path or "")
+            if p ~= "" then
+                pending_delete_paths[p] = true
+                table.insert(ops, { type = "delete", path = p, kind = op.kind })
+                table.insert(updated_pending, op)
+            end
+        elseif op.type == "copy" or op.type == "move" then
             local cloned = vim.deepcopy(op)
             if cloned.src then
                 cloned.src = path.abs(cloned.src)
@@ -103,7 +111,7 @@ function M.plan(original_lines, current_entries, root, pending_ops, buf)
 
     for row, orig in pairs(original_lines) do
         if not consumed_originals[row] then
-            if not pending_move_src_paths[orig.abs_path] then
+            if not pending_move_src_paths[orig.abs_path] and not pending_delete_paths[orig.abs_path] then
                 local still_exists = false
                 for _, item in ipairs(current_entries) do
                     if not item.deleted and item.entry.fs_name == orig.entry.fs_name then

@@ -1,6 +1,7 @@
-local state = require "adev-files.state"
+local plan = require "adev-files.sync.plan"
+local render = require "adev-files.file_manager.render"
 local selection = require "adev-files.events.selection"
-local parse = require "adev-files.parse"
+local state = require "adev-files.state"
 
 local M = {}
 
@@ -16,15 +17,21 @@ function M.delete_selected(buf)
         return
     end
 
-    local seen = {}
-    for _, row in ipairs(rows) do
-        if not seen[row] then
-            local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
-            local marked = parse.mark_delete(line)
-            vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { marked })
-            seen[row] = true
-        end
+    local ops = {}
+    for _, item in ipairs(items) do
+        table.insert(ops, {
+            type = "delete",
+            path = item.src,
+            kind = item.kind,
+        })
     end
+
+    if #ops == 0 then
+        return
+    end
+
+    plan.stage_ops(buf, ops)
+    render.add_virtual_text(buf, st.root)
 end
 
 return M

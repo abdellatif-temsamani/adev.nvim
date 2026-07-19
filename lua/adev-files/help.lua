@@ -7,7 +7,7 @@ local M = {}
 ---@return string[]
 function M.compact_content()
     return {
-        "[  <CR> open | <bs> parent | <leader>fy copy | <leader>fd cut | <leader>fp paste | <leader>fD delete  ]",
+        "[  <CR> open | <bs> parent | <leader>ny copy | <leader>nx cut | <leader>np paste | <leader>nd delete  ]",
     }
 end
 
@@ -20,21 +20,21 @@ local function content()
         "    <CR> / L        open file / enter directory",
         "    <bs> / H        parent directory",
         "    =              go to initial root",
-        "    <leader>fq     quit",
+        "    <leader>nq     quit",
         "",
         "  Clipboard",
-        "    <leader>fy     copy (normal/visual)",
-        "    <leader>fd     cut/move (normal/visual)",
-        "    <leader>fp     paste (at cursor)",
-        "    <leader>fc     clear clipboard",
+        "    <leader>ny     copy (normal/visual)",
+        "    <leader>nx     cut/move (normal/visual)",
+        "    <leader>np     paste (at cursor)",
+        "    <leader>nc     clear clipboard",
         "",
         "  Edits",
         "    Edit entries in-place, then :write to apply",
         "    u              undo edit",
-        "    <leader>fu     revert current line",
+        "    <leader>nu     revert current line",
         "",
         "  Delete",
-        "    <leader>fD     delete (normal/visual)",
+        "    <leader>nd     delete (normal/visual)",
         "",
         "  Global",
         "    <leader>no     open file manager",
