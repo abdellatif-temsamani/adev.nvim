@@ -2,7 +2,6 @@ local utils = require "adev-common.utils"
 
 local confirmation = require "adev-files.utils.confirmation"
 local sync = require "adev-files.sync"
-local state = require "adev-files.state"
 
 local M = {}
 
@@ -14,26 +13,7 @@ function M.confirm_discard_if_modified(buf, cb)
         return
     end
 
-    local ops, err = sync.plan_ops(buf)
-    if ops and #ops == 0 then
-        -- Some edits can flip the modified flag but don't translate into
-        -- filesystem operations. Treat those as safe to discard and reset view.
-        local ok, reset_err = sync.discard_reset(buf)
-        if not ok and reset_err then
-            utils.err_notify(reset_err, "adev-files")
-        end
-        cb(true)
-        return
-    end
-
     vim.schedule(function()
-        if err then
-            utils.notify(
-                "Pending edits could not be parsed; discarding will reset the view",
-                vim.log.levels.WARN,
-                "adev-files"
-            )
-        end
         confirmation.open({ "Discard unsaved edits and navigate?" }, {
             title = "adev-files",
             width = 54,

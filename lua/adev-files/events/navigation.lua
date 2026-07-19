@@ -40,7 +40,7 @@ function M.open_or_enter(buf)
         return
     end
 
-    local cfg = config.get_config()
+    local cfg = config.get_config() or {}
     local open_files = cfg.open_files or {}
     if not open_files.enabled then
         return

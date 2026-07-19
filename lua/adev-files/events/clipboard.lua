@@ -71,7 +71,8 @@ local function unique_dest(dest_root, base, existing_abs)
 
     local name, ext = split_name_ext(base)
     local i = 1
-    while true do
+    local max_attempts = 10000
+    while i <= max_attempts do
         local next_base = string.format("%s_%d%s", name, i, ext)
         local next_dst = path.join_abs(dest_root, next_base)
         if not utils.files.file_exists(next_dst) and not existing_abs[next_dst] then
@@ -79,6 +80,7 @@ local function unique_dest(dest_root, base, existing_abs)
         end
         i = i + 1
     end
+    return path.join_abs(dest_root, base)
 end
 
 ---@param buf integer

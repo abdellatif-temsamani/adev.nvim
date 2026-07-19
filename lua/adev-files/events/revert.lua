@@ -121,7 +121,11 @@ function M.revert_current_line(buf)
         return
     end
 
-    -- New line (create or pasted dest) - remove it
+    -- New line (create or pasted dest) - remove it, but only if it's a valid entry
+    local entry = select(1, parse.parse_line(clean))
+    if not entry then
+        return
+    end
     vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
 end
 

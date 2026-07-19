@@ -30,7 +30,10 @@ function M.get_config()
 end
 
 function M.open()
-    file_manager.open()
+    local ok, err = pcall(file_manager.open)
+    if not ok then
+        vim.notify("adev-files: " .. tostring(err), vim.log.levels.ERROR)
+    end
 end
 
 return M

@@ -19,21 +19,22 @@ local function normalize_pending(projection, pending_ops)
 
     for _, op in ipairs(pending_ops or {}) do
         if op.type == "copy" or op.type == "move" then
-            if op.src then
-                op.src = path.abs(op.src)
+            local cloned = vim.deepcopy(op)
+            if cloned.src then
+                cloned.src = path.abs(cloned.src)
             end
-            if op.dst then
-                op.dst = path.abs(op.dst)
+            if cloned.dst then
+                cloned.dst = path.abs(cloned.dst)
             end
-            if not op.dst_id and op.dst then
-                op.dst_id = projection.current_by_path[op.dst]
+            if not cloned.dst_id and cloned.dst then
+                cloned.dst_id = projection.current_by_path[cloned.dst]
             end
-            if op.dst_id then
-                by_dst_id[op.dst_id] = op
-                table.insert(updated, op)
+            if cloned.dst_id then
+                by_dst_id[cloned.dst_id] = cloned
+                table.insert(updated, cloned)
             end
-            if op.type == "move" and op.src then
-                move_sources[op.src] = true
+            if cloned.type == "move" and cloned.src then
+                move_sources[cloned.src] = true
             end
         else
             table.insert(updated, op)

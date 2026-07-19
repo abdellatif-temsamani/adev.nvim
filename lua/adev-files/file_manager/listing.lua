@@ -50,15 +50,19 @@ end
 ---@param root string
 ---@return string[]
 function M.build_lines(root)
-    local files = vim.fs.dir(root)
+    local files, err = vim.fs.dir(root)
+    if not files then
+        return {}
+    end
 
     -- Collect file entries
     local entries = {}
-    for name, type in files do
-        if type == "directory" and name:sub(-1) ~= "/" then
-            name = name .. "/"
+    for fname, ftype in files do
+        local entry_name = fname
+        if ftype == "directory" and entry_name:sub(-1) ~= "/" then
+            entry_name = entry_name .. "/"
         end
-        table.insert(entries, name)
+        table.insert(entries, entry_name)
     end
 
     table.sort(entries, sort_files)

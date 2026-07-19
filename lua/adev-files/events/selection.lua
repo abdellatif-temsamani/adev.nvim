@@ -46,13 +46,18 @@ function M.collect_entries(buf)
     if mode == "v" or mode == "V" or mode == "\22" then
         local a = vim.fn.getpos("'<")[2]
         local b = vim.fn.getpos("'>")[2]
-        if a > b then
-            a, b = b, a
-        end
-        vim.cmd "normal! \\<Esc>"
-        local lines = vim.api.nvim_buf_get_lines(buf, a - 1, b, false)
-        for _, l in ipairs(lines) do
-            push(l)
+        if a == 0 or b == 0 then
+            -- Marks not set; fall back to current line
+            push(vim.api.nvim_get_current_line())
+        else
+            if a > b then
+                a, b = b, a
+            end
+            vim.cmd "normal! \\<Esc>"
+            local lines = vim.api.nvim_buf_get_lines(buf, a - 1, b, false)
+            for _, l in ipairs(lines) do
+                push(l)
+            end
         end
     else
         push(vim.api.nvim_get_current_line())
@@ -92,13 +97,19 @@ function M.collect_entries_with_rows(buf)
     if mode == "v" or mode == "V" or mode == "\22" then
         local a = vim.fn.getpos("'<")[2]
         local b = vim.fn.getpos("'>")[2]
-        if a > b then
-            a, b = b, a
-        end
-        vim.cmd "normal! \\<Esc>"
-        local lines = vim.api.nvim_buf_get_lines(buf, a - 1, b, false)
-        for i, l in ipairs(lines) do
-            push(l, (a - 1) + (i - 1))
+        if a == 0 or b == 0 then
+            -- Marks not set; fall back to current line
+            local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+            push(vim.api.nvim_get_current_line(), row)
+        else
+            if a > b then
+                a, b = b, a
+            end
+            vim.cmd "normal! \\<Esc>"
+            local lines = vim.api.nvim_buf_get_lines(buf, a - 1, b, false)
+            for i, l in ipairs(lines) do
+                push(l, (a - 1) + (i - 1))
+            end
         end
     else
         local row = vim.api.nvim_win_get_cursor(0)[1] - 1

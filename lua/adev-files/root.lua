@@ -32,7 +32,10 @@ end
 function M.parent_root(root)
     root = M.normalize_root(root)
     local r = root:gsub("/$", "")
-    if r == "." or r == "" then
+    if r == "" then
+        return "/"
+    end
+    if r == "." then
         return "./"
     end
     local parent = vim.fs.dirname(r)

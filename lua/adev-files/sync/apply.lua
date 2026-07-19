@@ -74,11 +74,15 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         end
 
         st2.applying = true
-        local ok, apply_err = apply_ops(ops)
+        local ok, apply_ok_or_err, apply_err_msg = pcall(apply_ops, ops)
         st2.applying = false
 
         if not ok then
-            utils.err_notify(apply_err or "failed to apply changes", "adev-files")
+            utils.err_notify(tostring(apply_ok_or_err or "failed to apply changes"), "adev-files")
+            return
+        end
+        if not apply_ok_or_err then
+            utils.err_notify(apply_err_msg or "failed to apply changes", "adev-files")
             return
         end
 

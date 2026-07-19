@@ -42,9 +42,9 @@ end
 ---@param path string
 ---@return boolean, string?
 function M.rm_rf(path)
-    local res = vim.fn.delete(path, "rf")
-    if res ~= 0 then
-        return false, "failed to delete: " .. path
+    local ok, res = pcall(vim.fn.delete, path, "rf")
+    if not ok then
+        return false, "failed to delete: " .. path .. ": " .. tostring(res)
     end
     return true
 end
