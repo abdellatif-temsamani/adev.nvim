@@ -1,16 +1,13 @@
-local marks = require "adev-files.core.marks"
 local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
-local view = require "adev-files.core.view"
 
 local M = {}
 
 ---@param buf integer
----@param node_id integer|nil
 ---@param abs_path string|nil
 ---@return AdevFilesOp[]
-local function remove_pending_ops_at_row(buf, node_id, abs_path)
+local function remove_pending_ops_at_path(buf, abs_path)
     local pending = state.get_pending_ops(buf)
     if not pending or #pending == 0 then
         return {}
@@ -22,7 +19,7 @@ local function remove_pending_ops_at_row(buf, node_id, abs_path)
         local op_dst = op.dst and path.abs(op.dst) or nil
         if
             (op.type == "copy" or op.type == "move")
-            and ((node_id and op.dst_id == node_id) or (abs_path and op_dst == abs_path))
+            and (abs_path and op_dst == abs_path)
         then
             table.insert(removed, op)
         else
@@ -81,22 +78,10 @@ function M.revert_current_line(buf)
         return
     end
 
-    local entries, err = view.parse_buffer(buf)
-    if err then
-        return
-    end
-    local row_to_id = marks.sync(buf, entries)
-    local node_id = row_to_id[row]
-    local row_entry = nil
-    for _, item in ipairs(entries) do
-        if item.row == row then
-            row_entry = item.entry
-            break
-        end
-    end
-    local abs_path = row_entry and path.join_abs(st.root, row_entry.fs_name) or nil
+    local entry = select(1, parse.parse_line(clean))
+    local abs_path = entry and path.join_abs(st.root, entry.fs_name) or nil
 
-    local removed_ops = remove_pending_ops_at_row(buf, node_id, abs_path)
+    local removed_ops = remove_pending_ops_at_path(buf, abs_path)
     if #removed_ops > 0 then
         vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
         restore_move_sources(buf, st, removed_ops)
@@ -108,21 +93,19 @@ function M.revert_current_line(buf)
         return
     end
 
-    local original = node_id and st.model and st.model.original_by_id[node_id] or nil
+    local original_lines = state.get_original_lines(buf)
+    local original = original_lines[row]
     if original then
-        local entry = select(1, parse.parse_line(clean))
-        if entry and entry.fs_name ~= original.fs_name then
-            local display = original.fs_name
-            if original.kind == "directory" then
-                display = original.fs_name .. "/"
+        if entry and entry.fs_name ~= original.entry.fs_name then
+            local display = original.entry.fs_name
+            if original.entry.kind == "directory" then
+                display = original.entry.fs_name .. "/"
             end
             vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { display })
         end
         return
     end
 
-    -- New line (create or pasted dest) - remove it, but only if it's a valid entry
-    local entry = select(1, parse.parse_line(clean))
     if not entry then
         return
     end

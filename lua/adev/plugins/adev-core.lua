@@ -1,5 +1,6 @@
 local files = require "adev-common.utils.files"
 local configs = Adev.core_plugins
+local adev_files = require "adev-files"
 
 return {
     dir = files.adev_path .. "/lua/adev-files/",
@@ -10,11 +11,24 @@ return {
     cond = Adev.flags.experimental_adev_files,
     keys = {
         {
-            "<leader>n",
-            function()
-                require("adev-files").open()
-            end,
-            desc = "list files in cwd",
+            "<leader>no",
+            adev_files.open,
+            desc = "open file manager",
+        },
+        {
+            "<leader>na",
+            adev_files.create_file,
+            desc = "create file",
+        },
+        {
+            "<leader>nr",
+            adev_files.rename_file,
+            desc = "rename file",
+        },
+        {
+            "<leader>nd",
+            adev_files.delete_file,
+            desc = "delete file",
         },
     },
 }

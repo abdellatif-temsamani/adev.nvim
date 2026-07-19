@@ -1,8 +1,6 @@
 local M = {}
 
 local icons = require "adev-files.icon"
-local marks = require "adev-files.core.marks"
-local model = require "adev-files.core.model"
 local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
@@ -23,23 +21,17 @@ local function add_virtual_text(buf, root)
     if err then
         return
     end
-    local row_to_id = marks.sync(buf, entries)
-    local current_model = st.model or model.new(root)
-    local projection = model.project(current_model, entries, row_to_id)
-    state.set_view(buf, projection)
+
+    local original_lines = state.get_original_lines(buf)
 
     local pending_delete = {}
-    local pending_by_id = {}
     local pending_by_path = {}
     if st.pending_ops then
         for _, op in ipairs(st.pending_ops) do
             if op.type == "delete" and op.path then
                 pending_delete[op.path] = true
             elseif (op.type == "copy" or op.type == "move") and op.src then
-                if op.dst_id then
-                    pending_by_id[op.dst_id] = pending_by_id[op.dst_id] or {}
-                    table.insert(pending_by_id[op.dst_id], op)
-                elseif op.dst then
+                if op.dst then
                     local dst = path.abs(op.dst)
                     pending_by_path[dst] = pending_by_path[dst] or {}
                     table.insert(pending_by_path[dst], op)
@@ -48,7 +40,6 @@ local function add_virtual_text(buf, root)
         end
     end
 
-    -- Add icon virtual text for each entry
     for _, item in ipairs(entries) do
         local parsed = item.entry
         local row = item.row
@@ -62,31 +53,16 @@ local function add_virtual_text(buf, root)
             })
 
             local suffix = {}
-            local node_id = row_to_id[row]
-            local pending_ops = node_id and pending_by_id[node_id] or nil
-            local is_pending = pending_ops and #pending_ops > 0
-            local abs_path = path.join_abs(st.root, parsed.fs_name)
-            if not pending_ops then
-                pending_ops = pending_by_path[abs_path]
-                is_pending = pending_ops and #pending_ops > 0
-            end
+            local abs_path = path.join_abs(root, parsed.fs_name)
+            local original = original_lines[row]
             local deleted = is_deleted or pending_delete[abs_path]
-            local original = node_id and current_model.original_by_id[node_id] or nil
-            if not original then
-                local original_id = current_model.original_by_path[abs_path]
-                original = original_id and current_model.original_by_id[original_id] or nil
-            end
 
             if not deleted then
                 if original then
-                    if parsed.fs_name ~= original.fs_name then
-                        if not projection.current_by_path[original.abs_path] then
-                            table.insert(suffix, { "  R rename", "DiffChange" })
-                        else
-                            table.insert(suffix, { "  + create", "DiffAdd" })
-                        end
+                    if parsed.fs_name ~= original.entry.fs_name then
+                        table.insert(suffix, { "  R rename", "DiffChange" })
                     end
-                elseif not is_pending then
+                elseif not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0 then
                     table.insert(suffix, { "  + create", "DiffAdd" })
                 end
             end
@@ -95,13 +71,14 @@ local function add_virtual_text(buf, root)
                 table.insert(suffix, { "  D delete", "adevFilesPendingDelete" })
             end
 
-            if st and pending_ops and #pending_ops > 0 then
+            local pending_ops = pending_by_path[abs_path]
+            if pending_ops and #pending_ops > 0 then
                 for _, op in ipairs(pending_ops) do
-                    local src_rel = path.relpath(st.root, op.src or "")
+                    local src_rel = path.relpath(root, op.src or "")
                     local label = op.type == "move" and "  moved from " or "  copied from "
-                    local hl = op.type == "move" and "adevFilesPendingMove"
+                    local hl_name = op.type == "move" and "adevFilesPendingMove"
                         or "adevFilesPendingCopy"
-                    table.insert(suffix, { label .. src_rel, hl })
+                    table.insert(suffix, { label .. src_rel, hl_name })
                 end
             end
 

@@ -134,4 +134,23 @@ function M.quit(buf)
     end)
 end
 
+--- go to initial root directory
+---@param buf integer
+function M.go_root(buf)
+    local st = state.get(buf)
+    if not st or st.applying or not st.initial_root then
+        return
+    end
+    if st.root == st.initial_root then
+        return
+    end
+
+    confirm.confirm_discard_if_modified(buf, function(ok)
+        if not ok then
+            return
+        end
+        sync.set_root(buf, st.initial_root)
+    end)
+end
+
 return M

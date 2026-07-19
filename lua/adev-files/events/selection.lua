@@ -21,11 +21,13 @@ function M.collect_entries(buf)
     end
 
     local function exists_in_snapshot(entry)
-        if not st.model or not st.model.original_by_path then
-            return false
+        local original_lines = state.get_original_lines(buf)
+        for _, orig in pairs(original_lines) do
+            if orig.entry.fs_name == entry.fs_name then
+                return true
+            end
         end
-        local root = st.model.root or st.root
-        return st.model.original_by_path[path.join_abs(root, entry.fs_name)] ~= nil
+        return false
     end
 
     local push = function(line)

@@ -12,6 +12,7 @@ local model = require "adev-files.core.model"
 ---@field view AdevFilesProjection|nil
 ---@field applying boolean
 ---@field pending_ops AdevFilesOp[]
+---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -32,12 +33,13 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, model = model.new(root), view = nil, applying = false, pending_ops = {} }
+    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {} }
     states[buf].root = root
     states[buf].model = model.new(root)
     states[buf].view = nil
     states[buf].applying = false
     states[buf].pending_ops = {}
+    states[buf].original_lines = {}
     return states[buf]
 end
 
@@ -110,6 +112,25 @@ function M.clear_pending_ops(buf)
         return
     end
     states[buf].pending_ops = {}
+end
+
+---@param buf integer
+---@param lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
+function M.set_original_lines(buf, lines)
+    if not states[buf] then
+        return
+    end
+    states[buf].original_lines = lines or {}
+end
+
+---@param buf integer
+---@return table<integer, {entry: AdevFilesEntry, abs_path: string}>
+function M.get_original_lines(buf)
+    local st = states[buf]
+    if not st then
+        return {}
+    end
+    return st.original_lines or {}
 end
 
 ---@param buf integer

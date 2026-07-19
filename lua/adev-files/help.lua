@@ -7,37 +7,44 @@ local M = {}
 ---@return string[]
 function M.compact_content()
     return {
-        "[  <CR>/L open | H parent | yy copy | dd cut | P paste | D delete  ]",
+        "[  <CR> open | <bs> parent | <leader>fy copy | <leader>fd cut | <leader>fp paste | <leader>fD delete  ]",
     }
 end
 
 ---@return string[]
 local function content()
     return {
-        "adev-files",
+        "  adev-files",
         "",
-        "Navigation",
-        "  <CR>/L/<Right>   enter directory / open file",
-        "  H/<Left>/<BS>    parent directory",
-        "  q               quit",
+        "  Navigation",
+        "    <CR> / L        open file / enter directory",
+        "    <bs> / H        parent directory",
+        "    =              go to initial root",
+        "    <leader>fq     quit",
         "",
-        "Clipboard",
-        "  yy              copy (normal/visual)",
-        "  dd              cut/move (normal/visual)",
-        "  P               paste into current dir / dir under cursor",
-        "  yc              clear clipboard",
+        "  Clipboard",
+        "    <leader>fy     copy (normal/visual)",
+        "    <leader>fd     cut/move (normal/visual)",
+        "    <leader>fp     paste (at cursor)",
+        "    <leader>fc     clear clipboard",
         "",
-        "Edits",
-        "  Edit entries in-place, then :write to apply",
-        "  u               undo edit",
-        "  U               revert current line",
+        "  Edits",
+        "    Edit entries in-place, then :write to apply",
+        "    u              undo edit",
+        "    <leader>fu     revert current line",
         "",
-        "Delete",
-        "  D               delete (normal/visual)",
+        "  Delete",
+        "    <leader>fD     delete (normal/visual)",
         "",
-        "Confirm",
-        "  y/<CR>           confirm",
-        "  n/q/<Esc>        cancel",
+        "  Global",
+        "    <leader>no     open file manager",
+        "    <leader>na     create file",
+        "    <leader>nr     rename file",
+        "    <leader>nd     delete file",
+        "",
+        "  Confirm",
+        "    y / <CR>       confirm",
+        "    n / q / <Esc>  cancel",
     }
 end
 

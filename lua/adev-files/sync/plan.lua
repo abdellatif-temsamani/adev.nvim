@@ -1,7 +1,5 @@
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
-local marks = require "adev-files.core.marks"
-local model = require "adev-files.core.model"
 local planner = require "adev-files.core.planner"
 
 local M = {}
@@ -13,7 +11,7 @@ local function op_key(op)
         return string.format("%s:%s", op.type, op.path or "")
     end
     if op.type == "rename" or op.type == "copy" or op.type == "move" then
-        return string.format("%s:%s->%s:%s", op.type, op.src or "", op.dst or "", op.dst_id or "")
+        return string.format("%s:%s->%s", op.type, op.src or "", op.dst or "")
     end
     return "unknown"
 end
@@ -39,12 +37,8 @@ function M.plan_ops(buf)
         return nil, err
     end
 
-    local row_to_id = marks.sync(buf, entries)
-    local current_model = st.model or model.new(st.root)
-    local projection = model.project(current_model, entries, row_to_id)
-    state.set_view(buf, projection)
-
-    local ops, plan_err, updated_pending = planner.plan(current_model, projection, state.get_pending_ops(buf))
+    local original_lines = state.get_original_lines(buf)
+    local ops, plan_err, updated_pending = planner.plan(original_lines, entries, st.root, state.get_pending_ops(buf), buf)
     if plan_err then
         return nil, plan_err
     end

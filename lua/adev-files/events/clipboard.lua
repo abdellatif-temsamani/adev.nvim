@@ -205,7 +205,8 @@ function M.paste(buf, rel_dir)
     end
 
     local existing_abs = build_existing_abs(buf, st.root)
-    local insert_at = vim.api.nvim_buf_line_count(buf)
+    local insert_at = vim.api.nvim_win_get_cursor(0)[1]
+    local insert_start = insert_at
     for _, item in ipairs(items) do
         local src = path.abs(item.src or "")
         local base = vim.fs.basename(src)
@@ -224,6 +225,20 @@ function M.paste(buf, rel_dir)
             ops,
             { type = clip.mode, src = src, dst = dst, dst_id = dst_id, kind = item.kind }
         )
+    end
+
+    local ol = state.get_original_lines(buf)
+    if ol and next(ol) then
+        local num = #items
+        local new_ol = {}
+        for row, data in pairs(ol) do
+            if row >= insert_start then
+                new_ol[row + num] = data
+            else
+                new_ol[row] = data
+            end
+        end
+        state.set_original_lines(buf, new_ol)
     end
 
     if #ops == 0 then

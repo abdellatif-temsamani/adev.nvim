@@ -1,6 +1,7 @@
 local state = require "adev-files.state"
 local model = require "adev-files.core.model"
 local marks = require "adev-files.core.marks"
+local path = require "adev-files.utils.fs.path"
 local view = require "adev-files.core.view"
 
 local M = {}
@@ -19,6 +20,15 @@ function M.index_original(buf)
         return false, err
     end
     local row_to_id = marks.sync(buf, entries)
+
+    local original_lines = {}
+    for _, item in ipairs(entries) do
+        original_lines[item.row] = {
+            entry = vim.deepcopy(item.entry),
+            abs_path = path.join_abs(st.root, item.entry.fs_name),
+        }
+    end
+    state.set_original_lines(buf, original_lines)
 
     local next_model = model.new(st.root)
     model.snapshot(next_model, entries, row_to_id)
