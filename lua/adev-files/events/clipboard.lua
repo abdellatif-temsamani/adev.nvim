@@ -242,6 +242,7 @@ function M.paste(buf, rel_dir)
     end
 
     plan.stage_ops(buf, ops)
+    state.clear_selection_marks(buf)
     render.add_virtual_text(buf, st.root)
 end
 

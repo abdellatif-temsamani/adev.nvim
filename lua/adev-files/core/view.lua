@@ -1,5 +1,6 @@
 local listing = require "adev-files.file_manager.listing"
 local parse = require "adev-files.parse"
+local state = require "adev-files.state"
 
 local M = {}
 
@@ -8,6 +9,7 @@ local M = {}
 ---@param opts? { show_hidden?: boolean }
 ---@return string[]
 function M.render(buf, root, opts)
+    state.clear_selection_marks(buf)
     local header = listing.build_header(root)
     local entries = listing.build_lines(root, opts)
     if #entries == 0 then

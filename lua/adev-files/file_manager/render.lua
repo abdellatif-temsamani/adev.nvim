@@ -80,17 +80,24 @@ local function add_virtual_text(buf, root)
         end
     end
 
+    local selection_marks = state.get_selection_marks(buf)
+
     for _, item in ipairs(entries) do
         local parsed = item.entry
         local row = item.row
         if parsed then
             local icon, hl = icons.get_entry_icon(parsed.name)
-            local prefix = icon ~= "" and (icon .. " ") or "  "
-            if parsed.kind == "directory" then
-                prefix = "▸ " .. prefix
+            local virt_text = {}
+            if selection_marks[row] then
+                table.insert(virt_text, { "● ", "adevFilesPendingMark" })
             end
+            local entry_prefix = icon ~= "" and (icon .. " ") or "  "
+            if parsed.kind == "directory" then
+                entry_prefix = "▸ " .. entry_prefix
+            end
+            table.insert(virt_text, { entry_prefix, hl ~= "" and hl or "Normal" })
             vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
-                virt_text = { { prefix, hl ~= "" and hl or "Normal" } },
+                virt_text = virt_text,
                 virt_text_pos = "inline",
             })
 
@@ -103,19 +110,19 @@ local function add_virtual_text(buf, root)
             if not deleted then
                 if original then
                     if parsed.fs_name ~= original.entry.fs_name then
-                        table.insert(suffix, { "  R rename", "DiffChange" })
+                        table.insert(suffix, { " | renamed |", "adevFilesPendingMark" })
                     end
                 elseif not clip_mode and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0) then
-                    table.insert(suffix, { "  + create", "DiffAdd" })
+                    table.insert(suffix, { " | new |", "adevFilesPendingMark" })
                 end
             end
 
             if deleted then
-                table.insert(suffix, { "  D delete", "adevFilesPendingDelete" })
+                table.insert(suffix, { " | delete |", "adevFilesPendingDelete" })
             end
 
             if clip_mode then
-                local label = clip_mode == "move" and "  marked for move" or "  marked for copy"
+                local label = clip_mode == "move" and " | move |" or " | copy |"
                 local hl_name = clip_mode == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy"
                 table.insert(suffix, { label, hl_name })
             end
@@ -124,10 +131,10 @@ local function add_virtual_text(buf, root)
             if pending_ops and #pending_ops > 0 then
                 for _, op in ipairs(pending_ops) do
                     local src_rel = path.relpath(root, op.src or "")
-                    local label = op.type == "move" and "  moved from " or "  copied from "
+                    local label = op.type == "move" and " | moved from " or " | copied from "
                     local hl_name = op.type == "move" and "adevFilesPendingMove"
                         or "adevFilesPendingCopy"
-                    table.insert(suffix, { label .. src_rel, hl_name })
+                    table.insert(suffix, { label .. src_rel .. " |", hl_name })
                 end
             end
 

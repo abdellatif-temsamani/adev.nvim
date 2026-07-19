@@ -1,5 +1,6 @@
 local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
+local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
 
 local M = {}
@@ -62,13 +63,51 @@ function M.collect_entries(buf)
             end
         end
     else
-        push(vim.api.nvim_get_current_line())
+        local marks = state.get_selection_marks(buf)
+        if next(marks) then
+            local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+            for row, _ in pairs(marks) do
+                if row >= 0 and row < #lines then
+                    push(lines[row + 1])
+                end
+            end
+        else
+            push(vim.api.nvim_get_current_line())
+        end
     end
 
     return items, skipped
 end
 
 ---@param buf integer
+function M.toggle_mark(buf)
+    local st = state.get(buf)
+    if not st then
+        return
+    end
+    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local marks = state.get_selection_marks(buf)
+    if marks[row] then
+        marks[row] = nil
+    else
+        marks[row] = true
+    end
+    state.set_selection_marks(buf, marks)
+    render.add_virtual_text(buf, st.root)
+end
+
+---@param buf integer
+function M.clear_marks(buf)
+    local st = state.get(buf)
+    if not st then
+        return
+    end
+    state.clear_selection_marks(buf)
+    render.add_virtual_text(buf, st.root)
+end
+
+---@param buf integer
+
 ---@return AdevFilesClipboardItem[], integer[]
 function M.collect_entries_with_rows(buf)
     local st = state.get(buf)
@@ -114,8 +153,18 @@ function M.collect_entries_with_rows(buf)
             end
         end
     else
-        local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-        push(vim.api.nvim_get_current_line(), row)
+        local marks = state.get_selection_marks(buf)
+        if next(marks) then
+            local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+            for row, _ in pairs(marks) do
+                if row >= 0 and row < #lines then
+                    push(lines[row + 1], row)
+                end
+            end
+        else
+            local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+            push(vim.api.nvim_get_current_line(), row)
+        end
     end
 
     return items, rows

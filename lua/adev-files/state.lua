@@ -15,6 +15,7 @@ local model = require "adev-files.core.model"
 ---@field pending_ops AdevFilesOp[]
 ---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
 ---@field show_hidden boolean
+---@field selection_marks table<integer, true>
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -35,7 +36,7 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {}, show_hidden = false }
+    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {}, show_hidden = false, selection_marks = {} }
     states[buf].root = root
     states[buf].model = model.new(root)
     states[buf].view = nil
@@ -43,6 +44,7 @@ function M.init(buf, root)
     states[buf].pending_ops = {}
     states[buf].original_lines = {}
     states[buf].show_hidden = false
+    states[buf].selection_marks = {}
     return states[buf]
 end
 
@@ -153,6 +155,30 @@ function M.set_show_hidden(buf, val)
         return
     end
     states[buf].show_hidden = val
+end
+
+---@param buf integer
+---@return table<integer, true>
+function M.get_selection_marks(buf)
+    local st = states[buf]
+    return st and st.selection_marks or {}
+end
+
+---@param buf integer
+---@param marks table<integer, true>
+function M.set_selection_marks(buf, marks)
+    if not states[buf] then
+        return
+    end
+    states[buf].selection_marks = marks or {}
+end
+
+---@param buf integer
+function M.clear_selection_marks(buf)
+    if not states[buf] then
+        return
+    end
+    states[buf].selection_marks = {}
 end
 
 ---@param buf integer

@@ -4,6 +4,7 @@ local revert = require "adev-files.events.revert"
 local help = require "adev-files.help"
 local nav = require "adev-files.events.navigation"
 local parse = require "adev-files.parse"
+local selection = require "adev-files.events.selection"
 local sync_view = require "adev-files.sync.view"
 local utils = require "adev-common.utils"
 
@@ -51,6 +52,13 @@ function M.attach(buf)
 
     set_keymap("n", "<leader>nh", function()
         sync_view.toggle_hidden(buf)
+    end)
+
+    set_keymap("n", "<tab>", function()
+        selection.toggle_mark(buf)
+    end)
+    set_keymap("n", "<leader>nm", function()
+        selection.clear_marks(buf)
     end)
 
     set_keymap({ "n", "x" }, "<leader>ny", function()

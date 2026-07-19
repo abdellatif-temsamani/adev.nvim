@@ -68,8 +68,12 @@ highlight link adevFilesFileValue Normal
 " Pending ops (virtual inline markers)
 highlight default link adevFilesPendingDelete DiffDelete
 highlight default link adevFilesPendingCopy DiffAdd
-highlight default link adevFilesPendingMove DiffChange
+highlight default link adevFilesPendingMove DiffDelete
 highlight default adevFilesPendingCopy gui=bold cterm=bold
 highlight default adevFilesPendingMove gui=bold cterm=bold
+
+" Selection mark
+highlight default link adevFilesPendingMark Special
+highlight default adevFilesPendingMark gui=bold cterm=bold
 
 let b:current_syntax = "adev_files"
