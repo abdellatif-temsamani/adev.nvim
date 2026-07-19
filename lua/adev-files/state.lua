@@ -8,11 +8,13 @@ local model = require "adev-files.core.model"
 
 ---@class AdevFilesState
 ---@field root string
+---@field initial_root string
 ---@field model AdevFilesModel
 ---@field view AdevFilesProjection|nil
 ---@field applying boolean
 ---@field pending_ops AdevFilesOp[]
 ---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
+---@field show_hidden boolean
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -33,13 +35,14 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {} }
+    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {}, show_hidden = false }
     states[buf].root = root
     states[buf].model = model.new(root)
     states[buf].view = nil
     states[buf].applying = false
     states[buf].pending_ops = {}
     states[buf].original_lines = {}
+    states[buf].show_hidden = false
     return states[buf]
 end
 
@@ -131,6 +134,25 @@ function M.get_original_lines(buf)
         return {}
     end
     return st.original_lines or {}
+end
+
+---@param buf integer
+---@return boolean
+function M.get_show_hidden(buf)
+    local st = states[buf]
+    if not st then
+        return false
+    end
+    return st.show_hidden or false
+end
+
+---@param buf integer
+---@param val boolean
+function M.set_show_hidden(buf, val)
+    if not states[buf] then
+        return
+    end
+    states[buf].show_hidden = val
 end
 
 ---@param buf integer

@@ -1,5 +1,3 @@
-local help = require "adev-files.help"
-
 local M = {}
 
 ---@param a string
@@ -37,36 +35,84 @@ end
 ---@param root string
 ---@return string[]
 function M.build_header(root)
-    local help_line = help.compact_content()[1]
-    return {
-        help_line,
-        string.rep("=", #help_line),
-        "root: " .. root,
-        "",
-    }
+    local result = {}
+    table.insert(result, string.rep("=", 72))
+    table.insert(result, "root: " .. root)
+    table.insert(result, "")
+    return result
 end
 
 --- Build file entry lines (without icons - icons are virtual text)
 ---@param root string
+---@param opts? { show_hidden?: boolean }
 ---@return string[]
-function M.build_lines(root)
+function M.build_lines(root, opts)
     local files, err = vim.fs.dir(root)
     if not files then
         return {}
     end
 
+    local show_hidden = opts and opts.show_hidden or false
+
     -- Collect file entries
-    local entries = {}
+    local dirs = {}
+    local files_list = {}
     for fname, ftype in files do
+        if not show_hidden and fname:sub(1, 1) == "." then
+            goto continue
+        end
         local entry_name = fname
         if ftype == "directory" and entry_name:sub(-1) ~= "/" then
             entry_name = entry_name .. "/"
         end
-        table.insert(entries, entry_name)
+        if ftype == "directory" then
+            table.insert(dirs, entry_name)
+        else
+            table.insert(files_list, entry_name)
+        end
+        ::continue::
     end
 
-    table.sort(entries, sort_files)
+    table.sort(dirs, sort_files)
+    table.sort(files_list, sort_files)
+
+    local entries = {}
+    for _, d in ipairs(dirs) do
+        table.insert(entries, d)
+    end
+    if #dirs > 0 and #files_list > 0 then
+        table.insert(entries, "")
+    end
+    for _, f in ipairs(files_list) do
+        table.insert(entries, f)
+    end
+
     return entries
+end
+
+---@param buf integer
+---@param entries { row: integer, entry: AdevFilesEntry }[]
+---@return string
+function M.build_footer_line(buf, entries)
+    local st = require("adev-files.state").get(buf)
+    local dir_count = 0
+    local file_count = 0
+    for _, item in ipairs(entries) do
+        if item.entry.kind == "directory" then
+            dir_count = dir_count + 1
+        else
+            file_count = file_count + 1
+        end
+    end
+    local parts = { string.format("  Files: %d  Dirs: %d", file_count, dir_count) }
+    local pending = st and st.pending_ops or {}
+    if #pending > 0 then
+        table.insert(parts, string.format("  Pending: %d", #pending))
+    end
+    if st and st.show_hidden then
+        table.insert(parts, "  .hidden on")
+    end
+    return table.concat(parts, "  |")
 end
 
 return M

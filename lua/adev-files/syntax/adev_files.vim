@@ -7,8 +7,18 @@ endif
 " Format: help | ==== | root: <path> | name (directories end with /)
 " ============================================================
 
-" Help line (first line with keybindings)
-syntax match adevFilesHelp "^<CR>.*$"
+" Compact help bar lines — keybindings
+syntax match adevFilesHelp "^│.*$" contains=adevFilesHelpKey
+
+" Key tokens within help bar
+syntax match adevFilesHelpKey "\c<CR>" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "\c<bs>" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "[=?]" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "ny" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "nx" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "np" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "nd" contained containedin=adevFilesHelp
+syntax match adevFilesHelpKey "nc" contained containedin=adevFilesHelp
 
 " Separator line (====)
 syntax match adevFilesSeparator "^=\+$"
@@ -19,8 +29,11 @@ syntax match adevFilesDirValue "^.\+/$"
 " Root title line (defined after to take precedence over directory match)
 syntax match adevFilesTitle "^root:.*$"
 
-" Files - lines NOT starting with root: and NOT ending with /
-syntax match adevFilesFileValue "^[^r].*[^/]$"
+" Group separator (blank lines between sections)
+syntax match adevFilesGroupSep "^$"
+
+" Files - lines not starting with root:, │, =; not ending with /
+syntax match adevFilesFileValue "^[^r│=].*[^/]$"
 syntax match adevFilesFileValue "^r[^o].*[^/]$"
 syntax match adevFilesFileValue "^ro[^o].*[^/]$"
 syntax match adevFilesFileValue "^roo[^t].*[^/]$"
@@ -33,8 +46,14 @@ syntax match adevFilesFileValue "^root[^:].*[^/]$"
 " Help line - subtle color
 highlight link adevFilesHelp Comment
 
+" Help keys - stand out from descriptions
+highlight link adevFilesHelpKey Identifier
+
 " Separator - subtle
 highlight link adevFilesSeparator Comment
+
+" Group separator (blank line between dirs and files)
+highlight link adevFilesGroupSep Comment
 
 " Root title - distinct bold color for visibility
 highlight default link adevFilesTitle Type

@@ -2,9 +2,11 @@ local M = {}
 
 local clipboard = require "adev-files.clipboard"
 local icons = require "adev-files.icon"
+local listing = require "adev-files.file_manager.listing"
 local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
+local win = require "adev-files.file_manager.window"
 
 --- Build a map of source paths -> mode from the clipboard
 ---@return table<string, string>
@@ -20,6 +22,24 @@ local function build_clipboard_sources()
         end
     end
     return sources
+end
+
+--- Update window title with file/dir/pending counts
+---@param buf integer
+---@param root string
+---@param entries { row: integer, entry: AdevFilesEntry }[]
+local function update_title(buf, root, entries)
+    local dir_count = 0
+    local file_count = 0
+    for _, item in ipairs(entries) do
+        if item.entry.kind == "directory" then
+            dir_count = dir_count + 1
+        else
+            file_count = file_count + 1
+        end
+    end
+    local total = dir_count + file_count
+    win.set_title_from_state(buf, root, total)
 end
 
 --- Add virtual text icons to buffer
@@ -38,6 +58,8 @@ local function add_virtual_text(buf, root)
     if err then
         return
     end
+
+    update_title(buf, root, entries)
 
     local original_lines = state.get_original_lines(buf)
     local clip_sources = build_clipboard_sources()
@@ -64,6 +86,9 @@ local function add_virtual_text(buf, root)
         if parsed then
             local icon, hl = icons.get_entry_icon(parsed.name)
             local prefix = icon ~= "" and (icon .. " ") or "  "
+            if parsed.kind == "directory" then
+                prefix = "▸ " .. prefix
+            end
             vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
                 virt_text = { { prefix, hl ~= "" and hl or "Normal" } },
                 virt_text_pos = "inline",
@@ -114,6 +139,17 @@ local function add_virtual_text(buf, root)
             end
         end
     end
+
+    -- Footer line as virt_lines below last entry
+    local footer_line = listing.build_footer_line(buf, entries)
+    local anchor_row = #entries > 0 and entries[#entries].row
+        or vim.api.nvim_buf_line_count(buf) - 1
+    vim.api.nvim_buf_set_extmark(buf, ns, anchor_row, 0, {
+        virt_lines = {
+            { { footer_line, "Comment" } },
+        },
+        virt_lines_above = false,
+    })
 end
 
 --- Add virtual text only (when lines are already set in buffer)
@@ -126,7 +162,12 @@ end
 ---@param buf integer
 ---@param root string
 function M.render(buf, root)
-    view.render(buf, root)
+    local st = state.get(buf)
+    local opts = {}
+    if st then
+        opts.show_hidden = st.show_hidden
+    end
+    view.render(buf, root, opts)
 end
 
 return M

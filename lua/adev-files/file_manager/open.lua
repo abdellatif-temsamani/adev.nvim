@@ -35,9 +35,9 @@ function M.open()
     require("adev-files.events").register(buf, root)
 
     -- Prefer a taller window to allow editing/adding many entries.
-    local max_height = math.max(3, vim.o.lines - 4)
-    local header_offset = 4 -- help, separator, root, blank
-    local height = math.min(math.max(#lines + header_offset, 12), max_height)
+    local max_height = math.max(3, vim.o.lines - 2)
+    local header_offset = 5 -- 2 help lines, separator, root, blank
+    local height = math.min(math.max(#lines + header_offset, 20), max_height)
     win.create_win(buf, height, 72, root)
 
     local manager_win = vim.api.nvim_get_current_win()
@@ -45,7 +45,7 @@ function M.open()
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_win", manager_win)
 
     -- Try to position cursor on the file that was active before opening
-    local target_row = 1
+    local target_row = #listing.build_header(root) + 1
     local ok_prev, prev_buf = pcall(vim.api.nvim_win_get_buf, prev_win)
     if ok_prev and prev_buf and vim.api.nvim_buf_is_valid(prev_buf) then
         local buf_name = vim.api.nvim_buf_get_name(prev_buf)

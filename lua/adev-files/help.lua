@@ -3,14 +3,6 @@ local window = require "adev-common.ui.window"
 
 local M = {}
 
---- Compact help content for the help bar above file manager
----@return string[]
-function M.compact_content()
-    return {
-        "[  <CR> open | <bs> parent | <leader>ny copy | <leader>nx cut | <leader>np paste | <leader>nd delete  ]",
-    }
-end
-
 ---@return string[]
 local function content()
     return {
@@ -21,17 +13,18 @@ local function content()
         "    <bs> / H        parent directory",
         "    =              go to initial root",
         "    <leader>nq     quit",
+        "    <leader>nh     toggle hidden files",
         "",
         "  Clipboard",
         "    <leader>ny     copy (normal/visual)",
         "    <leader>nx     cut/move (normal/visual)",
         "    <leader>np     paste (at cursor)",
-        "    <leader>nc     clear clipboard",
         "",
         "  Edits",
         "    Edit entries in-place, then :write to apply",
         "    u              undo edit",
         "    <leader>nu     revert current line",
+        "    <leader>nc     reset all (discard changes)",
         "",
         "  Delete",
         "    <leader>nd     delete (normal/visual)",

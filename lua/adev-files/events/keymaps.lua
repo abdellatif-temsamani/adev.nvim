@@ -4,6 +4,7 @@ local revert = require "adev-files.events.revert"
 local help = require "adev-files.help"
 local nav = require "adev-files.events.navigation"
 local parse = require "adev-files.parse"
+local sync_view = require "adev-files.sync.view"
 local utils = require "adev-common.utils"
 
 local M = {}
@@ -48,6 +49,10 @@ function M.attach(buf)
         nav.quit(buf)
     end)
 
+    set_keymap("n", "<leader>nh", function()
+        sync_view.toggle_hidden(buf)
+    end)
+
     set_keymap({ "n", "x" }, "<leader>ny", function()
         clipboard.set_clipboard(buf, "copy")
     end)
@@ -60,6 +65,10 @@ function M.attach(buf)
 
     set_keymap("n", "<leader>nu", function()
         revert.revert_current_line(buf)
+    end)
+
+    set_keymap("n", "<leader>nc", function()
+        sync_view.discard_reset(buf)
     end)
 
     set_keymap("n", "?", function()
@@ -81,9 +90,6 @@ function M.attach(buf)
         clipboard.paste(buf, "")
     end)
 
-    set_keymap("n", "<leader>nc", function()
-        clipboard.clear(buf)
-    end)
 end
 
 return M

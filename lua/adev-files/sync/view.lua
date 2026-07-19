@@ -49,15 +49,25 @@ function M.discard_reset(buf)
     st.root = roots.normalize_root(st.root)
     state.clear_pending_ops(buf)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. (st.root or "./"))
-    local ok, manager_win = pcall(vim.api.nvim_buf_get_var, buf, "adev_files_win")
-    if ok and manager_win then
-        window.set_title(manager_win, st.root)
-    end
+    window.set_title_from_state(buf, st.root)
     render.render(buf, st.root)
     index.index_original(buf)
     index.reindex(buf)
     render.add_virtual_text(buf, st.root)
     return true
+end
+
+---@param buf integer
+function M.toggle_hidden(buf)
+    local st = state.get(buf)
+    if not st or st.applying then
+        return
+    end
+    st.show_hidden = not st.show_hidden
+    render.render(buf, st.root)
+    index.index_original(buf)
+    index.reindex(buf)
+    render.add_virtual_text(buf, st.root)
 end
 
 ---@param buf integer
@@ -69,10 +79,7 @@ function M.set_root(buf, root)
     end
     st.root = roots.normalize_root(root)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. st.root)
-    local ok, manager_win = pcall(vim.api.nvim_buf_get_var, buf, "adev_files_win")
-    if ok and manager_win then
-        window.set_title(manager_win, st.root)
-    end
+    window.set_title_from_state(buf, st.root)
     render.render(buf, st.root)
     index.index_original(buf)
     index.reindex(buf)

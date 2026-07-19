@@ -5,11 +5,20 @@ local M = {}
 
 ---@param buf integer
 ---@param root string
+---@param opts? { show_hidden?: boolean }
 ---@return string[]
-function M.render(buf, root)
-    local lines = listing.build_lines(root)
-    if #lines == 0 then
-        lines = { "" }
+function M.render(buf, root, opts)
+    local header = listing.build_header(root)
+    local entries = listing.build_lines(root, opts)
+    if #entries == 0 then
+        entries = { "" }
+    end
+    local lines = {}
+    for _, l in ipairs(header) do
+        table.insert(lines, l)
+    end
+    for _, l in ipairs(entries) do
+        table.insert(lines, l)
     end
     vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
