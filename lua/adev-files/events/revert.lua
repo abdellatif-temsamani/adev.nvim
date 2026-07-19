@@ -1,3 +1,4 @@
+local clipboard = require "adev-files.clipboard"
 local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
@@ -80,6 +81,10 @@ function M.revert_current_line(buf)
 
     local entry = select(1, parse.parse_line(clean))
     local abs_path = entry and path.join_abs(st.root, entry.fs_name) or nil
+
+    if abs_path then
+        clipboard.remove_by_src(abs_path)
+    end
 
     local removed_ops = remove_pending_ops_at_path(buf, abs_path)
     if #removed_ops > 0 then

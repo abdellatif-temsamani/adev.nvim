@@ -1,3 +1,4 @@
+local clipboard = require "adev-files.clipboard"
 local index = require "adev-files.sync.index"
 local render = require "adev-files.file_manager.render"
 local roots = require "adev-files.file_manager.roots"
@@ -47,6 +48,7 @@ function M.discard_reset(buf)
     end
 
     st.root = roots.normalize_root(st.root)
+    clipboard.clear()
     state.clear_pending_ops(buf)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. (st.root or "./"))
     window.set_title_from_state(buf, st.root)
