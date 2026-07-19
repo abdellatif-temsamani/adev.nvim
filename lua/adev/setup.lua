@@ -55,7 +55,7 @@ function M.setup(opts)
         require("adev.lsp").setup()
     end
 
-    if not opts.catppuccin.enabled and opts.colorscheme == "catppuccin" then
+    if not opts.catppuccin.enabled and opts.colorscheme:find "catppuccin" then
         opts.colorscheme = "default"
     end
     vim.cmd(string.format("colorscheme %s", opts.colorscheme))

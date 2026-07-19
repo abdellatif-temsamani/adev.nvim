@@ -40,7 +40,12 @@ function M.get_changelog(version)
         end
     end
 
-    local content = table.concat(vim.fn.readfile(utils.files:get_config_file "/CHANGELOG.md"), "\n")
+    local config_file = utils.files:get_config_file "/CHANGELOG.md"
+    if not utils.files.file_exists(config_file) then
+        utils.err_notify "Could not open CHANGELOG.md"
+        return nil
+    end
+    local content = table.concat(vim.fn.readfile(config_file), "\n")
     if content == "" then
         utils.err_notify "Could not open CHANGELOG.md"
         return nil

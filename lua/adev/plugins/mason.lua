@@ -7,7 +7,7 @@ return {
             {
                 "<leader>mm",
                 "<cmd>Mason<cr>",
-                desc = "go to declaration",
+                desc = "open Mason",
             },
         },
         opts = {

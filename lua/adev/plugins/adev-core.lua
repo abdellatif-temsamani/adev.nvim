@@ -11,7 +11,9 @@ return {
     keys = {
         {
             "<leader>n",
-            require("adev-files").open,
+            function()
+                require("adev-files").open()
+            end,
             desc = "list files in cwd",
         },
     },

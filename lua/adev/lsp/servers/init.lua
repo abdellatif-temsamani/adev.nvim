@@ -14,7 +14,9 @@ local servers = {
 }
 
 function M.setup()
-    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    if not vim.lsp.inlay_hint.is_enabled() then
+        vim.lsp.inlay_hint.enable(true)
+    end
     vim.diagnostic.config {
         virtual_text = {
             current_line = true,

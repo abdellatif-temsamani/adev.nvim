@@ -44,7 +44,7 @@ function M.get_available_versions(callback)
             end
             local versions = vim.tbl_filter(function(v)
                 return v ~= ""
-            end, vim.split(res.stdout, "\n"))
+            end, vim.split(res.stdout or "", "\n"))
             callback(#versions > 0 and versions or nil)
         end)
     else
@@ -54,17 +54,20 @@ function M.get_available_versions(callback)
         end
         local versions = vim.tbl_filter(function(v)
             return v ~= ""
-        end, vim.split(res.stdout, "\n"))
+        end, vim.split(res.stdout or "", "\n"))
         return #versions > 0 and versions or nil
     end
 end
 
 function M.delete_branch(branch, callback)
-    M.git({ "branch", "-D", branch }, function(res)
-        if callback then
+    if callback then
+        M.git({ "branch", "-D", branch }, function(res)
             callback(res and res.code == 0)
-        end
-    end)
+        end)
+    else
+        local res = M.git { "branch", "-D", branch }
+        return res and res.code == 0
+    end
 end
 
 return M

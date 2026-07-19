@@ -3,7 +3,6 @@ return {
     cmd = "Telescope",
     dependencies = {
         "nvim-mini/mini.icons",
-        "nvim-lua/popup.nvim",
         "nvim-lua/plenary.nvim",
         "nvim-telescope/telescope-fzf-native.nvim",
     },
@@ -31,7 +30,7 @@ return {
                     prompt_title = "search files in current buffer dir",
                 }
             end,
-            desc = "colorscheme",
+            desc = "find files in buffer dir",
         },
         {
             "<leader>fb",
