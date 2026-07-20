@@ -22,6 +22,7 @@ function M.render(buf, root, opts)
     for _, l in ipairs(entries) do
         table.insert(lines, l)
     end
+    table.insert(lines, "")
     vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modified = false

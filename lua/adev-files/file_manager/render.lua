@@ -237,15 +237,11 @@ local function add_virtual_text(buf, root)
         end
     end
 
-    -- Footer line as virt_lines below last entry
-    local footer_line = listing.build_footer_line(buf, entries)
-    local anchor_row = #entries > 0 and entries[#entries].row
-        or vim.api.nvim_buf_line_count(buf) - 1
-    vim.api.nvim_buf_set_extmark(buf, ns, anchor_row, 0, {
-        virt_lines = {
-            { { footer_line, "Comment" } },
-        },
-        virt_lines_above = false,
+    local footer_line = "│ " .. listing.build_footer_line(buf, entries)
+    local footer_row = vim.api.nvim_buf_line_count(buf) - 1
+    vim.api.nvim_buf_set_extmark(buf, ns, footer_row, 0, {
+        virt_text = { { footer_line, "Comment" } },
+        virt_text_pos = "inline",
     })
 end
 
