@@ -76,4 +76,12 @@ highlight default adevFilesPendingMove gui=bold cterm=bold
 highlight default link adevFilesPendingMark Special
 highlight default adevFilesPendingMark gui=bold cterm=bold
 
+" Git status indicators
+highlight adevFilesGitModified guifg=#E5C07B ctermfg=Yellow gui=bold cterm=bold
+highlight adevFilesGitAdded guifg=#98C379 ctermfg=Green gui=bold cterm=bold
+highlight adevFilesGitDeleted guifg=#E06C75 ctermfg=Red gui=bold cterm=bold
+highlight adevFilesGitRenamed guifg=#56B6C2 ctermfg=Cyan gui=bold cterm=bold
+highlight adevFilesGitCopied guifg=#C678DD ctermfg=Magenta gui=bold cterm=bold
+highlight adevFilesGitUntracked guifg=#5C6370 ctermfg=Grey
+
 let b:current_syntax = "adev_files"

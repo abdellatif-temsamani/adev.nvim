@@ -112,6 +112,23 @@ function M.build_footer_line(buf, entries)
     if st and st.show_hidden then
         table.insert(parts, "  .hidden on")
     end
+    local git_status = st and st.git_status
+    if git_status then
+        local counts = {}
+        for _, s in pairs(git_status) do
+            counts[s] = (counts[s] or 0) + 1
+        end
+        local order = { "M", "A", "D", "R", "C", "?" }
+        local git_parts = {}
+        for _, code in ipairs(order) do
+            if counts[code] and counts[code] > 0 then
+                table.insert(git_parts, code .. ":" .. counts[code])
+            end
+        end
+        if #git_parts > 0 then
+            table.insert(parts, "  Git: " .. table.concat(git_parts, " "))
+        end
+    end
     return table.concat(parts, "  |")
 end
 

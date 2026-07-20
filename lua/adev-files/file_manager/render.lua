@@ -1,12 +1,42 @@
 local M = {}
 
 local clipboard = require "adev-files.clipboard"
+local git = require "adev-files.git"
 local icons = require "adev-files.icon"
 local listing = require "adev-files.file_manager.listing"
 local path = require "adev-files.utils.fs.path"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
 local win = require "adev-files.file_manager.window"
+
+---@type table<string, string>
+local GIT_LABEL = {
+    M = "M",
+    A = "A",
+    D = "D",
+    R = "R",
+    C = "C",
+    ["?"] = "?",
+}
+
+---@type table<string, string>
+local GIT_HL = {
+    M = "adevFilesGitModified",
+    A = "adevFilesGitAdded",
+    D = "adevFilesGitDeleted",
+    R = "adevFilesGitRenamed",
+    C = "adevFilesGitCopied",
+    ["?"] = "adevFilesGitUntracked",
+}
+
+---@param status string|nil
+---@return string|nil, string|nil
+local function git_indicator(status)
+    if not status then
+        return nil, nil
+    end
+    return GIT_LABEL[status], GIT_HL[status]
+end
 
 --- Build a map of source paths -> mode from the clipboard
 ---@return table<string, string>
@@ -87,6 +117,7 @@ local function add_virtual_text(buf, root)
     end
 
     local selection_marks = state.get_selection_marks(buf)
+    local git_status = state.get_git_status(buf)
 
     for _, item in ipairs(entries) do
         local parsed = item.entry
@@ -108,6 +139,10 @@ local function add_virtual_text(buf, root)
             })
 
             local suffix = {}
+            local gs, gs_hl = git_indicator(git.get_file_status(git_status, parsed.fs_name))
+            if gs then
+                table.insert(suffix, { "[" .. gs .. "]", gs_hl })
+            end
             local abs_path = path.join_abs(root, parsed.fs_name)
             local original = original_by_path[abs_path]
             local deleted = pending_delete[abs_path]
@@ -123,7 +158,7 @@ local function add_virtual_text(buf, root)
                 end
             end
 
-            if deleted then
+            if deleted and not clip_mode then
                 table.insert(suffix, { " | delete |", "adevFilesPendingDelete" })
             end
 

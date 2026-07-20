@@ -1,8 +1,10 @@
 local utils = require "adev-common.utils"
 
+local git = require "adev-files.git"
 local listing = require "adev-files.file_manager.listing"
 local render = require "adev-files.file_manager.render"
 local roots = require "adev-files.file_manager.roots"
+local state = require "adev-files.state"
 local win = require "adev-files.file_manager.window"
 
 local M = {}
@@ -64,6 +66,14 @@ function M.open()
         end
     end
     pcall(vim.api.nvim_win_set_cursor, 0, { target_row, 0 })
+
+    git.fetch_status(root, function(status)
+        if not vim.api.nvim_buf_is_valid(buf) then
+            return
+        end
+        state.set_git_status(buf, status)
+        render.add_virtual_text(buf, root)
+    end)
 end
 
 return M

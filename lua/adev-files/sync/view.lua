@@ -1,4 +1,5 @@
 local clipboard = require "adev-files.clipboard"
+local git = require "adev-files.git"
 local index = require "adev-files.sync.index"
 local render = require "adev-files.file_manager.render"
 local roots = require "adev-files.file_manager.roots"
@@ -19,17 +20,40 @@ local function resolve_root(buf)
     return roots.normalize_root(root)
 end
 
+--- Fetch git status asynchronously and re-render virtual text
+---@param buf integer
+local function refresh_git_status(buf)
+    local st = state.get(buf)
+    if not st then
+        return
+    end
+    local root = st.root
+    git.fetch_status(root, function(status)
+        if not vim.api.nvim_buf_is_valid(buf) then
+            return
+        end
+        local s = state.get(buf)
+        if not s or s.root ~= root then
+            return
+        end
+        state.set_git_status(buf, status)
+        render.add_virtual_text(buf, root)
+    end)
+end
+
 ---@param buf integer
 function M.refresh(buf)
     local st = state.get(buf)
     if not st or st.applying then
         return
     end
+    state.set_git_status(buf, nil)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. (st.root or "./"))
     render.render(buf, st.root)
     index.index_original(buf)
     index.reindex(buf)
     render.add_virtual_text(buf, st.root)
+    refresh_git_status(buf)
 end
 
 ---@param buf integer
@@ -50,12 +74,14 @@ function M.discard_reset(buf)
     st.root = roots.normalize_root(st.root)
     clipboard.clear()
     state.clear_pending_ops(buf)
+    state.set_git_status(buf, nil)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. (st.root or "./"))
     window.set_title_from_state(buf, st.root)
     render.render(buf, st.root)
     index.index_original(buf)
     index.reindex(buf)
     render.add_virtual_text(buf, st.root)
+    refresh_git_status(buf)
     return true
 end
 
@@ -80,12 +106,14 @@ function M.set_root(buf, root)
         return
     end
     st.root = roots.normalize_root(root)
+    state.set_git_status(buf, nil)
     pcall(vim.api.nvim_buf_set_name, buf, "adev-files://" .. st.root)
     window.set_title_from_state(buf, st.root)
     render.render(buf, st.root)
     index.index_original(buf)
     index.reindex(buf)
     render.add_virtual_text(buf, st.root)
+    refresh_git_status(buf)
 end
 
 return M

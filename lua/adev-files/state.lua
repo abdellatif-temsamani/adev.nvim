@@ -16,6 +16,7 @@ local model = require "adev-files.core.model"
 ---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
 ---@field show_hidden boolean
 ---@field selection_marks table<integer, true>
+---@field git_status table<string, string>|nil  -- rel_path -> status char
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -36,7 +37,7 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {}, show_hidden = false, selection_marks = {} }
+    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {}, show_hidden = false, selection_marks = {}, git_status = nil }
     states[buf].root = root
     states[buf].model = model.new(root)
     states[buf].view = nil
@@ -45,6 +46,7 @@ function M.init(buf, root)
     states[buf].original_lines = {}
     states[buf].show_hidden = false
     states[buf].selection_marks = {}
+    states[buf].git_status = nil
     return states[buf]
 end
 
@@ -179,6 +181,25 @@ function M.clear_selection_marks(buf)
         return
     end
     states[buf].selection_marks = {}
+end
+
+---@param buf integer
+---@return table<string, string>|nil
+function M.get_git_status(buf)
+    local st = states[buf]
+    if not st then
+        return nil
+    end
+    return st.git_status
+end
+
+---@param buf integer
+---@param status table<string, string>
+function M.set_git_status(buf, status)
+    if not states[buf] then
+        return
+    end
+    states[buf].git_status = status
 end
 
 ---@param buf integer

@@ -1,6 +1,7 @@
 local clipboard = require "adev-files.clipboard"
 local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
+local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
 
 local M = {}
@@ -84,6 +85,7 @@ function M.revert_current_line(buf)
 
     if abs_path then
         clipboard.remove_by_src(abs_path)
+        render.add_virtual_text(buf, st.root)
     end
 
     local removed_ops = remove_pending_ops_at_path(buf, abs_path)
