@@ -5,9 +5,92 @@ local config = require "adev-files"
 local parse = require "adev-files.parse"
 local roots = require "adev-files.root"
 local state = require "adev-files.state"
-local sync = require "adev-files.sync"
+local view = require "adev-files.core.view"
 
 local M = {}
+
+---@param buf integer
+---@param row integer
+---@param entry AdevFilesEntry|nil
+---@param deleted boolean
+---@param original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
+---@return boolean
+local function is_modified_row(row, entry, deleted, original_lines)
+    if deleted then
+        return true
+    end
+    local orig = original_lines[row]
+    if not orig then
+        return entry ~= nil
+    end
+    if not entry then
+        return true
+    end
+    return entry.fs_name ~= orig.entry.fs_name
+end
+
+---@param buf integer
+---@return integer[], string?
+local function find_modified_rows(buf)
+    local st = state.get(buf)
+    if not st then
+        return {}, "missing state"
+    end
+    local entries, err = view.parse_buffer(buf)
+    if err then
+        return {}, err
+    end
+    local original_lines = state.get_original_lines(buf)
+    local rows = {}
+    for _, item in ipairs(entries) do
+        if is_modified_row(item.row, item.entry, item.deleted, original_lines) then
+            table.insert(rows, item.row)
+        end
+    end
+    return rows, nil
+end
+
+---@param buf integer
+function M.next_modification(buf)
+    local rows, err = find_modified_rows(buf)
+    if err then
+        utils.err_notify(err, "adev-files")
+        return
+    end
+    if #rows == 0 then
+        utils.notify("No modifications", vim.log.levels.INFO, "adev-files")
+        return
+    end
+    local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    for _, row in ipairs(rows) do
+        if row > cur_row then
+            vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+            return
+        end
+    end
+    vim.api.nvim_win_set_cursor(0, { rows[1] + 1, 0 })
+end
+
+---@param buf integer
+function M.prev_modification(buf)
+    local rows, err = find_modified_rows(buf)
+    if err then
+        utils.err_notify(err, "adev-files")
+        return
+    end
+    if #rows == 0 then
+        utils.notify("No modifications", vim.log.levels.INFO, "adev-files")
+        return
+    end
+    local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    for i = #rows, 1, -1 do
+        if rows[i] < cur_row then
+            vim.api.nvim_win_set_cursor(0, { rows[i] + 1, 0 })
+            return
+        end
+    end
+    vim.api.nvim_win_set_cursor(0, { rows[#rows] + 1, 0 })
+end
 
 --- enter directory under cursor
 ---@param buf integer
