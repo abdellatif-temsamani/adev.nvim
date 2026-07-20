@@ -71,6 +71,13 @@ function M.attach(buf)
         delete.delete_selected(buf)
     end)
 
+    set_keymap("n", "<leader>nj", function()
+        nav.next_modification(buf)
+    end)
+    set_keymap("n", "<leader>nk", function()
+        nav.prev_modification(buf)
+    end)
+
     set_keymap("n", "<leader>nu", function()
         revert.revert_current_line(buf)
     end)
