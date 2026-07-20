@@ -75,9 +75,18 @@ function M.plan(original_lines, current_entries, root, pending_ops, buf)
         if not item.deleted then
             local candidates = original_by_name[item.entry.fs_name]
             if candidates and #candidates > 0 then
-                local match = table.remove(candidates, 1)
-                consumed_originals[match.row] = true
-                matched_current[item.row] = true
+                local match_idx
+                for i, c in ipairs(candidates) do
+                    if c.entry.kind == item.entry.kind then
+                        match_idx = i
+                        break
+                    end
+                end
+                if match_idx then
+                    local match = table.remove(candidates, match_idx)
+                    consumed_originals[match.row] = true
+                    matched_current[item.row] = true
+                end
             end
         end
     end

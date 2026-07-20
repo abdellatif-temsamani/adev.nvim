@@ -1,5 +1,6 @@
 local file_manager = require "adev-files.file_manager"
 local select = require "adev-common.ui.select"
+local fs_ops = require "adev-files.sync.fs_ops"
 local M = {}
 
 ---@class FilesProps
@@ -38,11 +39,21 @@ function M.open()
 end
 
 function M.create_file()
-    vim.ui.input({ prompt = "New file path (relative to cwd): " }, function(input)
+    vim.ui.input({ prompt = "New path (relative to cwd, append / for directory): " }, function(input)
         if not input or input == "" then
             return
         end
+        local is_dir = input:sub(-1) == "/"
         local path = vim.fn.fnamemodify(input, ":p")
+        if is_dir then
+            local ok, err = fs_ops.mkdir_p(path)
+            if ok then
+                vim.notify("Created directory: " .. input, vim.log.levels.INFO, "adev-files")
+            else
+                vim.notify("Failed to create directory: " .. tostring(err), vim.log.levels.ERROR, "adev-files")
+            end
+            return
+        end
         local dir = vim.fn.fnamemodify(path, ":h")
         if vim.fn.isdirectory(dir) == 0 then
             vim.fn.mkdir(dir, "p")
@@ -72,7 +83,7 @@ function M.rename_file()
         end
         local dir = vim.fn.fnamemodify(file, ":h")
         local new_path = dir .. "/" .. input
-        local ok, err = vim.loop.fs_rename(file, new_path)
+        local ok, err = fs_ops.rename_path(file, new_path)
         if ok then
             vim.api.nvim_buf_set_name(buf, new_path)
             vim.notify("Renamed: " .. old_name .. " -> " .. input, vim.log.levels.INFO, "adev-files")
@@ -90,14 +101,21 @@ function M.delete_file()
         return
     end
     local name = vim.fn.fnamemodify(file, ":t")
+    local is_dir = vim.fn.isdirectory(file) == 1
+    local prompt = is_dir and ("Delete directory '" .. name .. "'?") or ("Delete '" .. name .. "'?")
     select(
-        "Delete '" .. name .. "'?",
+        prompt,
         { "Yes", "No" },
         function(item, idx)
             if idx ~= 1 then
                 return
             end
-            local ok, err = vim.loop.fs_unlink(file)
+            local ok, err
+            if is_dir then
+                ok, err = fs_ops.rm_rf(file)
+            else
+                ok, err = vim.loop.fs_unlink(file)
+            end
             if ok then
                 vim.cmd("bwipeout! " .. buf)
                 vim.notify("Deleted: " .. name, vim.log.levels.INFO, "adev-files")

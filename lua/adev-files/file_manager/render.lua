@@ -93,11 +93,54 @@ local function add_virtual_text(buf, root)
 
     local original_lines = state.get_original_lines(buf)
     local original_by_path = {}
-    for _, o in pairs(original_lines) do
+    local original_row_by_path = {}
+    for row, o in pairs(original_lines) do
         if o.abs_path then
             original_by_path[o.abs_path] = o.entry
+            original_row_by_path[o.abs_path] = row
         end
     end
+
+    local consumed = {}
+    local matched = {}
+    for _, item in ipairs(entries) do
+        if not item.deleted then
+            local abs_path = path.join_abs(root, item.entry.fs_name)
+            if original_by_path[abs_path] then
+                local orig_row = original_row_by_path[abs_path]
+                if orig_row then
+                    consumed[orig_row] = true
+                end
+                matched[item.row] = true
+            end
+        end
+    end
+
+    local original_by_name = {}
+    for row, o in pairs(original_lines) do
+        if not consumed[row] then
+            local name = o.entry.fs_name
+            original_by_name[name] = original_by_name[name] or {}
+            table.insert(original_by_name[name], { row = row, entry = o.entry, abs_path = o.abs_path })
+        end
+    end
+
+    for _, item in ipairs(entries) do
+        if not item.deleted and not matched[item.row] then
+            local candidates = original_by_name[item.entry.fs_name]
+            if candidates and #candidates > 0 then
+                for i, c in ipairs(candidates) do
+                    if c.entry.kind == item.entry.kind then
+                        consumed[c.row] = true
+                        matched[item.row] = true
+                        table.remove(candidates, i)
+                        break
+                    end
+                end
+            end
+        end
+    end
+
     local clip_sources = build_clipboard_sources()
 
     local pending_delete = {}
@@ -145,10 +188,16 @@ local function add_virtual_text(buf, root)
             end
             local abs_path = path.join_abs(root, parsed.fs_name)
             local original = original_by_path[abs_path]
-            local deleted = pending_delete[abs_path]
+            if not original and not matched[item.row] then
+                local orig_line = original_lines[row]
+                if orig_line and not consumed[row] then
+                    original = orig_line.entry
+                end
+            end
+            local deleted_item = pending_delete[abs_path]
             local clip_mode = clip_sources[abs_path]
 
-            if not deleted then
+            if not deleted_item then
                 if original then
                     if parsed.fs_name ~= original.fs_name then
                         table.insert(suffix, { " | renamed |", "adevFilesPendingMark" })
@@ -158,7 +207,7 @@ local function add_virtual_text(buf, root)
                 end
             end
 
-            if deleted and not clip_mode then
+            if deleted_item and not clip_mode then
                 table.insert(suffix, { " | delete |", "adevFilesPendingDelete" })
             end
 

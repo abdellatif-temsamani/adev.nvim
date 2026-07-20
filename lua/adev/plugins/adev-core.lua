@@ -18,17 +18,17 @@ return {
         {
             "<leader>na",
             adev_files.create_file,
-            desc = "create file",
+            desc = "create",
         },
         {
             "<leader>nr",
             adev_files.rename_file,
-            desc = "rename file",
+            desc = "rename",
         },
         {
             "<leader>nd",
             adev_files.delete_file,
-            desc = "delete file",
+            desc = "delete",
         },
     },
 }
