@@ -8,6 +8,32 @@ local M = {}
 
 ---@param buf integer
 ---@param abs_path string|nil
+---@return boolean
+local function remove_pending_delete_at_path(buf, abs_path)
+    local pending = state.get_pending_ops(buf)
+    if not pending or #pending == 0 then
+        return false
+    end
+
+    local updated = {}
+    local removed = false
+    for _, op in ipairs(pending) do
+        if op.type == "delete" and op.path and path.abs(op.path) == abs_path then
+            removed = true
+        else
+            table.insert(updated, op)
+        end
+    end
+
+    if removed then
+        state.set_pending_ops(buf, updated)
+    end
+
+    return removed
+end
+
+---@param buf integer
+---@param abs_path string|nil
 ---@return AdevFilesOp[]
 local function remove_pending_ops_at_path(buf, abs_path)
     local pending = state.get_pending_ops(buf)
@@ -93,6 +119,14 @@ function M.revert_current_line(buf)
         vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
         restore_move_sources(buf, st, removed_ops)
         return
+    end
+
+    if abs_path then
+        local removed_delete = remove_pending_delete_at_path(buf, abs_path)
+        if removed_delete then
+            render.add_virtual_text(buf, st.root)
+            return
+        end
     end
 
     if is_deleted then
