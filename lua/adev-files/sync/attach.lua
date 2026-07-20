@@ -79,7 +79,7 @@ function M.attach(buf, root)
         end,
     })
 
-    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP" }, {
+    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
         group = group,
         buffer = buf,
         callback = function(args)
