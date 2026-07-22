@@ -29,6 +29,8 @@ local GIT_HL = {
     ["?"] = "adevFilesGitUntracked",
 }
 
+local HEADER_WIDTH = 72
+
 ---@param status string|nil
 ---@return string|nil, string|nil
 local function git_indicator(status)
@@ -36,6 +38,69 @@ local function git_indicator(status)
         return nil, nil
     end
     return GIT_LABEL[status], GIT_HL[status]
+end
+
+---@param summary AdevFilesSummary
+---@return table[]
+local function summary_chunks(summary)
+    local chunks = {
+        { "│ ", "Comment" },
+        { string.format("%d files", summary.files), "Normal" },
+        { "  •  ", "Comment" },
+        { string.format("%d dirs", summary.directories), "Normal" },
+    }
+
+    if summary.pending > 0 then
+        table.insert(chunks, { "  •  ", "Comment" })
+        table.insert(chunks, { string.format("%d pending", summary.pending), "adevFilesPendingMark" })
+    end
+    if summary.show_hidden then
+        table.insert(chunks, { "  •  hidden", "Comment" })
+    end
+
+    local has_git = false
+    for _, code in ipairs({ "M", "A", "D", "R", "C", "?" }) do
+        if summary.git_counts[code] and summary.git_counts[code] > 0 then
+            if not has_git then
+                table.insert(chunks, { "  •  Git ", "Comment" })
+                has_git = true
+            end
+            table.insert(chunks, {
+                string.format("%s:%d ", code, summary.git_counts[code]),
+                GIT_HL[code] or "Comment",
+            })
+        end
+    end
+
+    return chunks
+end
+
+---@return table[]
+local function title_chunks()
+    local prefix = "╭─ "
+    local title = "adev-files"
+    local suffix_width = math.max(1, HEADER_WIDTH - vim.fn.strdisplaywidth(prefix .. title) - 2)
+    return {
+        { prefix, "Comment" },
+        { title, "Title" },
+        { " " .. string.rep("─", suffix_width) .. "╮", "Comment" },
+    }
+end
+
+---@param chunks table[]
+---@return table[]
+local function close_box(chunks)
+    local width = 0
+    for _, chunk in ipairs(chunks) do
+        width = width + vim.fn.strdisplaywidth(chunk[1])
+    end
+    if width < HEADER_WIDTH then
+        table.insert(chunks, {
+            string.rep(" ", math.max(1, HEADER_WIDTH - width - 1)) .. "│",
+            "Comment",
+        })
+    end
+    return chunks
 end
 
 --- Build a map of source paths -> mode from the clipboard
@@ -237,11 +302,19 @@ local function add_virtual_text(buf, root)
         end
     end
 
-    local footer_line = "│ " .. listing.build_footer_line(buf, entries)
-    local footer_row = vim.api.nvim_buf_line_count(buf) - 1
-    vim.api.nvim_buf_set_extmark(buf, ns, footer_row, 0, {
-        virt_text = { { footer_line, "Comment" } },
-        virt_text_pos = "inline",
+    local summary = listing.summarize(buf, entries)
+    vim.api.nvim_buf_set_extmark(buf, ns, 0, 0, {
+        virt_text = title_chunks(),
+        virt_text_pos = "overlay",
+        virt_lines = {
+            close_box {
+                { "│ root  ", "Comment" },
+                { root, "Directory" },
+            },
+            close_box(summary_chunks(summary)),
+            { { "╰" .. string.rep("─", HEADER_WIDTH - 2) .. "╯", "Comment" } },
+        },
+        virt_lines_above = false,
     })
 end
 

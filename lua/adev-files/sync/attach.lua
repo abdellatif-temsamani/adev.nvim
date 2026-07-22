@@ -103,6 +103,22 @@ function M.attach(buf, root)
         end,
     })
 
+    -- Row 0 only anchors the virtual header. Keep the cursor on editable
+    -- filesystem rows so the header cannot be modified accidentally.
+    vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        group = group,
+        buffer = buf,
+        callback = function(args)
+            if vim.api.nvim_buf_line_count(args.buf) < 2 then
+                return
+            end
+            local win = vim.fn.bufwinid(args.buf)
+            if win ~= -1 and vim.api.nvim_win_get_cursor(win)[1] == 1 then
+                vim.api.nvim_win_set_cursor(win, { 2, 0 })
+            end
+        end,
+    })
+
     st.root = root
 end
 
