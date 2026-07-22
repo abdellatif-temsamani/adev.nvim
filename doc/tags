@@ -18,7 +18,7 @@ adev-faq	adev.txt	/*adev-faq*
 adev-feature-flags	adev.txt	/*adev-feature-flags*
 adev-file-navigation	adev.txt	/*adev-file-navigation*
 adev-files	adev.txt	/*adev-files*
-adev-files-enable	adev.txt	/*adev-files-enable*
+adev-files-configure	adev.txt	/*adev-files-configure*
 adev-files-features	adev.txt	/*adev-files-features*
 adev-files-keymaps	adev.txt	/*adev-files-keymaps*
 adev-files-usage	adev.txt	/*adev-files-usage*

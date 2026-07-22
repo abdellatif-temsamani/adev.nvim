@@ -10,7 +10,6 @@ return {
         require("adev-files").setup(opts)
     end,
     opts = configs.adev_files,
-    cond = Adev.flags.experimental_adev_files,
     keys = {
         {
             "<leader>no",
