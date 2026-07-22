@@ -33,6 +33,16 @@ local ok, err = xpcall(function()
     assert(vim.api.nvim_buf_get_name(buf):match "^adev%-files://")
     assert(vim.api.nvim_win_get_config(0).relative == "")
 
+    for _, lhs in ipairs { "<leader>no", "<leader>na", "<leader>nr" } do
+        local mapping = vim.fn.maparg(lhs, "n", false, true)
+        assert(mapping.buffer == 1)
+        assert(mapping.rhs:lower() == "<nop>")
+    end
+
+    local delete_mapping = vim.fn.maparg("<leader>nd", "n", false, true)
+    assert(delete_mapping.buffer == 1)
+    assert(delete_mapping.callback ~= nil)
+
     local state = assert(require("adev-files.state").get(buf))
     assert(state.root == require("adev-files.root").normalize_root(root))
 
