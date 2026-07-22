@@ -46,6 +46,13 @@ function M.rm_rf(path)
     if not ok then
         return false, "failed to delete: " .. path .. ": " .. tostring(res)
     end
+    if res ~= 0 then
+        local detail = vim.v.errmsg
+        if not detail or detail == "" then
+            detail = "delete() returned " .. tostring(res)
+        end
+        return false, "failed to delete: " .. path .. ": " .. detail
+    end
     return true
 end
 

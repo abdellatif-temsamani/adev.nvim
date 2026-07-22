@@ -17,7 +17,9 @@ end
 ---@param path string
 ---@return boolean
 function M.exists(path)
-    return uv.fs_stat(path) ~= nil
+    -- `lstat` also treats broken symlinks as occupied paths. Filesystem
+    -- operations must never consider those destinations available.
+    return uv.fs_lstat(path) ~= nil
 end
 
 return M

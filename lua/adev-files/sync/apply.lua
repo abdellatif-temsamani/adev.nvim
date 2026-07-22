@@ -1,10 +1,10 @@
 local utils = require "adev-common.utils"
 
 local confirmation = require "adev-files.utils.confirmation"
+local executor = require "adev-files.core.executor"
 local fmt = require "adev-files.sync.format"
 local state = require "adev-files.state"
 local view = require "adev-files.sync.view"
-local executor = require "adev-files.core.executor"
 
 local M = {}
 
@@ -84,6 +84,9 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         if not apply_ok_or_err then
             utils.err_notify(apply_err_msg or "failed to apply changes", "adev-files")
             return
+        end
+        if apply_err_msg then
+            utils.notify(apply_err_msg, vim.log.levels.WARN, "adev-files")
         end
 
         -- Refresh after clearing `applying`, otherwise refresh is a no-op.
