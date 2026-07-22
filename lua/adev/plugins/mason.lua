@@ -73,7 +73,7 @@ return {
                 "emmet_ls",
                 "bashls",
                 "clangd",
-                "cmake",
+                -- "cmake",
                 "cssmodules_ls",
                 "dockerls",
                 "docker_compose_language_service",

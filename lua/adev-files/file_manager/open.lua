@@ -79,7 +79,7 @@ function M.open(root, opts)
     if not current_mode then
         -- Prefer a taller window to allow editing/adding many entries.
         local max_height = math.max(3, vim.o.lines - 2)
-        local header_offset = 5 -- 2 help lines, separator, root, blank
+        local header_offset = 4 -- virtual separator, root, summary, and blank line
         local height = math.min(math.max(#lines + header_offset, 20), max_height)
         win.create_win(buf, height, 72, root)
     end
@@ -93,7 +93,7 @@ function M.open(root, opts)
     end
 
     -- Try to position cursor on the file that was active before opening
-    local target_row = #listing.build_header(root) + 1
+    local target_row = 2
     local ok_prev, prev_buf = pcall(vim.api.nvim_win_get_buf, prev_win)
     if ok_prev and prev_buf and vim.api.nvim_buf_is_valid(prev_buf) then
         local buf_name = vim.api.nvim_buf_get_name(prev_buf)
@@ -112,6 +112,13 @@ function M.open(root, opts)
         end
     end
     pcall(vim.api.nvim_win_set_cursor, 0, { target_row, 0 })
+    if vim.api.nvim_win_is_valid(manager_win) then
+        vim.api.nvim_win_call(manager_win, function()
+            local saved_view = vim.fn.winsaveview()
+            saved_view.topline = 1
+            vim.fn.winrestview(saved_view)
+        end)
+    end
 
     git.fetch_status(root, function(status)
         if not vim.api.nvim_buf_is_valid(buf) then

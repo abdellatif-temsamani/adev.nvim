@@ -10,19 +10,16 @@ local M = {}
 ---@return string[]
 function M.render(buf, root, opts)
     state.clear_selection_marks(buf)
-    local header = listing.build_header(root)
     local entries = listing.build_lines(root, opts)
     if #entries == 0 then
         entries = { "" }
     end
-    local lines = {}
-    for _, l in ipairs(header) do
-        table.insert(lines, l)
-    end
+    -- Row 0 is a display-only anchor for the virtual header. Filesystem
+    -- entries start at row 1 and are the only editable content.
+    local lines = { "" }
     for _, l in ipairs(entries) do
         table.insert(lines, l)
     end
-    table.insert(lines, "")
     vim.bo[buf].modifiable = true
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modified = false
@@ -36,6 +33,9 @@ function M.parse_buffer(buf)
     local entries = {}
 
     for i, line in ipairs(lines) do
+        if i == 1 then
+            goto continue
+        end
         local _, deleted = parse.strip_delete_marker(line)
         local entry, err = parse.parse_line(line)
         if err then
@@ -44,6 +44,7 @@ function M.parse_buffer(buf)
         if entry then
             table.insert(entries, { row = i - 1, entry = entry, deleted = deleted })
         end
+        ::continue::
     end
 
     return entries, nil

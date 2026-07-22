@@ -3,13 +3,6 @@ local M = {}
 ---@param a string
 ---@param b string
 local function sort_files(a, b)
-    -- root: first
-    if a:sub(1, 5) == "root:" and b:sub(1, 5) ~= "root:" then
-        return true
-    elseif b:sub(1, 5) == "root:" and a:sub(1, 5) ~= "root:" then
-        return false
-    end
-
     -- empty string next
     if a == "" and b ~= "" then
         return true
@@ -29,17 +22,6 @@ local function sort_files(a, b)
     local b_name = b:gsub("/$", "")
 
     return a_name < b_name
-end
-
---- Build header lines for display
----@param root string
----@return string[]
-function M.build_header(root)
-    local result = {}
-    table.insert(result, string.rep("=", 72))
-    table.insert(result, "root: " .. root)
-    table.insert(result, "")
-    return result
 end
 
 --- Build file entry lines (without icons - icons are virtual text)
@@ -90,10 +72,17 @@ function M.build_lines(root, opts)
     return entries
 end
 
+---@class AdevFilesSummary
+---@field files integer
+---@field directories integer
+---@field pending integer
+---@field show_hidden boolean
+---@field git_counts table<string, integer>
+
 ---@param buf integer
 ---@param entries { row: integer, entry: AdevFilesEntry }[]
----@return string
-function M.build_footer_line(buf, entries)
+---@return AdevFilesSummary
+function M.summarize(buf, entries)
     local st = require("adev-files.state").get(buf)
     local dir_count = 0
     local file_count = 0
@@ -104,32 +93,21 @@ function M.build_footer_line(buf, entries)
             file_count = file_count + 1
         end
     end
-    local parts = { string.format("  Files: %d  Dirs: %d", file_count, dir_count) }
     local pending = st and st.pending_ops or {}
-    if #pending > 0 then
-        table.insert(parts, string.format("  Pending: %d", #pending))
-    end
-    if st and st.show_hidden then
-        table.insert(parts, "  .hidden on")
-    end
+    local git_counts = {}
     local git_status = st and st.git_status
     if git_status then
-        local counts = {}
         for _, s in pairs(git_status) do
-            counts[s] = (counts[s] or 0) + 1
-        end
-        local order = { "M", "A", "D", "R", "C", "?" }
-        local git_parts = {}
-        for _, code in ipairs(order) do
-            if counts[code] and counts[code] > 0 then
-                table.insert(git_parts, code .. ":" .. counts[code])
-            end
-        end
-        if #git_parts > 0 then
-            table.insert(parts, "  Git: " .. table.concat(git_parts, " "))
+            git_counts[s] = (git_counts[s] or 0) + 1
         end
     end
-    return table.concat(parts, "  |")
+    return {
+        files = file_count,
+        directories = dir_count,
+        pending = #pending,
+        show_hidden = st and st.show_hidden or false,
+        git_counts = git_counts,
+    }
 end
 
 return M
