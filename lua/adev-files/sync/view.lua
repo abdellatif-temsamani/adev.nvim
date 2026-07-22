@@ -16,7 +16,7 @@ local function resolve_root(buf)
     if name:sub(1, #prefix) ~= prefix then
         return nil
     end
-    local root = name:sub(#prefix + 1)
+    local root = name:sub(#prefix + 1):gsub("#%d+$", "")
     return roots.normalize_root(root)
 end
 

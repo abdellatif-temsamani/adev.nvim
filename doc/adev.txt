@@ -300,7 +300,8 @@ alternative to external file explorers with deeper Neovim integration.
 
 FEATURES						*adev-files-features*
 
-- Floating file manager for the current directory
+- Netrw replacement for directory buffers (`nvim .`, `:edit path/to/directory`)
+- Floating file manager when opened with `<leader>no`
 - Navigate directories and open files
 - Create/rename/move/copy/delete files and directories
 - Multi-selection via visual mode or normal-mode marks
@@ -320,12 +321,19 @@ To enable adev-files, use :ADConfig to edit your configuration and add: >
 return {
   flags = {
     experimental_adev_files = true,
+  },
+  core_plugins = {
+    adev_files = {
+      replace_netrw = true,  -- Default: true
+    },
   }
 }
 <
 
 When enabled, adev-files replaces the Snacks file explorer (`<leader>n`) and
-provides its own file management interface.
+provides its own file management interface. By default it also replaces netrw:
+opening a directory with `nvim .` or `:edit path/to/directory` opens adev-files
+in the current window. Set `replace_netrw = false` to retain netrw.
 
 KEYMAPS							*adev-files-keymaps*
 

@@ -4,6 +4,8 @@ local adev_files = require "adev-files"
 
 return {
     dir = files.adev_path .. "/lua/adev-files/",
+    -- Directory buffers must be intercepted during startup, before netrw.
+    lazy = not configs.adev_files.replace_netrw,
     config = function(_, opts)
         require("adev-files").setup(opts)
     end,

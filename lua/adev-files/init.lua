@@ -4,12 +4,15 @@ local fs_ops = require "adev-files.sync.fs_ops"
 local M = {}
 
 ---@class FilesProps
+---@field replace_netrw boolean
+---@field open_files FilesOpenFilesProps
 ---@class FilesOpenFilesProps
 ---@field enabled boolean
 ---@field method 'edit'|'split'|'vsplit'|'tabedit'
 
 ---@type FilesProps
 M.defaults = {
+    replace_netrw = true,
     open_files = {
         enabled = false,
         method = "edit",
@@ -24,6 +27,13 @@ function M.setup(opts)
     ---@type FilesProps
     opts = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
     M.config = opts
+
+    local netrw = require "adev-files.netrw"
+    if opts.replace_netrw then
+        netrw.setup()
+    else
+        netrw.teardown()
+    end
 end
 
 ---@return FilesProps
@@ -31,8 +41,9 @@ function M.get_config()
     return M.config or M.defaults
 end
 
-function M.open()
-    local ok, err = pcall(file_manager.open)
+---@param root? string
+function M.open(root)
+    local ok, err = pcall(file_manager.open, root)
     if not ok then
         vim.notify("adev-files: " .. tostring(err), vim.log.levels.ERROR)
     end
