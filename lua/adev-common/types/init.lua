@@ -40,4 +40,3 @@
 ---@field opts table?  AI assistant options (default: `nil`)
 
 ---@class AdevFlags
----@field experimental_adev_files boolean enable adev-flags experimental file manager
