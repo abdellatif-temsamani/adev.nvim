@@ -45,20 +45,48 @@ function M.open(lines, opts, cb)
         virt_lines_above = false,
     })
 
+    window.floating_window {
+        buf = buf,
+        title = opts.title or "adev-files",
+        width = opts.width or 80,
+        height = opts.height or math.min(#content + 2, 20),
+        wo = { wrap = true },
+    }
+
     local finished = false
-    local finish = function(ok)
-        if finished then
-            return
-        end
-        finished = true
-        if cb then
-            cb(ok)
+    local function cleanup()
+        -- Deleting a displayed buffer can leave a floating window alive with
+        -- an empty replacement buffer. Close every window first, then wipe the
+        -- confirmation buffer if it still exists.
+        for _, win_id in ipairs(vim.fn.win_findbuf(buf)) do
+            if vim.api.nvim_win_is_valid(win_id) then
+                pcall(vim.api.nvim_win_close, win_id, true)
+            end
         end
         if vim.api.nvim_buf_is_valid(buf) then
             pcall(vim.api.nvim_buf_delete, buf, { force = true })
         end
     end
 
+    local function finish(confirmed)
+        if finished then
+            return
+        end
+        finished = true
+        cleanup()
+
+        if cb then
+            local ok, err = xpcall(cb, debug.traceback, confirmed)
+            if not ok then
+                vim.schedule(function()
+                    vim.notify("adev-files: " .. tostring(err), vim.log.levels.ERROR)
+                end)
+            end
+        end
+    end
+
+    -- Install these after floating_window(), whose generic q mapping would
+    -- otherwise override confirmation cancellation.
     local set_keymap = keymaps.buffer(buf)
     set_keymap("n", "y", function()
         finish(true)
@@ -75,14 +103,6 @@ function M.open(lines, opts, cb)
     set_keymap("n", "<esc>", function()
         finish(false)
     end)
-
-    window.floating_window {
-        buf = buf,
-        title = opts.title or "adev-files",
-        width = opts.width or 80,
-        height = opts.height or math.min(#content + 2, 20),
-        wo = { wrap = true },
-    }
 end
 
 return M
