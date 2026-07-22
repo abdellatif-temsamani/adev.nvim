@@ -8,7 +8,7 @@
 > This file is generated automatically from conventional commits using [git-cliff](https://git-cliff.org). Do not edit it manually.
 
 ---
-## Unreleased
+## [2.1.1](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.1.1) · 2026-07-22
 > 10 changes
 
 
@@ -18,7 +18,7 @@
 - `2026-07-22` · **`adev-files`** · Replace netrw directory buffers ([`0e24467`](https://github.com/abdellatif-temsamani/adev.nvim/commit/0e2446741fd2848593f84c8e38f98a3d9898518d))
 - `2026-07-22` · **`adev-files`** · Polish virtual header ([`ff67e3a`](https://github.com/abdellatif-temsamani/adev.nvim/commit/ff67e3a364cbf2161caa12c65f4d0fc31fce8735))
 - `2026-07-22` · **`adev-files`** · Promote to core file manager ([`a02cded`](https://github.com/abdellatif-temsamani/adev.nvim/commit/a02cdedaad37fdfd3fbcd0566656b6d6f06375e9))
-- `2026-07-22` · **`changelog`** · Add commit dates and chronological ordering ([`dbe3d80`](https://github.com/abdellatif-temsamani/adev.nvim/commit/dbe3d80d97098acbfaabe27c609d76b822abc53c))
+- `2026-07-22` · **`changelog`** · Add commit dates and chronological ordering ([`ddca3c7`](https://github.com/abdellatif-temsamani/adev.nvim/commit/ddca3c7a05b646c95c1b0fd9c429146a41c163d2))
 
 ### Bug fixes
 
