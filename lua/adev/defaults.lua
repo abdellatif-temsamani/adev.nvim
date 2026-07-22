@@ -11,6 +11,7 @@ local defaults = {
     },
     core_plugins = {
         adev_files = {
+            replace_netrw = true,
             open_files = {
                 enabled = false,
                 method = "edit",

@@ -10,6 +10,7 @@ lua/adev-files/
 ├── state.lua                   # Per-buffer state management
 ├── clipboard.lua               # In-memory clipboard (copy/move items)
 ├── help.lua                    # In-buffer floating help window
+├── netrw.lua                   # Directory-buffer interception and netrw replacement
 ├── root.lua                    # Root directory resolution
 ├── validation.lua              # Input validation helpers
 │
@@ -63,6 +64,22 @@ lua/adev-files/
     ├── adev_files.vim          # Buffer syntax highlighting
     └── adev_files_help.vim     # Help window syntax highlighting
 ```
+
+## Configuration
+
+```lua
+require("adev-files").setup({
+    replace_netrw = true, -- default
+    open_files = {
+        enabled = false,
+        method = "edit", -- edit, split, vsplit, or tabedit
+    },
+})
+```
+
+With `replace_netrw = true`, opening a directory through `nvim .` or
+`:edit path/to/directory` opens adev-files in the current window. Calling
+`require("adev-files").open()` directly retains the floating-window interface.
 
 ## State
 
