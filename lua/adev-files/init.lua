@@ -97,7 +97,19 @@ function M.rename_file()
         local ok, err = fs_ops.rename_path(file, new_path)
         if ok then
             vim.api.nvim_buf_set_name(buf, new_path)
-            vim.notify("Renamed: " .. old_name .. " -> " .. input, vim.log.levels.INFO, "adev-files")
+            -- Renaming a buffer makes Neovim treat the destination as a new
+            -- file. Since the filesystem move already created it, the next
+            -- regular :write would otherwise ask whether to overwrite it.
+            -- Writing once with ! also preserves any edits made before the
+            -- rename and refreshes Neovim's file metadata for later writes.
+            vim.api.nvim_buf_call(buf, function()
+                vim.cmd "silent write!"
+            end)
+            vim.notify(
+                "Renamed: " .. old_name .. " -> " .. input,
+                vim.log.levels.INFO,
+                "adev-files"
+            )
         else
             vim.notify("Rename failed: " .. tostring(err), vim.log.levels.ERROR, "adev-files")
         end
