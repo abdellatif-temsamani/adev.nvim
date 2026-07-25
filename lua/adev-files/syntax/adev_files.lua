@@ -56,6 +56,10 @@ vim.api.nvim_set_hl(
     { link = "adevFilesGitRenamed", bold = true, default = true }
 )
 vim.api.nvim_set_hl(0, "adevFilesPendingMark", { link = "Special", bold = true, default = true })
+vim.api.nvim_set_hl(0, "adevFilesPermRead", { fg = "#61AFEF" })
+vim.api.nvim_set_hl(0, "adevFilesPermWrite", { fg = "#E5C07B" })
+vim.api.nvim_set_hl(0, "adevFilesPermExec", { fg = "#98C379" })
+vim.api.nvim_set_hl(0, "adevFilesPermDash", { fg = "#5C6370" })
 vim.api.nvim_set_hl(0, "adevFilesGitModified", { fg = "#E5C07B", bold = true })
 vim.api.nvim_set_hl(0, "adevFilesGitAdded", { fg = "#98C379", bold = true })
 vim.api.nvim_set_hl(0, "adevFilesGitDeleted", { fg = "#E06C75", bold = true })

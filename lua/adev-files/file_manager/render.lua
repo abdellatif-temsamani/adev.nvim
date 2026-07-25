@@ -1,5 +1,6 @@
 local M = {}
 
+local uv = vim.uv or vim.loop
 local clipboard = require "adev-files.clipboard"
 local git = require "adev-files.git"
 local icons = require "adev-files.icon"
@@ -28,6 +29,24 @@ local GIT_HL = {
     C = "adevFilesGitCopied",
     ["?"] = "adevFilesGitUntracked",
 }
+
+local function format_mode(mode)
+    if not mode then
+        return nil
+    end
+    local perm = mode % 512
+    local result = {}
+    local bits = { 256, 128, 64, 32, 16, 8, 4, 2, 1 }
+    for i = 1, 9 do
+        if perm >= bits[i] then
+            perm = perm - bits[i]
+            result[i] = ({ "r", "w", "x", "r", "w", "x", "r", "w", "x" })[i]
+        else
+            result[i] = "-"
+        end
+    end
+    return table.concat(result)
+end
 
 local HEADER_WIDTH = 72
 
@@ -237,8 +256,26 @@ local function add_virtual_text(buf, root)
         local parsed = item.entry
         local row = item.row
         if parsed then
+            local abs_path = path.join_abs(root, parsed.fs_name)
             local icon, hl = icons.get_entry_icon(parsed.name)
             local virt_text = {}
+
+            local stat = uv.fs_lstat(abs_path)
+            if stat then
+                local perm_str = format_mode(stat.mode)
+                if perm_str then
+                    for i = 1, 9 do
+                        local ch = perm_str:sub(i, i)
+                        local hl = ch == "r" and "adevFilesPermRead"
+                            or ch == "w" and "adevFilesPermWrite"
+                            or ch == "x" and "adevFilesPermExec"
+                            or "adevFilesPermDash"
+                        table.insert(virt_text, { ch, hl })
+                    end
+                    table.insert(virt_text, { " ", "Comment" })
+                end
+            end
+
             if selection_marks[row] then
                 table.insert(virt_text, { "● ", "adevFilesPendingMark" })
             end
@@ -253,7 +290,6 @@ local function add_virtual_text(buf, root)
             })
 
             local suffix = {}
-            local abs_path = path.join_abs(root, parsed.fs_name)
             local original = original_by_path[abs_path]
             if not original and not matched[item.row] then
                 local orig_line = original_lines[row]

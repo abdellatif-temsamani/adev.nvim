@@ -1,3 +1,4 @@
+local chmod = require "adev-files.events.chmod"
 local clipboard = require "adev-files.events.clipboard"
 local delete = require "adev-files.events.delete"
 local help = require "adev-files.help"
@@ -91,6 +92,10 @@ function M.attach(buf)
 
     set_keymap("n", "<leader>nu", function()
         revert.revert_current_line(buf)
+    end)
+
+    set_keymap("n", "<leader>nz", function()
+        chmod.chmod_entry(buf)
     end)
 
     set_keymap("n", "<leader>nc", function()

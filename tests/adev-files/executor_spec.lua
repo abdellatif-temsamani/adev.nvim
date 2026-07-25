@@ -4,6 +4,23 @@ local executor = require "adev-files.core.executor"
 local fs = require "adev-files.utils.fs"
 local uv = vim.uv or vim.loop
 
+local function perm(str)
+    str = str:gsub("%s+", "")
+    local num = 0
+    local bits = { 256, 128, 64, 32, 16, 8, 4, 2, 1 }
+    for i = 1, 9 do
+        local ch = str:sub(i, i)
+        if ch == "r" or ch == "w" or ch == "x" then
+            num = num + bits[i]
+        end
+    end
+    return num
+end
+
+local function chmod(path, str)
+    return uv.fs_chmod(path, perm(str))
+end
+
 local tests = {}
 
 local function exists(path)
@@ -30,7 +47,7 @@ local function with_temp_dir(run)
     local ok, err = xpcall(function()
         run(root)
     end, debug.traceback)
-    uv.fs_chmod(root, 493)
+    chmod(root, "rwxr-xr-x")
     vim.fn.delete(root, "rf")
     if not ok then
         error(err)
@@ -41,14 +58,14 @@ function tests.rm_rf_reports_delete_failure()
     with_temp_dir(function(root)
         local target = root .. "/locked.txt"
         write_file(target, "keep")
-        assert(uv.fs_chmod(root, 365))
+        assert(chmod(root, "r-xr-xr-x"))
 
         local ok, err = fs.rm_rf(target)
 
         assert(ok == false)
         assert(type(err) == "string" and err:match "failed to delete")
         assert(exists(target))
-        assert(uv.fs_chmod(root, 493))
+        assert(chmod(root, "rwxr-xr-x"))
     end)
 end
 
@@ -75,7 +92,7 @@ function tests.runtime_failure_rolls_back_created_paths()
         local first = root .. "/first"
         local locked = root .. "/locked"
         assert(vim.fn.mkdir(locked, "p") == 1)
-        assert(uv.fs_chmod(locked, 365))
+        assert(chmod(locked, "r-xr-xr-x"))
 
         local ok = executor.apply_ops {
             { type = "create", kind = "file", path = first },
@@ -85,7 +102,7 @@ function tests.runtime_failure_rolls_back_created_paths()
         assert(ok == false)
         assert(not exists(first))
         assert(not exists(locked .. "/second"))
-        assert(uv.fs_chmod(locked, 493))
+        assert(chmod(locked, "rwxr-xr-x"))
     end)
 end
 
@@ -96,7 +113,7 @@ function tests.runtime_failure_restores_staged_rename()
         local locked = root .. "/locked"
         write_file(source, "original")
         assert(vim.fn.mkdir(locked, "p") == 1)
-        assert(uv.fs_chmod(locked, 365))
+        assert(chmod(locked, "r-xr-xr-x"))
 
         local ok = executor.apply_ops {
             { type = "rename", kind = "file", src = source, dst = destination },
@@ -107,7 +124,7 @@ function tests.runtime_failure_restores_staged_rename()
         assert(read_file(source) == "original")
         assert(not exists(destination))
         assert(not exists(locked .. "/failure"))
-        assert(uv.fs_chmod(locked, 493))
+        assert(chmod(locked, "rwxr-xr-x"))
     end)
 end
 
