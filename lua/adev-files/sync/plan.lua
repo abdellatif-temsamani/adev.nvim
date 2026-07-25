@@ -1,6 +1,6 @@
+local planner = require "adev-files.core.planner"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
-local planner = require "adev-files.core.planner"
 
 local M = {}
 
@@ -38,7 +38,8 @@ function M.plan_ops(buf)
     end
 
     local original_lines = state.get_original_lines(buf)
-    local ops, plan_err, updated_pending = planner.plan(original_lines, entries, st.root, state.get_pending_ops(buf), buf)
+    local ops, plan_err, updated_pending =
+        planner.plan(original_lines, entries, st.root, state.get_pending_ops(buf), buf)
     if plan_err then
         return nil, plan_err
     end

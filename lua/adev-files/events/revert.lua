@@ -45,10 +45,7 @@ local function remove_pending_ops_at_path(buf, abs_path)
     local removed = {}
     for _, op in ipairs(pending) do
         local op_dst = op.dst and path.abs(op.dst) or nil
-        if
-            (op.type == "copy" or op.type == "move")
-            and (abs_path and op_dst == abs_path)
-        then
+        if (op.type == "copy" or op.type == "move") and (abs_path and op_dst == abs_path) then
             table.insert(removed, op)
         else
             table.insert(updated, op)

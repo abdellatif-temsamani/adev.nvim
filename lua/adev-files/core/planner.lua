@@ -19,7 +19,10 @@ function M.plan(original_lines, current_entries, root, pending_ops, buf)
     for row, orig in pairs(original_lines) do
         local name = orig.entry.fs_name
         original_by_name[name] = original_by_name[name] or {}
-        table.insert(original_by_name[name], { row = row, entry = orig.entry, abs_path = orig.abs_path })
+        table.insert(
+            original_by_name[name],
+            { row = row, entry = orig.entry, abs_path = orig.abs_path }
+        )
         original_by_path[orig.abs_path] = row
     end
 
@@ -61,7 +64,10 @@ function M.plan(original_lines, current_entries, root, pending_ops, buf)
                 if cloned.type == "move" and cloned.src then
                     pending_move_src_paths[cloned.src] = true
                 end
-                table.insert(ops, { type = op.type, src = cloned.src, dst = cloned.dst, kind = op.kind })
+                table.insert(
+                    ops,
+                    { type = op.type, src = cloned.src, dst = cloned.dst, kind = op.kind }
+                )
                 table.insert(updated_pending, cloned)
             end
         else
@@ -120,7 +126,10 @@ function M.plan(original_lines, current_entries, root, pending_ops, buf)
 
     for row, orig in pairs(original_lines) do
         if not consumed_originals[row] then
-            if not pending_move_src_paths[orig.abs_path] and not pending_delete_paths[orig.abs_path] then
+            if
+                not pending_move_src_paths[orig.abs_path]
+                and not pending_delete_paths[orig.abs_path]
+            then
                 local still_exists = false
                 for _, item in ipairs(current_entries) do
                     if not item.deleted and item.entry.fs_name == orig.entry.fs_name then

@@ -1,7 +1,7 @@
-local state = require "adev-files.state"
-local model = require "adev-files.core.model"
 local marks = require "adev-files.core.marks"
+local model = require "adev-files.core.model"
 local path = require "adev-files.utils.fs.path"
+local state = require "adev-files.state"
 local view = require "adev-files.core.view"
 
 local M = {}

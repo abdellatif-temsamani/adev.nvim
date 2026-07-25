@@ -52,14 +52,17 @@ local function summary_chunks(summary)
 
     if summary.pending > 0 then
         table.insert(chunks, { "  •  ", "Comment" })
-        table.insert(chunks, { string.format("%d pending", summary.pending), "adevFilesPendingMark" })
+        table.insert(
+            chunks,
+            { string.format("%d pending", summary.pending), "adevFilesPendingMark" }
+        )
     end
     if summary.show_hidden then
         table.insert(chunks, { "  •  hidden", "Comment" })
     end
 
     local has_git = false
-    for _, code in ipairs({ "M", "A", "D", "R", "C", "?" }) do
+    for _, code in ipairs { "M", "A", "D", "R", "C", "?" } do
         if summary.git_counts[code] and summary.git_counts[code] > 0 then
             if not has_git then
                 table.insert(chunks, { "  •  Git ", "Comment" })
@@ -186,7 +189,10 @@ local function add_virtual_text(buf, root)
         if not consumed[row] then
             local name = o.entry.fs_name
             original_by_name[name] = original_by_name[name] or {}
-            table.insert(original_by_name[name], { row = row, entry = o.entry, abs_path = o.abs_path })
+            table.insert(
+                original_by_name[name],
+                { row = row, entry = o.entry, abs_path = o.abs_path }
+            )
         end
     end
 
@@ -269,7 +275,10 @@ local function add_virtual_text(buf, root)
                     if parsed.fs_name ~= original.fs_name then
                         table.insert(suffix, { " | renamed |", "adevFilesPendingRenamed" })
                     end
-                elseif not clip_mode and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0) then
+                elseif
+                    not clip_mode
+                    and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0)
+                then
                     table.insert(suffix, { " | new |", "adevFilesPendingNew" })
                 end
             end
@@ -280,7 +289,8 @@ local function add_virtual_text(buf, root)
 
             if clip_mode then
                 local label = clip_mode == "move" and " | move |" or " | copy |"
-                local hl_name = clip_mode == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy"
+                local hl_name = clip_mode == "move" and "adevFilesPendingMove"
+                    or "adevFilesPendingCopy"
                 table.insert(suffix, { label, hl_name })
             end
 

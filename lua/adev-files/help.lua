@@ -5,44 +5,48 @@ local M = {}
 
 ---@return string[]
 local function content()
-    return {
+    local entry = function(key, desc)
+        return "    " .. key .. string.rep(" ", 22 - #key) .. desc
+    end
+
+    local lines = {
         "  adev-files",
         "",
         "  Navigation",
-        "    <CR> / L        open file / enter directory",
-        "    <bs> / H        parent directory",
-        "    =              go to initial root",
-        "    <leader>nq     quit",
-        "    <leader>nh     toggle hidden files",
+        entry("<CR> / L",       "open file / enter directory"),
+        entry("<bs> / H",       "parent directory"),
+        entry("=",              "go to initial root"),
+        entry("<leader>nq",     "quit"),
+        entry("<leader>nh",     "toggle hidden files"),
         "",
         "  Selection",
-        "    <TAB>          toggle mark on current line",
-        "    <leader>nm     clear all marks",
+        entry("<TAB>",          "toggle mark on current line"),
+        entry("<leader>nm",     "clear all marks"),
         "",
         "  Clipboard",
-        "    <leader>ny     copy (normal/visual)",
-        "    <leader>nx     cut/move (normal/visual)",
-        "    <leader>np     paste (at cursor)",
+        entry("<leader>ny",     "copy (normal/visual)"),
+        entry("<leader>nx",     "cut/move (normal/visual)"),
+        entry("<leader>np",     "paste (at cursor)"),
         "",
         "  Edits",
-        "    Edit entries in-place, then :write to apply",
-        "    u              undo edit",
-        "    <leader>nu     revert current line",
-        "    <leader>nc     reset all (discard changes)",
+        entry("<leader>bs",      "apply edits"),
+        entry("<leader>nu",     "revert current line"),
+        entry("<leader>nc",     "reset all (discard changes)"),
         "",
         "  Delete",
-        "    <leader>nd     delete (normal/visual)",
+        entry("<leader>nd",     "delete (normal/visual)"),
         "",
         "  Global",
-        "    <leader>no     open file manager",
-        "    <leader>na     create file",
-        "    <leader>nr     rename file",
-        "    <leader>nd     delete file",
+        entry("<leader>no",     "open file manager"),
+        entry("<leader>na",     "create file"),
+        entry("<leader>nr",     "rename file"),
+        entry("<leader>nd",     "delete file"),
         "",
         "  Confirm",
-        "    y / <CR>       confirm",
-        "    n / q / <Esc>  cancel",
+        entry("y / <CR>",       "confirm"),
+        entry("n / q / <Esc>",  "cancel"),
     }
+    return lines
 end
 
 function M.open()

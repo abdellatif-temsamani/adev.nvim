@@ -37,7 +37,19 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf] or { root = root, initial_root = root, model = model.new(root), view = nil, applying = false, pending_ops = {}, original_lines = {}, show_hidden = false, selection_marks = {}, git_status = nil }
+    states[buf] = states[buf]
+        or {
+            root = root,
+            initial_root = root,
+            model = model.new(root),
+            view = nil,
+            applying = false,
+            pending_ops = {},
+            original_lines = {},
+            show_hidden = false,
+            selection_marks = {},
+            git_status = nil,
+        }
     states[buf].root = root
     states[buf].model = model.new(root)
     states[buf].view = nil

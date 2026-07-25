@@ -1,7 +1,7 @@
 local utils = require "adev-common.utils"
 
-local confirm = require "adev-files.events.confirm"
 local config = require "adev-files"
+local confirm = require "adev-files.events.confirm"
 local parse = require "adev-files.parse"
 local roots = require "adev-files.root"
 local state = require "adev-files.state"

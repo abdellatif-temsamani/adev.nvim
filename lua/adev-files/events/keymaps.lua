@@ -1,9 +1,9 @@
 local clipboard = require "adev-files.events.clipboard"
 local delete = require "adev-files.events.delete"
 local help = require "adev-files.help"
-local revert = require "adev-files.events.revert"
 local nav = require "adev-files.events.navigation"
 local path = require "adev-files.utils.fs.path"
+local revert = require "adev-files.events.revert"
 local selection = require "adev-files.events.selection"
 local state = require "adev-files.state"
 local sync_view = require "adev-files.sync.view"
@@ -27,6 +27,8 @@ function M.attach(buf)
         nav.open_or_enter(buf)
     end)
 
+    set_keymap("n", "u", "<nop>")
+    set_keymap("n", "<c-r>", "<nop>")
     set_keymap("n", "K", "<nop>")
     set_keymap("n", "J", "<nop>")
     set_keymap("n", "dd", "<nop>")
@@ -115,8 +117,18 @@ function M.attach(buf)
         if #pending > 0 then
             table.insert(lines, "Staged ops:")
             for _, op in ipairs(pending) do
-                local opstr = op.type == "move" or op.type == "copy" and string.format("  %s %s -> %s", op.type, rel(op.src), rel(op.dst))
-                    or op.type == "rename" and string.format("  rename %s -> %s", rel(op.src), rel(op.dst))
+                local opstr = op.type == "move"
+                    or op.type == "copy" and string.format(
+                        "  %s %s -> %s",
+                        op.type,
+                        rel(op.src),
+                        rel(op.dst)
+                    )
+                    or op.type == "rename" and string.format(
+                        "  rename %s -> %s",
+                        rel(op.src),
+                        rel(op.dst)
+                    )
                     or op.type == "delete" and string.format("  delete %s", rel(op.path))
                     or op.type == "create" and string.format("  create %s", rel(op.path))
                     or string.format("  %s", vim.inspect(op))
@@ -131,8 +143,18 @@ function M.attach(buf)
             table.insert(lines, "")
             table.insert(lines, "Planned ops:")
             for _, op in ipairs(ops) do
-                local opstr = op.type == "move" or op.type == "copy" and string.format("  %s %s -> %s", op.type, rel(op.src), rel(op.dst))
-                    or op.type == "rename" and string.format("  rename %s -> %s", rel(op.src), rel(op.dst))
+                local opstr = op.type == "move"
+                    or op.type == "copy" and string.format(
+                        "  %s %s -> %s",
+                        op.type,
+                        rel(op.src),
+                        rel(op.dst)
+                    )
+                    or op.type == "rename" and string.format(
+                        "  rename %s -> %s",
+                        rel(op.src),
+                        rel(op.dst)
+                    )
                     or op.type == "delete" and string.format("  delete %s", rel(op.path))
                     or op.type == "create" and string.format("  create %s", rel(op.path))
                     or string.format("  %s", vim.inspect(op))
@@ -170,7 +192,6 @@ function M.attach(buf)
         s_keys("n", "q", "<cmd>bwipeout<CR>")
         s_keys("n", "<esc>", "<cmd>bwipeout<CR>")
     end)
-
 end
 
 return M
