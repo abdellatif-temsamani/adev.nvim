@@ -13,7 +13,7 @@ local defaults = {
         adev_files = {
             replace_netrw = true,
             open_files = {
-                enabled = false,
+                enabled = true,
                 method = "edit",
             },
         },

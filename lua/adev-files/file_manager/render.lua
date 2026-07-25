@@ -311,23 +311,23 @@ local function add_virtual_text(buf, root)
             if not deleted_item then
                 if original then
                     if parsed.fs_name ~= original.fs_name and gs ~= "R" then
-                        table.insert(suffix, { " | renamed |", "adevFilesPendingRenamed" })
+                        table.insert(suffix, { " [renamed]", "adevFilesPendingRenamed" })
                     end
                 elseif
                     not gs
                     and not clip_mode
                     and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0)
                 then
-                    table.insert(suffix, { " | new |", "adevFilesPendingNew" })
+                    table.insert(suffix, { " [new]", "adevFilesPendingNew" })
                 end
             end
 
             if deleted_item and not clip_mode then
-                table.insert(suffix, { " | delete |", "adevFilesPendingDelete" })
+                table.insert(suffix, { " [deleted]", "adevFilesPendingDelete" })
             end
 
             if clip_mode then
-                local label = clip_mode == "move" and " | move |" or " | copy |"
+                local label = clip_mode == "move" and " [moved]" or " [copied]"
                 local hl_name = clip_mode == "move" and "adevFilesPendingMove"
                     or "adevFilesPendingCopy"
                 table.insert(suffix, { label, hl_name })
@@ -337,10 +337,10 @@ local function add_virtual_text(buf, root)
             if pending_ops and #pending_ops > 0 then
                 for _, op in ipairs(pending_ops) do
                     local src_rel = path.relpath(root, op.src or "")
-                    local label = op.type == "move" and " | moved from " or " | copied from "
+                    local label = op.type == "move" and " [moved from " or " [copied from "
                     local hl_name = op.type == "move" and "adevFilesPendingMove"
                         or "adevFilesPendingCopy"
-                    table.insert(suffix, { label .. src_rel .. " |", hl_name })
+                    table.insert(suffix, { label .. src_rel .. "]", hl_name })
                 end
             end
 

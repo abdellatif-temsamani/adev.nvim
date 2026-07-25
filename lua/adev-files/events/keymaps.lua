@@ -120,55 +120,48 @@ function M.attach(buf)
         local lines = {}
         local pending = state.get_pending_ops(buf)
         if #pending > 0 then
-            table.insert(lines, "Staged ops:")
+            table.insert(lines, "Changes staged:")
             for _, op in ipairs(pending) do
-                local opstr = op.type == "move"
-                    or op.type == "copy" and string.format(
-                        "  %s %s -> %s",
-                        op.type,
-                        rel(op.src),
-                        rel(op.dst)
-                    )
-                    or op.type == "rename" and string.format(
-                        "  rename %s -> %s",
-                        rel(op.src),
-                        rel(op.dst)
-                    )
-                    or op.type == "delete" and string.format("  delete %s", rel(op.path))
-                    or op.type == "create" and string.format("  create %s", rel(op.path))
-                    or string.format("  %s", vim.inspect(op))
-                table.insert(lines, opstr)
+                if op.type == "create" then
+                    table.insert(lines, "  created:    " .. rel(op.path))
+                elseif op.type == "delete" then
+                    table.insert(lines, "  deleted:    " .. rel(op.path))
+                elseif op.type == "rename" then
+                    table.insert(lines, "  renamed:    " .. rel(op.src) .. "  ->  " .. rel(op.dst))
+                elseif op.type == "move" then
+                    table.insert(lines, "  moved:      " .. rel(op.src) .. "  ->  " .. rel(op.dst))
+                elseif op.type == "copy" then
+                    table.insert(lines, "  copied:     " .. rel(op.src) .. "  ->  " .. rel(op.dst))
+                end
             end
         end
 
         local ops, err = require("adev-files.sync").plan_ops(buf)
         if err then
-            table.insert(lines, string.format("Error: %s", err))
-        elseif ops and #ops > 0 then
             table.insert(lines, "")
-            table.insert(lines, "Planned ops:")
+            table.insert(lines, "  error: " .. err)
+        elseif ops and #ops > 0 then
+            if #lines > 0 then
+                table.insert(lines, "")
+            end
+            table.insert(lines, "Changes pending:")
             for _, op in ipairs(ops) do
-                local opstr = op.type == "move"
-                    or op.type == "copy" and string.format(
-                        "  %s %s -> %s",
-                        op.type,
-                        rel(op.src),
-                        rel(op.dst)
-                    )
-                    or op.type == "rename" and string.format(
-                        "  rename %s -> %s",
-                        rel(op.src),
-                        rel(op.dst)
-                    )
-                    or op.type == "delete" and string.format("  delete %s", rel(op.path))
-                    or op.type == "create" and string.format("  create %s", rel(op.path))
-                    or string.format("  %s", vim.inspect(op))
-                table.insert(lines, opstr)
+                if op.type == "create" then
+                    table.insert(lines, "  created:    " .. rel(op.path))
+                elseif op.type == "delete" then
+                    table.insert(lines, "  deleted:    " .. rel(op.path))
+                elseif op.type == "rename" then
+                    table.insert(lines, "  renamed:    " .. rel(op.src) .. "  ->  " .. rel(op.dst))
+                elseif op.type == "move" then
+                    table.insert(lines, "  moved:      " .. rel(op.src) .. "  ->  " .. rel(op.dst))
+                elseif op.type == "copy" then
+                    table.insert(lines, "  copied:     " .. rel(op.src) .. "  ->  " .. rel(op.dst))
+                end
             end
         end
 
         if #lines == 0 then
-            vim.notify("(no pending changes)", vim.log.levels.INFO, { title = "adev-files" })
+            vim.notify("(no changes)", vim.log.levels.INFO, { title = "adev-files" })
             return
         end
 
@@ -184,7 +177,7 @@ function M.attach(buf)
         local width = 72
         window.floating_window {
             buf = sbuf,
-            title = "adev-files status [q: close]",
+            title = "adev-files changes [q: close]",
             width = width,
             height = math.min(#lines + 2, 28),
             wo = { wrap = false },
