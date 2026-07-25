@@ -3,7 +3,6 @@ local delete = require "adev-files.events.delete"
 local revert = require "adev-files.events.revert"
 local help = require "adev-files.help"
 local nav = require "adev-files.events.navigation"
-local parse = require "adev-files.parse"
 local selection = require "adev-files.events.selection"
 local sync_view = require "adev-files.sync.view"
 local utils = require "adev-common.utils"
@@ -98,17 +97,6 @@ function M.attach(buf)
     end)
 
     set_keymap("n", "<leader>np", function()
-        local entry, err = parse.parse_line(vim.api.nvim_get_current_line())
-        if err then
-            utils.err_notify(err, "adev-files")
-            return
-        end
-
-        if entry and entry.kind == "directory" then
-            clipboard.paste(buf, entry.fs_name)
-            return
-        end
-
         clipboard.paste(buf, "")
     end)
 
