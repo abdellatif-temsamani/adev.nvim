@@ -14,19 +14,14 @@ end
 
 function M.fetch_latest(cb, now)
     local stamp = now or vim.uv.now()
-    git.git({ "fetch", "--tags", "-q" }, function(res)
-        if not res or res.code ~= 0 then
-            cb(nil)
-            return
-        end
+    git.git({ "fetch", "--tags", "-q" }, function() end)
 
-        git.get_available_versions(function(versions)
-            local tag = versions and #versions > 0 and versions[1] or nil
-            if tag then
-                cache = { tag = tag, timestamp = stamp }
-            end
-            cb(tag)
-        end)
+    git.get_available_versions(function(versions)
+        local tag = versions and #versions > 0 and versions[1] or nil
+        if tag then
+            cache = { tag = tag, timestamp = stamp }
+        end
+        cb(tag)
     end)
 end
 

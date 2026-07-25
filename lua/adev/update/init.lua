@@ -18,7 +18,6 @@ function M.check_update()
 
     git.get_version(function(current)
         if not current then
-            utils.notify("adev.nvim: Unable to get current version", vim.log.levels.WARN)
             return
         end
 
@@ -28,11 +27,9 @@ function M.check_update()
         end
 
         cache.fetch_latest(function(tag)
-            if not tag then
-                utils.notify("adev.nvim: Unable to check updates", vim.log.levels.WARN)
-                return
+            if tag then
+                check(current, tag)
             end
-            check(current, tag)
         end, now)
     end)
 end
