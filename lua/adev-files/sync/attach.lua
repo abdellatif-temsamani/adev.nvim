@@ -7,6 +7,8 @@ local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
 
+local view = require "adev-files.core.view"
+
 local M = {}
 
 ---@param buf integer
@@ -99,6 +101,41 @@ function M.attach(buf, root)
                 end
                 index.reindex(b)
                 render.add_virtual_text(b, s0.root)
+
+                if not vim.bo[b].modified then
+                    return
+                end
+
+                local entries, err = view.parse_buffer(b)
+                if err or not entries then
+                    return
+                end
+                local original = state.get_original_lines(b)
+                local n = 0
+                for _, _ in pairs(original) do
+                    n = n + 1
+                end
+                if #entries ~= n then
+                    return
+                end
+                local entry_names = {}
+                local orig_names = {}
+                for i, item in ipairs(entries) do
+                    entry_names[i] = item.entry.fs_name
+                end
+                local idx = 0
+                for _, data in pairs(original) do
+                    idx = idx + 1
+                    orig_names[idx] = data.entry.fs_name
+                end
+                table.sort(entry_names)
+                table.sort(orig_names)
+                for i, name in ipairs(entry_names) do
+                    if name ~= orig_names[i] then
+                        return
+                    end
+                end
+                vim.bo[b].modified = false
             end)
         end,
     })
