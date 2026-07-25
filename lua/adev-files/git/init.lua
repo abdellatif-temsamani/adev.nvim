@@ -41,7 +41,7 @@ local function parse_porcelain(output, root, git_root)
 
         -- Handle rename: "R  old -> new"
         if index_status == "R" or worktree_status == "R" then
-            local arrow = rel:find " -> "
+            local arrow = rel:find " %-> "
             if arrow then
                 rel = rel:sub(arrow + 4)
             end

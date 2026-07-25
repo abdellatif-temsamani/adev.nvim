@@ -269,9 +269,7 @@ local function add_virtual_text(buf, root)
             local clip_mode = clip_sources[abs_path]
 
             if not deleted_item then
-                if gs == "R" then
-                    table.insert(suffix, { " | renamed |", "adevFilesPendingRenamed" })
-                elseif original then
+                if original then
                     if parsed.fs_name ~= original.fs_name then
                         table.insert(suffix, { " | renamed |", "adevFilesPendingRenamed" })
                     end
