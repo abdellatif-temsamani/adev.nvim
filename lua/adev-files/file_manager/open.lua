@@ -74,7 +74,7 @@ function M.open(root, opts)
     set_buffer_name(buf, root)
 
     -- keep this lazy to avoid require cycles
-    require("adev-files.events").register(buf, root, { disable_global_actions = current_mode })
+    require("adev-files.events").register(buf, root)
 
     if not current_mode then
         -- Prefer a taller window to allow editing/adding many entries.

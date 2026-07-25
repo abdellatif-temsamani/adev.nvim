@@ -11,23 +11,14 @@ local utils = require "adev-common.utils"
 local M = {}
 
 ---@param buf integer
----@param opts? { disable_global_actions: boolean? }
-function M.attach(buf, opts)
-    opts = opts or {}
+function M.attach(buf)
     local set_keymap = utils.keymaps.buffer(buf)
 
-    if opts.disable_global_actions then
-        -- Global file actions operate on the current buffer name. In netrw
-        -- replacement mode that name is an adev-files:// URI, so shadow them
-        -- while this directory buffer is active. The manager's own mappings
-        -- below remain available; in particular, they replace <leader>nd with
-        -- the safe selected-entry deletion action.
-        for _, lhs in ipairs { "<leader>no", "<leader>na", "<leader>nr", "<leader>nd" } do
-            set_keymap("n", lhs, "<nop>", {
-                desc = "disabled in adev-files",
-                silent = true,
-            })
-        end
+    for _, lhs in ipairs { "<leader>no", "<leader>na", "<leader>nr", "<leader>nd" } do
+        set_keymap("n", lhs, "<nop>", {
+            desc = "disabled in adev-files",
+            silent = true,
+        })
     end
 
     set_keymap("n", "<cr>", function()
