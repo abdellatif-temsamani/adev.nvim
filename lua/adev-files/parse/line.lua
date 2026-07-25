@@ -63,7 +63,7 @@ function M.parse_line(line)
     if line:sub(1, 1) == "[" and line:sub(-1) == "]" then
         return nil, nil
     end
-    if line:match("^│") then
+    if line:match "^│" then
         return nil, nil
     end
     if line:match "^=+$" then

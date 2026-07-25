@@ -3,8 +3,8 @@ local git = require "adev-files.git"
 local index = require "adev-files.sync.index"
 local render = require "adev-files.file_manager.render"
 local roots = require "adev-files.file_manager.roots"
-local window = require "adev-files.file_manager.window"
 local state = require "adev-files.state"
+local window = require "adev-files.file_manager.window"
 
 local M = {}
 

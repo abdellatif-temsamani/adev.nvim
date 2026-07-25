@@ -8,6 +8,28 @@
 > This file is generated automatically from conventional commits using [git-cliff](https://git-cliff.org). Do not edit it manually.
 
 ---
+## [2.1.2](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.1.2) · 2026-07-25
+> 8 changes
+
+
+### Features
+
+- `2026-07-25` · **`adev-files`** · Add &lt;leader&gt;ns for git status and commit --amend ([`cc02a44`](https://github.com/abdellatif-temsamani/adev.nvim/commit/cc02a442b3194916a3078ea16973a2097c582701))
+
+### Bug fixes
+
+- `2026-07-25` · **`adev-files`** · Always disable global keymaps in adev-files buffers ([`34d262b`](https://github.com/abdellatif-temsamani/adev.nvim/commit/34d262b32c699ca2a431b750f2b527e5ad6f9c95))
+- `2026-07-25` · **`adev-files`** · Reset modified flag when only empty lines change ([`f4e2efa`](https://github.com/abdellatif-temsamani/adev.nvim/commit/f4e2efadd634d0165f4f267c82e9bf5a77c005cb))
+- `2026-07-25` · **`adev-files`** · Paste always into current root, not cursor directory ([`4520b64`](https://github.com/abdellatif-temsamani/adev.nvim/commit/4520b6442561ba7293aa578ac5f3c70ac3f40973))
+- `2026-07-25` · **`adev-files`** · Auto-discard changes on navigation without prompt ([`795eea1`](https://github.com/abdellatif-temsamani/adev.nvim/commit/795eea16d3afcdfc502b55580a993a1991eba026))
+- `2026-07-25` · **`adev-files`** · Escape dash in rename pattern, remove R special case in render ([`cf94380`](https://github.com/abdellatif-temsamani/adev.nvim/commit/cf94380536123410f312621a6d96d404857ff900))
+- `2026-07-25` · **`adev-files`** · Carry git status across pending renames, suppress redundant pending indicators ([`9a79840`](https://github.com/abdellatif-temsamani/adev.nvim/commit/9a79840b48bf20b55b2aa0fbac9a8f6f1c3cacb5))
+
+### Refactoring
+
+- `2026-07-25` · **`adev-files`** · Convert syntax files to lua, unify colors with git highlights ([`c25f23b`](https://github.com/abdellatif-temsamani/adev.nvim/commit/c25f23b1506daadd7ffb4109a658ac6d8a9c2aa6))
+
+---
 ## [2.1.1](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.1.1) · 2026-07-22
 > 10 changes
 

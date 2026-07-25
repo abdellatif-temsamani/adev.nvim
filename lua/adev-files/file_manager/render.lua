@@ -52,14 +52,17 @@ local function summary_chunks(summary)
 
     if summary.pending > 0 then
         table.insert(chunks, { "  •  ", "Comment" })
-        table.insert(chunks, { string.format("%d pending", summary.pending), "adevFilesPendingMark" })
+        table.insert(
+            chunks,
+            { string.format("%d pending", summary.pending), "adevFilesPendingMark" }
+        )
     end
     if summary.show_hidden then
         table.insert(chunks, { "  •  hidden", "Comment" })
     end
 
     local has_git = false
-    for _, code in ipairs({ "M", "A", "D", "R", "C", "?" }) do
+    for _, code in ipairs { "M", "A", "D", "R", "C", "?" } do
         if summary.git_counts[code] and summary.git_counts[code] > 0 then
             if not has_git then
                 table.insert(chunks, { "  •  Git ", "Comment" })
@@ -186,7 +189,10 @@ local function add_virtual_text(buf, root)
         if not consumed[row] then
             local name = o.entry.fs_name
             original_by_name[name] = original_by_name[name] or {}
-            table.insert(original_by_name[name], { row = row, entry = o.entry, abs_path = o.abs_path })
+            table.insert(
+                original_by_name[name],
+                { row = row, entry = o.entry, abs_path = o.abs_path }
+            )
         end
     end
 
@@ -247,10 +253,6 @@ local function add_virtual_text(buf, root)
             })
 
             local suffix = {}
-            local gs, gs_hl = git_indicator(git.get_file_status(git_status, parsed.fs_name))
-            if gs then
-                table.insert(suffix, { "[" .. gs .. "]", gs_hl })
-            end
             local abs_path = path.join_abs(root, parsed.fs_name)
             local original = original_by_path[abs_path]
             if not original and not matched[item.row] then
@@ -259,16 +261,26 @@ local function add_virtual_text(buf, root)
                     original = orig_line.entry
                 end
             end
+            local lookup_name = (original and parsed.fs_name ~= original.fs_name) and original.fs_name or parsed.fs_name
+            local gs, gs_hl = git_indicator(git.get_file_status(git_status, lookup_name))
+            if gs then
+                table.insert(suffix, { "[" .. gs .. "]", gs_hl })
+            end
+
             local deleted_item = pending_delete[abs_path]
             local clip_mode = clip_sources[abs_path]
 
             if not deleted_item then
                 if original then
-                    if parsed.fs_name ~= original.fs_name then
-                        table.insert(suffix, { " | renamed |", "adevFilesPendingMark" })
+                    if parsed.fs_name ~= original.fs_name and gs ~= "R" then
+                        table.insert(suffix, { " | renamed |", "adevFilesPendingRenamed" })
                     end
-                elseif not clip_mode and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0) then
-                    table.insert(suffix, { " | new |", "adevFilesPendingMark" })
+                elseif
+                    not gs
+                    and not clip_mode
+                    and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0)
+                then
+                    table.insert(suffix, { " | new |", "adevFilesPendingNew" })
                 end
             end
 
@@ -278,7 +290,8 @@ local function add_virtual_text(buf, root)
 
             if clip_mode then
                 local label = clip_mode == "move" and " | move |" or " | copy |"
-                local hl_name = clip_mode == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy"
+                local hl_name = clip_mode == "move" and "adevFilesPendingMove"
+                    or "adevFilesPendingCopy"
                 table.insert(suffix, { label, hl_name })
             end
 

@@ -34,14 +34,14 @@ end
 ---@return table<string, string>  -- rel_path (from root) -> status char
 local function parse_porcelain(output, root, git_root)
     local result = {}
-    for line in output:gmatch("[^\r\n]+") do
+    for line in output:gmatch "[^\r\n]+" do
         local index_status = line:sub(1, 1)
         local worktree_status = line:sub(2, 2)
         local rel = line:sub(4)
 
         -- Handle rename: "R  old -> new"
         if index_status == "R" or worktree_status == "R" then
-            local arrow = rel:find(" -> ")
+            local arrow = rel:find " %-> "
             if arrow then
                 rel = rel:sub(arrow + 4)
             end
@@ -63,7 +63,7 @@ local function parse_porcelain(output, root, git_root)
         local rel_to_root = path.relpath(root, abs)
 
         -- Skip entries outside the displayed root
-        if rel_to_root and not rel_to_root:match("^%.%.") and rel_to_root ~= "." then
+        if rel_to_root and not rel_to_root:match "^%.%." and rel_to_root ~= "." then
             -- Strip trailing slash normalization
             rel_to_root = rel_to_root:gsub("/$", "")
 
@@ -105,18 +105,18 @@ end
 function M.fetch_status(root, callback)
     local git_root = find_git_root(root)
     if not git_root then
-        callback({})
+        callback {}
         return
     end
 
     local git = Adev and Adev.git or "git"
-    vim.system({ git, "status", "--porcelain", "-u" }, {
+    vim.system({ git, "status", "--porcelain", "-u", "-M" }, {
         cwd = git_root,
         text = true,
     }, function(res)
         vim.schedule(function()
             if not res or res.code ~= 0 then
-                callback({})
+                callback {}
                 return
             end
             local status = parse_porcelain(res.stdout or "", root, git_root)

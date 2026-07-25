@@ -5,10 +5,9 @@ local M = {}
 
 ---@param buf number
 ---@param root string
----@param opts? { disable_global_actions: boolean? }
-function M.register(buf, root, opts)
+function M.register(buf, root)
     assert(vim.api.nvim_buf_is_valid(buf), "not a valid buffer")
-    keymaps.attach(buf, opts)
+    keymaps.attach(buf)
     sync.attach(buf, root)
 end
 
