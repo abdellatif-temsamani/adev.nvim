@@ -297,7 +297,9 @@ local function add_virtual_text(buf, root)
                     original = orig_line.entry
                 end
             end
-            local lookup_name = (original and parsed.fs_name ~= original.fs_name) and original.fs_name or parsed.fs_name
+            local lookup_name = (original and parsed.fs_name ~= original.fs_name)
+                    and original.fs_name
+                or parsed.fs_name
             local gs, gs_hl = git_indicator(git.get_file_status(git_status, lookup_name))
             if gs then
                 table.insert(suffix, { "[" .. gs .. "]", gs_hl })

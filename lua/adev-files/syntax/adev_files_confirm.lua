@@ -23,11 +23,11 @@ vim.cmd [[syn match adevFilesCopyLine   "^copy:.*$"   contains=adevFilesCopy,ade
 vim.cmd [[syn match adevFilesMoveLine   "^move:.*$"   contains=adevFilesMove,adevFilesArrow,adevFilesSrcPath,adevFilesDstPath]]
 vim.cmd [[syn match adevFilesFooter "^[yn</].*$"]]
 
-vim.api.nvim_set_hl(0, "adevFilesCreate", { link = "adevFilesGitAdded", default = true })
-vim.api.nvim_set_hl(0, "adevFilesDelete", { link = "adevFilesGitDeleted", default = true })
-vim.api.nvim_set_hl(0, "adevFilesRename", { link = "adevFilesGitRenamed", default = true })
-vim.api.nvim_set_hl(0, "adevFilesCopy", { link = "adevFilesGitCopied", default = true })
-vim.api.nvim_set_hl(0, "adevFilesMove", { link = "adevFilesGitModified", default = true })
+vim.api.nvim_set_hl(0, "adevFilesCreate", { link = "DiffAdd", default = true })
+vim.api.nvim_set_hl(0, "adevFilesDelete", { link = "DiffDelete", default = true })
+vim.api.nvim_set_hl(0, "adevFilesRename", { link = "DiffText", default = true })
+vim.api.nvim_set_hl(0, "adevFilesCopy", { link = "Special", default = true })
+vim.api.nvim_set_hl(0, "adevFilesMove", { link = "DiffChange", default = true })
 vim.api.nvim_set_hl(0, "adevFilesArrow", { link = "Operator", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPath", { link = "String", default = true })
 vim.api.nvim_set_hl(0, "adevFilesSrcPath", { link = "Comment", default = true })

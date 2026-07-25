@@ -11,13 +11,13 @@ vim.cmd [[syntax match adevChangesCreate "\v^\s+create\s"]]
 vim.cmd [[syntax match adevChangesArrow " -> "]]
 vim.cmd [[syntax match adevChangesNone "(no pending changes)"]]
 
-vim.api.nvim_set_hl(0, "adevChangesSection", { link = "Title" })
-vim.api.nvim_set_hl(0, "adevChangesMove", { link = "adevFilesGitModified" })
-vim.api.nvim_set_hl(0, "adevChangesCopy", { link = "adevFilesGitCopied" })
-vim.api.nvim_set_hl(0, "adevChangesRename", { link = "adevFilesGitRenamed" })
-vim.api.nvim_set_hl(0, "adevChangesDelete", { link = "adevFilesGitDeleted" })
-vim.api.nvim_set_hl(0, "adevChangesCreate", { link = "adevFilesGitAdded" })
-vim.api.nvim_set_hl(0, "adevChangesArrow", { link = "Special" })
-vim.api.nvim_set_hl(0, "adevChangesNone", { link = "Comment" })
+vim.api.nvim_set_hl(0, "adevChangesSection", { link = "Title", default = true })
+vim.api.nvim_set_hl(0, "adevChangesMove", { link = "DiffChange", default = true })
+vim.api.nvim_set_hl(0, "adevChangesCopy", { link = "Special", default = true })
+vim.api.nvim_set_hl(0, "adevChangesRename", { link = "DiffText", default = true })
+vim.api.nvim_set_hl(0, "adevChangesDelete", { link = "DiffDelete", default = true })
+vim.api.nvim_set_hl(0, "adevChangesCreate", { link = "DiffAdd", default = true })
+vim.api.nvim_set_hl(0, "adevChangesArrow", { link = "Special", default = true })
+vim.api.nvim_set_hl(0, "adevChangesNone", { link = "Comment", default = true })
 
 vim.b.current_syntax = "adev_changes"

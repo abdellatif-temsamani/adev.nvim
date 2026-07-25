@@ -7,11 +7,11 @@ local uv = vim.uv or vim.loop
 local M = {}
 
 local BITS = { 256, 128, 64, 32, 16, 8, 4, 2, 1 }
-local GUIDE_NS = vim.api.nvim_create_namespace("adev_files_chmod_guide")
+local GUIDE_NS = vim.api.nvim_create_namespace "adev_files_chmod_guide"
 
 local function perm_from_str(str)
     str = str:gsub("%s+", "")
-    if str:match("^%d+$") then
+    if str:match "^%d+$" then
         return tonumber(str, 8)
     end
     local num = 0
@@ -57,7 +57,7 @@ local function highlight_perm_chars(buf, lines)
                     })
                 end
             end
-        elseif line:match("^  [rwx%-] =") then
+        elseif line:match "^  [rwx%-] =" then
             local ch = line:sub(3, 3)
             local hl = ch == "r" and "adevFilesPermRead"
                 or ch == "w" and "adevFilesPermWrite"
@@ -146,8 +146,7 @@ function M.chmod_entry(buf)
     end
 
     local current = format_mode(stat.mode)
-    local label = #items == 1
-        and path.relpath(st.root, target.src)
+    local label = #items == 1 and path.relpath(st.root, target.src)
         or (tostring(#items) .. " items")
 
     local guide_buf = show_guide(current)
@@ -174,8 +173,7 @@ function M.chmod_entry(buf)
                 ok_count = ok_count + 1
             else
                 vim.notify(
-                    "Chmod failed: " .. path.relpath(st.root, item.src)
-                        .. " - " .. tostring(err),
+                    "Chmod failed: " .. path.relpath(st.root, item.src) .. " - " .. tostring(err),
                     vim.log.levels.ERROR,
                     "adev-files"
                 )

@@ -13,7 +13,7 @@ end
 ---@return string icon
 ---@return string hl
 function M.get_icon(name)
-    local fallback_icon, fallback_hl = "f", "MiniFilesFile"
+    local fallback_icon, fallback_hl = "f", "Normal"
     local ft = detect_filetype(name)
     if not ft then
         return fallback_icon, fallback_hl

@@ -27,44 +27,28 @@ vim.cmd [[syntax match adevFilesFileValue "^ro[^o].*[^/]$"]]
 vim.cmd [[syntax match adevFilesFileValue "^roo[^t].*[^/]$"]]
 vim.cmd [[syntax match adevFilesFileValue "^root[^:].*[^/]$"]]
 
-vim.api.nvim_set_hl(0, "adevFilesHelp", { link = "Comment" })
-vim.api.nvim_set_hl(0, "adevFilesHelpKey", { link = "Identifier" })
-vim.api.nvim_set_hl(0, "adevFilesSeparator", { link = "Comment" })
-vim.api.nvim_set_hl(0, "adevFilesGroupSep", { link = "Comment" })
-vim.api.nvim_set_hl(0, "adevFilesTitle", { link = "Type", bold = true, default = true })
-vim.api.nvim_set_hl(0, "adevFilesDirValue", { link = "Function" })
-vim.api.nvim_set_hl(0, "adevFilesFileValue", { link = "Normal" })
+vim.api.nvim_set_hl(0, "adevFilesHelp", { link = "Comment", default = true })
+vim.api.nvim_set_hl(0, "adevFilesHelpKey", { link = "Identifier", default = true })
+vim.api.nvim_set_hl(0, "adevFilesSeparator", { link = "Comment", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGroupSep", { link = "Comment", default = true })
+vim.api.nvim_set_hl(0, "adevFilesTitle", { link = "Type", default = true })
+vim.api.nvim_set_hl(0, "adevFilesDirValue", { link = "Function", default = true })
+vim.api.nvim_set_hl(0, "adevFilesFileValue", { link = "Normal", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingDelete", { link = "adevFilesGitDeleted", default = true })
-vim.api.nvim_set_hl(
-    0,
-    "adevFilesPendingCopy",
-    { link = "adevFilesGitCopied", bold = true, default = true }
-)
-vim.api.nvim_set_hl(
-    0,
-    "adevFilesPendingMove",
-    { link = "adevFilesGitModified", bold = true, default = true }
-)
-vim.api.nvim_set_hl(
-    0,
-    "adevFilesPendingNew",
-    { link = "adevFilesGitAdded", bold = true, default = true }
-)
-vim.api.nvim_set_hl(
-    0,
-    "adevFilesPendingRenamed",
-    { link = "adevFilesGitRenamed", bold = true, default = true }
-)
-vim.api.nvim_set_hl(0, "adevFilesPendingMark", { link = "Special", bold = true, default = true })
-vim.api.nvim_set_hl(0, "adevFilesPermRead", { fg = "#61AFEF" })
-vim.api.nvim_set_hl(0, "adevFilesPermWrite", { fg = "#E5C07B" })
-vim.api.nvim_set_hl(0, "adevFilesPermExec", { fg = "#98C379" })
-vim.api.nvim_set_hl(0, "adevFilesPermDash", { fg = "#5C6370" })
-vim.api.nvim_set_hl(0, "adevFilesGitModified", { fg = "#E5C07B", bold = true })
-vim.api.nvim_set_hl(0, "adevFilesGitAdded", { fg = "#98C379", bold = true })
-vim.api.nvim_set_hl(0, "adevFilesGitDeleted", { fg = "#E06C75", bold = true })
-vim.api.nvim_set_hl(0, "adevFilesGitRenamed", { fg = "#56B6C2", bold = true })
-vim.api.nvim_set_hl(0, "adevFilesGitCopied", { fg = "#C678DD", bold = true })
-vim.api.nvim_set_hl(0, "adevFilesGitUntracked", { fg = "#5C6370" })
+vim.api.nvim_set_hl(0, "adevFilesPendingCopy", { link = "adevFilesGitCopied", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPendingMove", { link = "adevFilesGitModified", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPendingNew", { link = "adevFilesGitAdded", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPendingRenamed", { link = "adevFilesGitRenamed", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPendingMark", { link = "Special", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPermRead", { link = "Constant", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPermWrite", { link = "PreProc", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPermExec", { link = "Function", default = true })
+vim.api.nvim_set_hl(0, "adevFilesPermDash", { link = "Comment", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitModified", { link = "DiffChange", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitAdded", { link = "DiffAdd", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitDeleted", { link = "DiffDelete", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitRenamed", { link = "DiffText", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitCopied", { link = "Special", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitUntracked", { link = "Comment", default = true })
 
 vim.b.current_syntax = "adev_files"
