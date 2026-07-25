@@ -253,10 +253,6 @@ local function add_virtual_text(buf, root)
             })
 
             local suffix = {}
-            local gs, gs_hl = git_indicator(git.get_file_status(git_status, parsed.fs_name))
-            if gs then
-                table.insert(suffix, { "[" .. gs .. "]", gs_hl })
-            end
             local abs_path = path.join_abs(root, parsed.fs_name)
             local original = original_by_path[abs_path]
             if not original and not matched[item.row] then
@@ -265,16 +261,23 @@ local function add_virtual_text(buf, root)
                     original = orig_line.entry
                 end
             end
+            local lookup_name = (original and parsed.fs_name ~= original.fs_name) and original.fs_name or parsed.fs_name
+            local gs, gs_hl = git_indicator(git.get_file_status(git_status, lookup_name))
+            if gs then
+                table.insert(suffix, { "[" .. gs .. "]", gs_hl })
+            end
+
             local deleted_item = pending_delete[abs_path]
             local clip_mode = clip_sources[abs_path]
 
             if not deleted_item then
                 if original then
-                    if parsed.fs_name ~= original.fs_name then
+                    if parsed.fs_name ~= original.fs_name and gs ~= "R" then
                         table.insert(suffix, { " | renamed |", "adevFilesPendingRenamed" })
                     end
                 elseif
-                    not clip_mode
+                    not gs
+                    and not clip_mode
                     and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0)
                 then
                     table.insert(suffix, { " | new |", "adevFilesPendingNew" })
