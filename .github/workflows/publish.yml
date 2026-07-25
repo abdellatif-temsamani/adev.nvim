@@ -25,11 +25,11 @@ jobs:
           awk '
             BEGIN {
               version = "'"$VERSION"'"
-              header = "^## \\[" version "\\] - "
+              header = "^## \\[" version "\\]"
             }
             $0 ~ header {flag=1; getline; next}
             /^## \[/ && flag {flag=0}
-            /^<!--/ {flag=0}
+            /^---$/ && flag {flag=0}
             flag
           ' CHANGELOG.md > RELEASE_NOTES.md
 
