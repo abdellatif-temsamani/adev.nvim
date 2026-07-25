@@ -1,6 +1,7 @@
 local clipboard = require "adev-files.events.clipboard"
 local delete = require "adev-files.events.delete"
 local help = require "adev-files.help"
+local revert = require "adev-files.events.revert"
 local nav = require "adev-files.events.navigation"
 local path = require "adev-files.utils.fs.path"
 local selection = require "adev-files.events.selection"

@@ -110,7 +110,7 @@ function M.fetch_status(root, callback)
     end
 
     local git = Adev and Adev.git or "git"
-    vim.system({ git, "status", "--porcelain", "-u" }, {
+    vim.system({ git, "status", "--porcelain", "-u", "-M" }, {
         cwd = git_root,
         text = true,
     }, function(res)
