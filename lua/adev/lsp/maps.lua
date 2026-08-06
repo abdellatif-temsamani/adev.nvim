@@ -1,6 +1,7 @@
 return {
     lua_ls = { "lua" },
     intelephense = { "php" },
+    laravel_lsp = { "php", "blade" },
     asm_lsp = { "asm", "vmasm" },
     gopls = { "go", "gomod", "gowork", "gotmpl" },
     astro = { "astro" },

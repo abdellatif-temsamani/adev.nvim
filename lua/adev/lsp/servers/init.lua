@@ -11,6 +11,7 @@ local servers = {
     "pylsp",
     "texlab",
     "intelephense",
+    "laravel_lsp",
 }
 
 function M.setup()
