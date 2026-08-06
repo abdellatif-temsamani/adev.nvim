@@ -60,7 +60,11 @@ return {
         lsp_key("<leader>ga", "rename", "lsp rename"),
         {
             "<leader>ms",
-            "<cmd>LspInfo<cr>",
+            function()
+                for _, client in ipairs(vim.lsp.get_clients()) do
+                    print(client.name)
+                end
+            end,
             desc = "lsp info",
         },
     },
