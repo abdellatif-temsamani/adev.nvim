@@ -1,5 +1,25 @@
 local M = {}
 
+---@param root string
+---@param name string
+---@param ftype string
+---@return boolean
+local function is_directory(root, name, ftype)
+    if ftype == "directory" then
+        return true
+    end
+
+    -- `vim.fs.dir()` reports symlinks as `link`, regardless of the target
+    -- type. Follow links here so links to directories are displayed and
+    -- parsed as directories (with a trailing slash).
+    if ftype == "link" then
+        local stat = (vim.uv or vim.loop).fs_stat(root .. "/" .. name)
+        return stat ~= nil and stat.type == "directory"
+    end
+
+    return false
+end
+
 ---@param a string
 ---@param b string
 local function sort_files(a, b)
@@ -44,10 +64,11 @@ function M.build_lines(root, opts)
             goto continue
         end
         local entry_name = fname
-        if ftype == "directory" and entry_name:sub(-1) ~= "/" then
+        local is_dir = is_directory(root, fname, ftype)
+        if is_dir and entry_name:sub(-1) ~= "/" then
             entry_name = entry_name .. "/"
         end
-        if ftype == "directory" then
+        if is_dir then
             table.insert(dirs, entry_name)
         else
             table.insert(files_list, entry_name)

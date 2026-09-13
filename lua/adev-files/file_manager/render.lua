@@ -279,6 +279,9 @@ local function add_virtual_text(buf, root)
             if selection_marks[row] then
                 table.insert(virt_text, { "● ", "adevFilesPendingMark" })
             end
+            if stat and stat.type == "link" then
+                table.insert(virt_text, { "@ ", "adevFilesSymlink" })
+            end
             local entry_prefix = icon ~= "" and (icon .. " ") or "  "
             if parsed.kind == "directory" then
                 entry_prefix = "▸ " .. entry_prefix

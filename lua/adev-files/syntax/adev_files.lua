@@ -40,6 +40,7 @@ vim.api.nvim_set_hl(0, "adevFilesPendingMove", { link = "adevFilesGitModified", 
 vim.api.nvim_set_hl(0, "adevFilesPendingNew", { link = "adevFilesGitAdded", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingRenamed", { link = "adevFilesGitRenamed", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingMark", { link = "Special", default = true })
+vim.api.nvim_set_hl(0, "adevFilesSymlink", { link = "Special", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPermRead", { link = "Constant", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPermWrite", { link = "PreProc", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPermExec", { link = "Function", default = true })

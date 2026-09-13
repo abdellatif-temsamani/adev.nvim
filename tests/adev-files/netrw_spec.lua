@@ -96,17 +96,46 @@ local ok, err = xpcall(function()
     assert(vim.api.nvim_get_current_buf() == previous_buf)
     assert(not vim.api.nvim_buf_is_valid(buf))
 
+    assert(vim.fn.mkdir(root .. "/linked-target", "p") == 1)
+    assert(uv.fs_symlink(root .. "/linked-target", root .. "/linked-directory"))
     vim.cmd.edit(vim.fn.fnameescape(root))
     buf = vim.api.nvim_get_current_buf()
 
+    local symlink_row
     local child_row
     for row, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+        if line == "linked-directory/" then
+            symlink_row = row
+        end
         if line == "child.txt" then
             child_row = row
-            break
         end
     end
+    assert(symlink_row)
     assert(child_row)
+
+    local symlink_marked = false
+    for _, mark in
+        ipairs(
+            vim.api.nvim_buf_get_extmarks(
+                buf,
+                require("adev-files.state").display_ns(),
+                0,
+                -1,
+                { details = true }
+            )
+        )
+    do
+        if mark[2] == symlink_row - 1 then
+            for _, chunk in ipairs(mark[4].virt_text or {}) do
+                if chunk[1] == "@ " and chunk[2] == "adevFilesSymlink" then
+                    symlink_marked = true
+                end
+            end
+        end
+    end
+    assert(symlink_marked)
+
     vim.api.nvim_win_set_cursor(0, { child_row, 0 })
     require("adev-files.events.navigation").open_or_enter(buf)
 
