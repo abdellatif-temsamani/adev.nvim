@@ -22,6 +22,7 @@ return {
         dependencies = "mason-org/mason.nvim",
         opts = {
             ensure_installed = {
+                "laravel_lsp",
                 "gitlint",
                 "actionlint",
                 "cfn_lint",
