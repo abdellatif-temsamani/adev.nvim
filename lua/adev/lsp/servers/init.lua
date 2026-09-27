@@ -3,6 +3,7 @@ local capabilities = require "adev.lsp.capabilities"
 local M = {}
 
 local servers = {
+    "clangd",
     "lua_ls",
     "tailwindcss",
     "vue_ls",
