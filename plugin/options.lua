@@ -63,3 +63,6 @@ o.numberwidth = 3
 
 -- Disable mouse
 o.mouse = ""
+
+-- auto run .nvim.lua (project specific)
+o.exrc = true
