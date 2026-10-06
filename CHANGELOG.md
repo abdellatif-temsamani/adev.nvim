@@ -14,11 +14,11 @@
 
 ### Features
 
-- `2026-07-22` · **`adev-files`** · &lt;leader&gt;nj/k jump to next/prev modification ([`d504786`](https://github.com/abdellatif-temsamani/adev.nvim/commit/d50478640d1f1a1b13efa047a1218a26c6d87dd5))
-- `2026-07-22` · **`changelog`** · Add commit dates and chronological ordering ([`591aa94`](https://github.com/abdellatif-temsamani/adev.nvim/commit/591aa947dee6cc37f653ac819bbe9751456f8bde))
 - `2026-07-22` · **`adev-files`** · Promote to core file manager ([`7c9bf99`](https://github.com/abdellatif-temsamani/adev.nvim/commit/7c9bf9905f65e428c9a7a9164edc7c1e2e9430be))
-- `2026-07-22` · **`adev-files`** · Polish virtual header ([`d204e7f`](https://github.com/abdellatif-temsamani/adev.nvim/commit/d204e7fc53dc77c9e0075229a47d4fe37db3f3d9))
+- `2026-07-22` · **`changelog`** · Add commit dates and chronological ordering ([`591aa94`](https://github.com/abdellatif-temsamani/adev.nvim/commit/591aa947dee6cc37f653ac819bbe9751456f8bde))
+- `2026-07-22` · **`adev-files`** · &lt;leader&gt;nj/k jump to next/prev modification ([`d504786`](https://github.com/abdellatif-temsamani/adev.nvim/commit/d50478640d1f1a1b13efa047a1218a26c6d87dd5))
 - `2026-07-22` · **`adev-files`** · Replace netrw directory buffers ([`4c68838`](https://github.com/abdellatif-temsamani/adev.nvim/commit/4c6883878b3d6f821f8628e14fd004ed0e2da97e))
+- `2026-07-22` · **`adev-files`** · Polish virtual header ([`d204e7f`](https://github.com/abdellatif-temsamani/adev.nvim/commit/d204e7fc53dc77c9e0075229a47d4fe37db3f3d9))
 - `2026-07-25` · **`adev-files`** · Add permission display and chmod support ([`5fd2c5b`](https://github.com/abdellatif-temsamani/adev.nvim/commit/5fd2c5b1336e48babce1fa1545edaefc983d8c2f))
 - `2026-08-06` · New lspinfo ([`5936c62`](https://github.com/abdellatif-temsamani/adev.nvim/commit/5936c62547ab09d374a707fcb3c1ffe0c0d2208f))
 - `2026-08-06` · **`adev-lsp`** · Add laravel_lsp server config ([`a8be217`](https://github.com/abdellatif-temsamani/adev.nvim/commit/a8be217184c93eb7f8e6c706a9981fb54c55a277))
@@ -26,11 +26,11 @@
 
 ### Bug fixes
 
-- `2026-07-22` · **`adev-files`** · Close confirmation windows ([`fd147bb`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fd147bb9cd622344317cea28965874194ea3b616))
-- `2026-07-22` · **`adev-files`** · Footer undo, utf-8 line parse, and TextChangedP cleanup ([`db51762`](https://github.com/abdellatif-temsamani/adev.nvim/commit/db51762cc9f13f1ca5974758f56492480ef420f5))
-- `2026-07-22` · **`adev-files`** · Disable global actions in netrw mode ([`fb967de`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fb967de271c779516a7185cf4370ffdbd5b95c47))
-- `2026-07-22` · **`adev-files`** · Make filesystem batches transactional ([`bcc3d41`](https://github.com/abdellatif-temsamani/adev.nvim/commit/bcc3d419874902052ea556651d688a1976a5e2d1))
 - `2026-07-22` · **`adev-files`** · Avoid overwrite prompt after rename ([`fc4ddd9`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fc4ddd929b4c23d35d0a6367410b5da7838c7a38))
+- `2026-07-22` · **`adev-files`** · Footer undo, utf-8 line parse, and TextChangedP cleanup ([`db51762`](https://github.com/abdellatif-temsamani/adev.nvim/commit/db51762cc9f13f1ca5974758f56492480ef420f5))
+- `2026-07-22` · **`adev-files`** · Make filesystem batches transactional ([`bcc3d41`](https://github.com/abdellatif-temsamani/adev.nvim/commit/bcc3d419874902052ea556651d688a1976a5e2d1))
+- `2026-07-22` · **`adev-files`** · Close confirmation windows ([`fd147bb`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fd147bb9cd622344317cea28965874194ea3b616))
+- `2026-07-22` · **`adev-files`** · Disable global actions in netrw mode ([`fb967de`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fb967de271c779516a7185cf4370ffdbd5b95c47))
 - `2026-07-25` · **`adev-lsp`** · Map pylsp to python instead of unconfigured ruff ([`8dcce75`](https://github.com/abdellatif-temsamani/adev.nvim/commit/8dcce75d4c0244c77b687de63b602ebbc35fe9e6))
 - `2026-07-25` · **`adev-update`** · Fall back to local tags when remote fetch fails ([`1f0f644`](https://github.com/abdellatif-temsamani/adev.nvim/commit/1f0f6444bc8a87cb9626888f058f2c9d92af924e))
 - `2026-09-13` · **`adev-files`** · Mark symlink entries ([`fe9d209`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fe9d209cb49586ab09c190aa4eaf1ad95c8b6b3b))
@@ -51,7 +51,6 @@
 - `2026-07-25` · **`publish`** · Match git-cliff changelog format in awk extraction ([`45078e2`](https://github.com/abdellatif-temsamani/adev.nvim/commit/45078e2e9d7a54d552da0267eecc48bc1051118f))
 
 ---
-
 ## [2.1.2](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.1.2) · 2026-07-25
 > 8 changes
 
@@ -96,7 +95,7 @@
 
 ---
 ## [2.1.0](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.1.0) · 2026-07-20
-> 37 changes
+> 38 changes
 
 
 ### Features
@@ -128,6 +127,7 @@
 
 ### Other changes
 
+- `2026-01-31` · Adev-files (#14) ([`ce8d0bd`](https://github.com/abdellatif-temsamani/adev.nvim/commit/ce8d0bd4921fe59c9d7be8da06836004f32036a6))
 - `2026-06-14` · **`lsp`** · Remove pyright support ([`6228c78`](https://github.com/abdellatif-temsamani/adev.nvim/commit/6228c784d7484f7df22db7ed75c1bee738f4efbc))
 
 ### Refactoring
@@ -187,11 +187,11 @@
 
 - `2026-01-28` · **`telescope`** · Changing keymaps ([`7f0e555`](https://github.com/abdellatif-temsamani/adev.nvim/commit/7f0e555d6a9587a72f4a82c11ef3e198d8813e75))
 - `2026-01-31` · Adev-files ([`91b48ce`](https://github.com/abdellatif-temsamani/adev.nvim/commit/91b48ce87b4d097ff2259ba4b13da42b827f2a76))
-- `2026-01-31` · Adev-files (#14) ([`ce8d0bd`](https://github.com/abdellatif-temsamani/adev.nvim/commit/ce8d0bd4921fe59c9d7be8da06836004f32036a6))
 - `2026-01-31` · Adev-files ([`f9b869d`](https://github.com/abdellatif-temsamani/adev.nvim/commit/f9b869dfbc3538356c54c7d1a5af23c709a0e1f5))
 
 ### Refactoring
 
+- `2026-01-11` · Consolidate utilities and add feature flags system (#8) ([`fb07e6b`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fb07e6b2d4012e3bb87302e9de28a8c8aed0e7c0))
 - `2026-01-27` · Restructure file manager and remove deprecated code ([`6dc41e1`](https://github.com/abdellatif-temsamani/adev.nvim/commit/6dc41e169ecd671864649c0539e0c9458159ff39))
 - `2026-01-29` · **`core`** · Big refactor ([`6837be4`](https://github.com/abdellatif-temsamani/adev.nvim/commit/6837be4030dc98645c114715835bdcb678eb0655))
 - `2026-01-30` · **`adev-files`** · Change keymap to &lt;leader&gt;n ([`9146a2c`](https://github.com/abdellatif-temsamani/adev.nvim/commit/9146a2ca7b5c66d90c93758f56439058e1cba02f))
@@ -214,7 +214,7 @@
 
 ---
 ## [2.0.4](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.0.4) · 2026-01-20
-> 15 changes
+> 14 changes
 
 
 ### Features
@@ -232,7 +232,6 @@
 
 ### Refactoring
 
-- `2026-01-11` · Consolidate utilities and add feature flags system (#8) ([`fb07e6b`](https://github.com/abdellatif-temsamani/adev.nvim/commit/fb07e6b2d4012e3bb87302e9de28a8c8aed0e7c0))
 - `2026-01-17` · **`lualine`** · **BREAKING** · Replace winbar with tabline.windows ([`7f64439`](https://github.com/abdellatif-temsamani/adev.nvim/commit/7f64439f798d88c5d815c6cfabaa778c6da4d437))
 - `2026-01-17` · **`lualine`** · Change placing of lsp status ([`d105dcb`](https://github.com/abdellatif-temsamani/adev.nvim/commit/d105dcb2dfe67feacddbe63582768c03a589adac))
 - `2026-01-17` · **`core-plugin`** · Re-structure adev core plugins ([`8a45d40`](https://github.com/abdellatif-temsamani/adev.nvim/commit/8a45d40b61a8c22dc6cc8c20241b7409dd5900fd))
@@ -278,7 +277,7 @@
 
 ---
 ## [2.0.2](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.0.2) · 2026-01-09
-> 65 changes
+> 66 changes
 
 
 ### Features
@@ -297,6 +296,7 @@
 
 ### Bug fixes
 
+- `2025-10-08` · **BREAKING** · Cmp ([`1e446f1`](https://github.com/abdellatif-temsamani/adev.nvim/commit/1e446f1d7ab892e653bc6effdadcfe536b5c07fc))
 - `2025-12-23` · **`treesitter`** · Add ipkg to ignore_install list ([`128b114`](https://github.com/abdellatif-temsamani/adev.nvim/commit/128b11431ee00773c1bc5d9668b0074948344850))
 - `2025-12-29` · Treesitter ([`2af2eca`](https://github.com/abdellatif-temsamani/adev.nvim/commit/2af2eca7eaec598efef231c28eb7a8e55e454fa6))
 - `2025-12-29` · Remove those annoying arg auto fill snippets ([`29e749a`](https://github.com/abdellatif-temsamani/adev.nvim/commit/29e749a2e0f2cdf59be83483f29d58adace5dcb1))
@@ -366,7 +366,7 @@
 
 ---
 ## [2.0.1](https://github.com/abdellatif-temsamani/adev.nvim/releases/tag/v2.0.1) · 2025-12-23
-> 109 changes
+> 108 changes
 
 
 ### Features
@@ -421,7 +421,6 @@
 - `2025-09-15` · **`laravel`** · **BREAKING** · Fix commands ([`d09760a`](https://github.com/abdellatif-temsamani/adev.nvim/commit/d09760a8284a25d77dd845640a512be540b91ad5))
 - `2025-10-04` · Sets config ([`0d619f9`](https://github.com/abdellatif-temsamani/adev.nvim/commit/0d619f9d95aad4ed6625ad28c3ef9dd762900994))
 - `2025-10-08` · **`blink.cmp`** · Config ([`11fc43a`](https://github.com/abdellatif-temsamani/adev.nvim/commit/11fc43a86a45b056ffabe0aa506e7445ead9bb1c))
-- `2025-10-08` · **BREAKING** · Cmp ([`1e446f1`](https://github.com/abdellatif-temsamani/adev.nvim/commit/1e446f1d7ab892e653bc6effdadcfe536b5c07fc))
 - `2025-10-08` · Version ([`43017c9`](https://github.com/abdellatif-temsamani/adev.nvim/commit/43017c92880bfc1105b79a6928cb0f8001495939))
 - `2025-10-09` · Check update ([`1133ef8`](https://github.com/abdellatif-temsamani/adev.nvim/commit/1133ef84e97bcbed259e707aef84b9b921d63127))
 - `2025-10-10` · **`laravel`** · Fix lazyloading ([`8c2e8a5`](https://github.com/abdellatif-temsamani/adev.nvim/commit/8c2e8a57c16e2ea2b6dc8a81fd6345580fa912db))
