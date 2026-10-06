@@ -1,153 +1,69 @@
 local clipboard = require "adev-files.clipboard"
+local index = require "adev-files.sync.index"
+local marks = require "adev-files.core.marks"
 local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
+local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
 
 local M = {}
 
 ---@param buf integer
----@param abs_path string|nil
----@return boolean
-local function remove_pending_delete_at_path(buf, abs_path)
-    local pending = state.get_pending_ops(buf)
-    if not pending or #pending == 0 then
-        return false
-    end
-
-    local updated = {}
-    local removed = false
-    for _, op in ipairs(pending) do
-        if op.type == "delete" and op.path and path.abs(op.path) == abs_path then
-            removed = true
-        else
-            table.insert(updated, op)
-        end
-    end
-
-    if removed then
-        state.set_pending_ops(buf, updated)
-    end
-
-    return removed
-end
-
----@param buf integer
----@param abs_path string|nil
----@return AdevFilesOp[]
-local function remove_pending_ops_at_path(buf, abs_path)
-    local pending = state.get_pending_ops(buf)
-    if not pending or #pending == 0 then
-        return {}
-    end
-
-    local updated = {}
-    local removed = {}
-    for _, op in ipairs(pending) do
-        local op_dst = op.dst and path.abs(op.dst) or nil
-        if (op.type == "copy" or op.type == "move") and (abs_path and op_dst == abs_path) then
-            table.insert(removed, op)
-        else
-            table.insert(updated, op)
-        end
-    end
-
-    if #removed > 0 then
-        state.set_pending_ops(buf, updated)
-    end
-
-    return removed
-end
-
----@param buf integer
----@param st AdevFilesState
----@param ops AdevFilesOp[]
-local function restore_move_sources(buf, st, ops)
-    if not st or not ops or #ops == 0 then
-        return
-    end
-
-    local targets = {}
-    for _, op in ipairs(ops) do
-        if op.type == "move" and op.src then
-            targets[path.abs(op.src)] = true
-        end
-    end
-    if next(targets) == nil then
-        return
-    end
-
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    for i, line in ipairs(lines) do
-        local clean, is_deleted = parse.strip_delete_marker(line)
-        if is_deleted then
-            local entry = select(1, parse.parse_line(clean))
-            if entry then
-                local abs = path.join_abs(st.root, entry.fs_name)
-                if targets[abs] then
-                    vim.api.nvim_buf_set_lines(buf, i - 1, i, false, { clean })
-                end
-            end
-        end
-    end
-end
-
----@param buf integer
 function M.revert_current_line(buf)
-    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
-    local clean, is_deleted = parse.strip_delete_marker(line)
-
     local st = state.get(buf)
-    if not st then
+    if not st or st.applying or st.confirming or st.needs_refresh then
         return
     end
-
-    local entry = select(1, parse.parse_line(clean))
-    local abs_path = entry and path.join_abs(st.root, entry.fs_name) or nil
-
-    if abs_path then
-        clipboard.remove_by_src(abs_path)
-        render.add_virtual_text(buf, st.root)
-    end
-
-    local removed_ops = remove_pending_ops_at_path(buf, abs_path)
-    if #removed_ops > 0 then
-        vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
-        restore_move_sources(buf, st, removed_ops)
+    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    if row < 1 then
         return
     end
-
-    if abs_path then
-        local removed_delete = remove_pending_delete_at_path(buf, abs_path)
-        if removed_delete then
-            render.add_virtual_text(buf, st.root)
-            return
-        end
+    index.restore_ids(buf)
+    local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
+    local _, id = parse.strip_id(line)
+    local original = st.model.original_by_id[id]
+    local entry = parse.parse_line(line)
+    local _, _, changes = plan.plan_ops(buf)
+    local change = changes and changes[row]
+    local duplicate_copy = change and change.op and change.op.type == "copy" and original
+    local abs = original and original.abs_path or (entry and path.join_abs(st.root, entry.fs_name))
+    if abs then
+        clipboard.remove_by_src(abs)
     end
 
-    if is_deleted then
-        vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { clean })
-        return
-    end
-
-    local original_lines = state.get_original_lines(buf)
-    local original = original_lines[row]
-    if original then
-        if entry and entry.fs_name ~= original.entry.fs_name then
-            local display = original.entry.fs_name
-            if original.entry.kind == "directory" then
-                display = original.entry.fs_name .. "/"
+    local kept, remove_rows = {}, {}
+    for _, op in ipairs(state.get_pending_ops(buf)) do
+        local destination = op.dst_id and op.dst_id == id
+        local source = op.type == "move" and abs and path.abs(op.src) == abs
+        local deleted = op.type == "delete" and abs and path.abs(op.path) == abs
+        if destination or source then
+            local destination_row = op.dst_id and marks.row_for_node(buf, op.dst_id)
+            if destination_row then
+                remove_rows[destination_row] = true
             end
-            vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { display })
+        elseif not deleted then
+            table.insert(kept, op)
         end
-        return
+    end
+    state.set_pending_ops(buf, kept)
+
+    if original and not duplicate_copy then
+        local name = parse.format_name(original.fs_name)
+            .. (original.kind == "directory" and "/" or "")
+        vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { parse.with_id(name, id) })
+    else
+        remove_rows[row] = true
     end
 
-    if not entry then
-        return
+    local rows = vim.tbl_keys(remove_rows)
+    table.sort(rows, function(a, b)
+        return a > b
+    end)
+    for _, target in ipairs(rows) do
+        vim.api.nvim_buf_set_lines(buf, target, target + 1, false, {})
     end
-    vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
+    render.add_virtual_text(buf, st.root)
 end
 
 return M

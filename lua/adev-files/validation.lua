@@ -9,7 +9,7 @@ function M.is_valid_rel_path(p)
     if p:sub(1, 1) == "/" then
         return false
     end
-    if p:find("\\", 1, true) then
+    if vim.fn.has "win32" == 1 and p:find("\\", 1, true) then
         return false
     end
     if p:find "%z" then
@@ -39,7 +39,11 @@ function M.validate_rel_dir(s)
     if s:sub(1, 1) == "/" then
         return false, "path must be relative"
     end
-    if s:find("\\", 1, true) or s:find "%z" or s:find("//", 1, true) then
+    if
+        (vim.fn.has "win32" == 1 and s:find("\\", 1, true))
+        or s:find "%z"
+        or s:find("//", 1, true)
+    then
         return false, "invalid path"
     end
     for seg in s:gmatch "[^/]+" do

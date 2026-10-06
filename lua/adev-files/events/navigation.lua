@@ -3,10 +3,10 @@ local utils = require "adev-common.utils"
 local config = require "adev-files"
 local confirm = require "adev-files.events.confirm"
 local parse = require "adev-files.parse"
+local plan = require "adev-files.sync.plan"
 local roots = require "adev-files.root"
 local state = require "adev-files.state"
 local sync = require "adev-files.sync"
-local view = require "adev-files.core.view"
 
 local M = {}
 
@@ -22,43 +22,20 @@ local function get_buf_var(buf, name)
 end
 
 ---@param buf integer
----@param row integer
----@param entry AdevFilesEntry|nil
----@param deleted boolean
----@param original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
----@return boolean
-local function is_modified_row(row, entry, deleted, original_lines)
-    if deleted then
-        return true
-    end
-    local orig = original_lines[row]
-    if not orig then
-        return entry ~= nil
-    end
-    if not entry then
-        return true
-    end
-    return entry.fs_name ~= orig.entry.fs_name
-end
-
----@param buf integer
 ---@return integer[], string?
 local function find_modified_rows(buf)
-    local st = state.get(buf)
-    if not st then
-        return {}, "missing state"
-    end
-    local entries, err = view.parse_buffer(buf)
+    local ops, err = plan.plan_ops(buf)
     if err then
         return {}, err
     end
-    local original_lines = state.get_original_lines(buf)
-    local rows = {}
-    for _, item in ipairs(entries) do
-        if is_modified_row(item.row, item.entry, item.deleted, original_lines) then
-            table.insert(rows, item.row)
+    local found = {}
+    for _, op in ipairs(ops or {}) do
+        if op.row then
+            found[op.row] = true
         end
     end
+    local rows = vim.tbl_keys(found)
+    table.sort(rows)
     return rows, nil
 end
 
@@ -108,7 +85,7 @@ end
 ---@param buf integer
 function M.open_or_enter(buf)
     local st = state.get(buf)
-    if not st or st.applying then
+    if not st or st.applying or st.confirming then
         return
     end
 
@@ -121,7 +98,12 @@ function M.open_or_enter(buf)
         return
     end
 
-    if entry.kind == "directory" then
+    local original = st.model.original_by_id[entry.id]
+    if not original then
+        utils.notify("Save changes before opening this entry", vim.log.levels.WARN, "adev-files")
+        return
+    end
+    if original.kind == "directory" then
         confirm.confirm_discard_if_modified(buf, function(ok)
             if not ok then
                 return
@@ -130,7 +112,7 @@ function M.open_or_enter(buf)
             if not st2 or st2.applying then
                 return
             end
-            sync.set_root(buf, roots.child_root(st2.root, entry.fs_name))
+            sync.set_root(buf, roots.child_root(st2.root, original.fs_name))
         end)
         return
     end
@@ -142,7 +124,7 @@ function M.open_or_enter(buf)
     end
 
     local method = open_files.method or "edit"
-    local path = roots.normalize_root(st.root) .. entry.fs_name
+    local path = original.abs_path
     local prev_win = get_buf_var(buf, "adev_files_prev_win")
     local manager_win = get_buf_var(buf, "adev_files_win")
     local manager_mode = get_buf_var(buf, "adev_files_mode")
@@ -175,7 +157,7 @@ end
 ---@param buf integer
 function M.go_parent(buf)
     local st = state.get(buf)
-    if not st or st.applying then
+    if not st or st.applying or st.confirming then
         return
     end
     local parent = roots.parent_root(st.root)
@@ -195,7 +177,7 @@ end
 ---@param buf integer
 function M.quit(buf)
     local st = state.get(buf)
-    if not st or st.applying then
+    if not st or st.applying or st.confirming then
         return
     end
 
@@ -243,7 +225,7 @@ end
 ---@param buf integer
 function M.go_root(buf)
     local st = state.get(buf)
-    if not st or st.applying or not st.initial_root then
+    if not st or st.applying or st.confirming or not st.initial_root then
         return
     end
     if st.root == st.initial_root then

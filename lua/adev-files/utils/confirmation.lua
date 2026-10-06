@@ -103,6 +103,17 @@ function M.open(lines, opts, cb)
     set_keymap("n", "<esc>", function()
         finish(false)
     end)
+    vim.api.nvim_create_autocmd("BufWipeout", {
+        buffer = buf,
+        once = true,
+        callback = function()
+            if not finished then
+                vim.schedule(function()
+                    finish(false)
+                end)
+            end
+        end,
+    })
 end
 
 return M

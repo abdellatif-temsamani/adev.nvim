@@ -1,3 +1,4 @@
+local fs = require "adev-files.utils.fs"
 local utils = require "adev-common.utils"
 
 local clipboard = require "adev-files.clipboard"
@@ -40,31 +41,13 @@ local function build_existing_abs(buf, root)
     return existing
 end
 
----@param buf integer
----@param root string
----@return table<string, integer>
-local function build_row_by_abs(buf, root)
-    local rows = {}
-    local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-    for i, line in ipairs(lines) do
-        local clean, is_deleted = parse.strip_delete_marker(line)
-        if not is_deleted then
-            local entry = select(1, parse.parse_line(clean))
-            if entry then
-                rows[path.join_abs(root, entry.fs_name)] = i - 1
-            end
-        end
-    end
-    return rows
-end
-
 ---@param dest_root string
 ---@param base string
 ---@param existing_abs table<string, boolean>
 ---@return string
 local function unique_dest(dest_root, base, existing_abs)
     local candidate = path.join_abs(dest_root, base)
-    if not utils.files.file_exists(candidate) and not existing_abs[candidate] then
+    if not fs.exists(candidate) and not existing_abs[candidate] then
         return candidate
     end
 
@@ -74,7 +57,7 @@ local function unique_dest(dest_root, base, existing_abs)
     while i <= max_attempts do
         local next_base = string.format("%s_%d%s", name, i, ext)
         local next_dst = path.join_abs(dest_root, next_base)
-        if not utils.files.file_exists(next_dst) and not existing_abs[next_dst] then
+        if not fs.exists(next_dst) and not existing_abs[next_dst] then
             return next_dst
         end
         i = i + 1
@@ -93,7 +76,15 @@ end
 ---@param buf integer
 ---@param mode 'copy'|'move'
 function M.set_clipboard(buf, mode)
-    local items, skipped = selection.collect_entries(buf)
+    local st = state.get(buf)
+    if not st or st.applying or st.confirming or st.needs_refresh then
+        return
+    end
+    local items, skipped, err = selection.collect_entries(buf)
+    if err then
+        utils.err_notify(err, "adev-files")
+        return
+    end
     if #items == 0 then
         if skipped and skipped > 0 then
             utils.err_notify(
@@ -123,7 +114,7 @@ end
 ---@param rel_dir string
 function M.paste(buf, rel_dir)
     local st = state.get(buf)
-    if not st or st.applying then
+    if not st or st.applying or st.confirming or st.needs_refresh then
         return
     end
 
@@ -131,6 +122,36 @@ function M.paste(buf, rel_dir)
     if not clip or not clip.items or #clip.items == 0 then
         utils.notify("Clipboard empty", vim.log.levels.INFO, "adev-files")
         return
+    end
+
+    -- A clipboard captured before an edit must obey the same source rules.
+    for _, item in ipairs(clip.items) do
+        if not item.src or not fs.exists(item.src) then
+            utils.err_notify(
+                "Clipboard source no longer exists: " .. tostring(item.src),
+                "adev-files"
+            )
+            return
+        end
+    end
+    for _, source_buf in ipairs(vim.api.nvim_list_bufs()) do
+        local source_state = state.get(source_buf)
+        if source_state and vim.api.nvim_buf_is_valid(source_buf) then
+            local source_ops = plan.plan_ops(source_buf)
+            for _, op in ipairs(source_ops or {}) do
+                if op.type == "rename" then
+                    for _, item in ipairs(clip.items) do
+                        if path.is_same_or_subpath(op.src, item.src) then
+                            utils.err_notify(
+                                "Save or revert the pending rename before copying or cutting",
+                                "adev-files"
+                            )
+                            return
+                        end
+                    end
+                end
+            end
+        end
     end
 
     local ok_dir, cleaned = validate.validate_rel_dir(rel_dir or "")
@@ -183,32 +204,15 @@ function M.paste(buf, rel_dir)
     end
 
     local ops = {}
-    local row_by_abs = build_row_by_abs(buf, st.root)
-    local mark_rows = {}
-    if clip.mode == "move" then
-        for _, item in ipairs(items) do
-            local row = row_by_abs[item.src]
-            if row ~= nil then
-                mark_rows[row] = true
-            end
-        end
-    end
-
-    for row, _ in pairs(mark_rows) do
-        local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
-        local marked = parse.mark_delete(line)
-        vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { marked })
-    end
-
     local existing_abs = build_existing_abs(buf, st.root)
     local insert_at = vim.api.nvim_win_get_cursor(0)[1]
-    local insert_start = insert_at
     for _, item in ipairs(items) do
         local src = path.abs(item.src or "")
         local base = vim.fs.basename(src)
         local dst = unique_dest(dest_root, base, existing_abs)
 
         local rel = path.relpath(st.root, dst)
+        rel = parse.format_name(rel)
         if item.kind == "directory" and rel:sub(-1) ~= "/" then
             rel = rel .. "/"
         end
@@ -221,20 +225,6 @@ function M.paste(buf, rel_dir)
             ops,
             { type = clip.mode, src = src, dst = dst, dst_id = dst_id, kind = item.kind }
         )
-    end
-
-    local ol = state.get_original_lines(buf)
-    if ol and next(ol) then
-        local num = #items
-        local new_ol = {}
-        for row, data in pairs(ol) do
-            if row >= insert_start then
-                new_ol[row + num] = data
-            else
-                new_ol[row] = data
-            end
-        end
-        state.set_original_lines(buf, new_ol)
     end
 
     if #ops == 0 then

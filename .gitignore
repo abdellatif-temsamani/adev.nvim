@@ -2,3 +2,4 @@ spell/
 /lazy-lock.json
 /init.lua
 init-opts.lua
+/nvim.log

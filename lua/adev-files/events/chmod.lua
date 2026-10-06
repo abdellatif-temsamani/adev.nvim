@@ -11,8 +11,11 @@ local GUIDE_NS = vim.api.nvim_create_namespace "adev_files_chmod_guide"
 
 local function perm_from_str(str)
     str = str:gsub("%s+", "")
-    if str:match "^%d+$" then
+    if str:match "^[0-7]+$" and #str <= 3 then
         return tonumber(str, 8)
+    end
+    if not str:match "^[r%-][w%-][x%-][r%-][w%-][x%-][r%-][w%-][x%-]$" then
+        return nil
     end
     local num = 0
     for i = 1, 9 do
@@ -129,7 +132,7 @@ end
 
 function M.chmod_entry(buf)
     local st = state.get(buf)
-    if not st or st.applying then
+    if not st or st.applying or st.confirming or st.needs_refresh then
         return
     end
 
@@ -150,11 +153,17 @@ function M.chmod_entry(buf)
         or (tostring(#items) .. " items")
 
     local guide_buf = show_guide(current)
+    local guide_windows = vim.fn.win_findbuf(guide_buf)
 
     vim.ui.input({
         prompt = "Permissions for " .. label .. " (" .. current .. "): ",
         default = current,
     }, function(input)
+        for _, win in ipairs(guide_windows) do
+            if vim.api.nvim_win_is_valid(win) then
+                vim.api.nvim_win_close(win, true)
+            end
+        end
         if guide_buf and vim.api.nvim_buf_is_valid(guide_buf) then
             vim.api.nvim_buf_delete(guide_buf, { force = true })
         end

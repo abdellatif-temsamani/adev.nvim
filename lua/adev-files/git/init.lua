@@ -1,20 +1,10 @@
-local M = {}
-
 local path = require "adev-files.utils.fs.path"
 
---- Status priority for directory aggregation (higher = more significant)
-local STATUS_PRIORITY = {
-    D = 6,
-    M = 5,
-    A = 4,
-    R = 3,
-    C = 2,
-    ["?"] = 1,
-}
+local M = {}
 
----@param a string
----@param b string
----@return string
+local STATUS_PRIORITY = { U = 7, D = 6, M = 5, A = 4, R = 3, C = 2, ["?"] = 1 }
+local UNMERGED = { DD = true, AU = true, UD = true, UA = true, DU = true, AA = true, UU = true }
+
 local function worst_status(a, b)
     if not a then
         return b
@@ -22,120 +12,107 @@ local function worst_status(a, b)
     if not b then
         return a
     end
-    local pa = STATUS_PRIORITY[a] or 0
-    local pb = STATUS_PRIORITY[b] or 0
-    return pa >= pb and a or b
+    return (STATUS_PRIORITY[a] or 0) >= (STATUS_PRIORITY[b] or 0) and a or b
 end
 
---- Parse `git status --porcelain -u` output into a path -> status map
----@param output string
----@param root string  -- the directory being displayed
----@param git_root string -- the git repo root
----@return table<string, string>  -- rel_path (from root) -> status char
+--- NUL-separated porcelain preserves spaces, quotes, newlines, and Unicode.
+--- Rename/copy records contain the destination followed by a second source field.
 local function parse_porcelain(output, root, git_root)
-    local result = {}
-    for line in output:gmatch "[^\r\n]+" do
-        local index_status = line:sub(1, 1)
-        local worktree_status = line:sub(2, 2)
-        local rel = line:sub(4)
-
-        -- Handle rename: "R  old -> new"
-        if index_status == "R" or worktree_status == "R" then
-            local arrow = rel:find " %-> "
-            if arrow then
-                rel = rel:sub(arrow + 4)
+    local result, files = {}, {}
+    local records = vim.split(output, "\0", { plain = true })
+    local i = 1
+    while i <= #records do
+        local record = records[i]
+        local x, y = record:sub(1, 1), record:sub(2, 2)
+        local rel = record:sub(4)
+        i = i + 1
+        if x == "R" or y == "R" or x == "C" or y == "C" then
+            i = i + 1
+        end
+        if #record >= 4 then
+            local status
+            if UNMERGED[x .. y] then
+                status = "U"
+            else
+                x = x == "T" and "M" or x
+                y = y == "T" and "M" or y
+                status = worst_status(x ~= " " and x or nil, y ~= " " and y or nil)
             end
-        end
-
-        -- Compute the absolute path from git root
-        local abs = path.abs(git_root .. "/" .. rel)
-
-        -- Determine the effective status
-        local status = index_status
-        if status == " " then
-            status = worktree_status
-        end
-        if status == "?" then
-            status = "?"
-        end
-
-        -- Make path relative to the displayed root
-        local rel_to_root = path.relpath(root, abs)
-
-        -- Skip entries outside the displayed root
-        if rel_to_root and not rel_to_root:match "^%.%." and rel_to_root ~= "." then
-            -- Strip trailing slash normalization
-            rel_to_root = rel_to_root:gsub("/$", "")
-
-            result[rel_to_root] = status
-
-            -- Propagate status up to parent directories
-            local parts = vim.split(rel_to_root, "/", { plain = true, trimempty = true })
-            local accumulated = ""
-            for i = 1, #parts - 1 do
-                accumulated = accumulated == "" and parts[i] or (accumulated .. "/" .. parts[i])
-                result[accumulated] = worst_status(result[accumulated], status)
+            local abs = path.join_abs(git_root, rel)
+            local relative = path.relpath(root, abs)
+            if status and relative ~= "." and relative ~= ".." and not relative:match "^%.%./" then
+                relative = relative:gsub("/$", "")
+                files[relative] = status
+                result[relative] = worst_status(result[relative], status)
+                local parent = vim.fs.dirname(relative)
+                while parent and parent ~= "." and parent ~= "" do
+                    result[parent] = worst_status(result[parent], status)
+                    parent = vim.fs.dirname(parent)
+                end
             end
         end
     end
-    return result
+    return result, files
 end
 
---- Find the git root for a given directory
+--- Both repository discovery and status collection run asynchronously.
 ---@param root string
----@return string|nil
-local function find_git_root(root)
-    local git = Adev and Adev.git or "git"
-    local res = vim.system({ git, "rev-parse", "--show-toplevel" }, {
-        cwd = root,
-        text = true,
-    }):wait()
-    if res and res.code == 0 then
-        local gt = vim.trim(res.stdout or "")
-        if gt ~= "" then
-            return gt
-        end
-    end
-    return nil
-end
-
---- Fetch git status asynchronously for a root directory
----@param root string
----@param callback fun(status: table<string, string>)
+---@param callback fun(status: table<string, string>, files?: table<string, string>)
 function M.fetch_status(root, callback)
-    local git_root = find_git_root(root)
-    if not git_root then
-        callback {}
-        return
+    local executable = Adev and Adev.git or "git"
+    root = path.norm_real(root)
+    local function run(args, cwd, done)
+        local ok = pcall(vim.system, args, { cwd = cwd, text = false }, function(result)
+            vim.schedule(function()
+                done(result)
+            end)
+        end)
+        if not ok then
+            vim.schedule(function()
+                done(nil)
+            end)
+        end
     end
 
-    local git = Adev and Adev.git or "git"
-    vim.system({ git, "status", "--porcelain", "-u", "-M" }, {
-        cwd = git_root,
-        text = true,
-    }, function(res)
-        vim.schedule(function()
-            if not res or res.code ~= 0 then
-                callback {}
-                return
+    run({ executable, "rev-parse", "--show-toplevel" }, root, function(result)
+        if not result or result.code ~= 0 then
+            callback({}, {})
+            return
+        end
+        local git_root = (result.stdout or ""):gsub("[\r\n]+$", "")
+        if git_root == "" then
+            callback({}, {})
+            return
+        end
+        run(
+            {
+                executable,
+                "--no-optional-locks",
+                "-c",
+                "status.relativePaths=false",
+                "status",
+                "--porcelain=v1",
+                "-z",
+                "--untracked-files=all",
+                "--renames",
+            },
+            git_root,
+            function(status_result)
+                if not status_result or status_result.code ~= 0 then
+                    callback({}, {})
+                    return
+                end
+                callback(parse_porcelain(status_result.stdout or "", root, git_root))
             end
-            local status = parse_porcelain(res.stdout or "", root, git_root)
-            callback(status)
-        end)
+        )
     end)
 end
 
---- Get git status character for a file/directory
 ---@param git_status table<string, string>|nil
 ---@param rel_path string
 ---@return string|nil
 function M.get_file_status(git_status, rel_path)
-    if not git_status then
-        return nil
-    end
-    -- Strip trailing slash for lookup
-    local key = rel_path:gsub("/$", "")
-    return git_status[key]
+    return git_status and git_status[rel_path:gsub("/$", "")] or nil
 end
 
 return M

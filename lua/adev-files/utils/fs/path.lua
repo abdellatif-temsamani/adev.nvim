@@ -69,7 +69,7 @@ function M.relpath(root, path)
     local path_abs = M.abs(path)
 
     if vim.fs and vim.fs.relpath then
-        local rel = vim.fs.relpath(path_abs, root_abs)
+        local rel = vim.fs.relpath(root_abs, path_abs)
         if rel and rel ~= "" then
             return rel
         end

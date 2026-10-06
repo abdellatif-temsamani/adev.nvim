@@ -12,11 +12,19 @@ local model = require "adev-files.core.model"
 ---@field model AdevFilesModel
 ---@field view AdevFilesProjection|nil
 ---@field applying boolean
+---@field confirming boolean
 ---@field pending_ops AdevFilesOp[]
 ---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
 ---@field show_hidden boolean
 ---@field selection_marks table<integer, true>
 ---@field git_status table<string, string>|nil  -- rel_path -> status char
+---@field git_files table<string, string>|nil
+---@field git_generation integer
+---@field change_ops AdevFilesOp[]|nil
+---@field row_changes table<integer, AdevFilesRowChange>
+---@field plan_error string|nil
+---@field needs_refresh boolean
+---@field refresh_modifiable? boolean
 
 ---@type table<integer, AdevFilesState>
 local states = {}
@@ -44,21 +52,36 @@ function M.init(buf, root)
             model = model.new(root),
             view = nil,
             applying = false,
+            confirming = false,
             pending_ops = {},
             original_lines = {},
             show_hidden = false,
             selection_marks = {},
+            selection_ids = {},
             git_status = nil,
+            git_files = nil,
+            git_generation = 0,
+            change_ops = nil,
+            row_changes = {},
         }
     states[buf].root = root
     states[buf].model = model.new(root)
     states[buf].view = nil
     states[buf].applying = false
+    states[buf].confirming = false
     states[buf].pending_ops = {}
     states[buf].original_lines = {}
     states[buf].show_hidden = false
     states[buf].selection_marks = {}
+    states[buf].selection_ids = {}
     states[buf].git_status = nil
+    states[buf].git_files = nil
+    states[buf].git_generation = (states[buf].git_generation or 0) + 1
+    states[buf].change_ops = nil
+    states[buf].row_changes = {}
+    states[buf].plan_error = nil
+    states[buf].needs_refresh = false
+    states[buf].refresh_modifiable = nil
     return states[buf]
 end
 
@@ -175,7 +198,17 @@ end
 ---@return table<integer, true>
 function M.get_selection_marks(buf)
     local st = states[buf]
-    return st and st.selection_marks or {}
+    local rows = {}
+    if st and vim.api.nvim_buf_is_valid(buf) then
+        local parse = require "adev-files.parse"
+        for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+            local _, id = parse.strip_id(line)
+            if id and st.selection_ids[id] then
+                rows[i - 1] = true
+            end
+        end
+    end
+    return rows
 end
 
 ---@param buf integer
@@ -185,6 +218,15 @@ function M.set_selection_marks(buf, marks)
         return
     end
     states[buf].selection_marks = marks or {}
+    states[buf].selection_ids = {}
+    local parse = require "adev-files.parse"
+    for row in pairs(marks or {}) do
+        local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
+        local _, id = parse.strip_id(line)
+        if id then
+            states[buf].selection_ids[id] = true
+        end
+    end
 end
 
 ---@param buf integer
@@ -193,6 +235,7 @@ function M.clear_selection_marks(buf)
         return
     end
     states[buf].selection_marks = {}
+    states[buf].selection_ids = {}
 end
 
 ---@param buf integer
@@ -207,11 +250,12 @@ end
 
 ---@param buf integer
 ---@param status table<string, string>
-function M.set_git_status(buf, status)
+function M.set_git_status(buf, status, files)
     if not states[buf] then
         return
     end
     states[buf].git_status = status
+    states[buf].git_files = files
 end
 
 ---@param buf integer

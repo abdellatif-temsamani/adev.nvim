@@ -26,6 +26,8 @@ function M.create_win(buf, height, width, root)
         wo = {
             cursorline = true,
             cursorlineopt = "line",
+            conceallevel = 3,
+            concealcursor = "nvic",
         },
     }
 end

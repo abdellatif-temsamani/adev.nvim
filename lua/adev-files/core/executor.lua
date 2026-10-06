@@ -99,12 +99,16 @@ local function preflight(ops)
         end
     end
 
-    -- A copy source must stay stable for the whole transaction.
+    -- Copies of a staged source read from its transaction snapshot. Nested
+    -- sources still conflict because staging a parent relocates its children.
     for _, read in ipairs(read_sources) do
         for _, destructive in ipairs(destructive_sources) do
             if
-                path.is_same_or_subpath(destructive.path, read.path)
-                or path.is_same_or_subpath(read.path, destructive.path)
+                read.path ~= destructive.path
+                and (
+                    path.is_same_or_subpath(destructive.path, read.path)
+                    or path.is_same_or_subpath(read.path, destructive.path)
+                )
             then
                 return nil,
                     string.format(
@@ -140,7 +144,15 @@ local function preflight(ops)
                     )
             end
             for _, other in ipairs(destination_list) do
-                if path.is_subpath(other.path, dst) or path.is_subpath(dst, other.path) then
+                local other_is_parent = path.is_subpath(other.path, dst)
+                local current_is_parent = path.is_subpath(dst, other.path)
+                local allowed = (
+                    other_is_parent
+                    and other.type == "create"
+                    and other.kind == "directory"
+                )
+                    or (current_is_parent and op.type == "create" and op.kind == "directory")
+                if (other_is_parent or current_is_parent) and not allowed then
                     return nil,
                         string.format(
                             "operations %d and %d have nested destinations",
@@ -150,7 +162,10 @@ local function preflight(ops)
                 end
             end
             destinations[dst] = op._index
-            table.insert(destination_list, { path = dst, index = op._index })
+            table.insert(
+                destination_list,
+                { path = dst, index = op._index, type = op.type, kind = op.kind }
+            )
 
             if fs.exists(dst) and not vacated[dst] then
                 return nil, "target exists: " .. dst
@@ -359,6 +374,7 @@ function M.apply_ops(ops)
     local seed = tostring(uv.hrtime()):gsub("[^%w]", "")
     local staged = {}
     local staged_by_index = {}
+    local staged_by_source = {}
     local created_paths = {}
     local created_dirs = {}
     local created_dir_set = {}
@@ -381,10 +397,39 @@ function M.apply_ops(ops)
         local item = { op = op, src = src, temp = temp, dst = op.dst, materialized = nil }
         table.insert(staged, item)
         staged_by_index[op._index] = item
+        staged_by_source[src] = item
     end
 
     local function abort(message)
         return failed(message, rollback(staged, created_paths, created_dirs))
+    end
+
+    -- Explicit directory creates precede operations inside them. Parent-first
+    -- ordering also makes nested creation independent of the incoming op order.
+    table.sort(buckets.create, function(a, b)
+        if #a.path == #b.path then
+            return a.path < b.path
+        end
+        return #a.path < #b.path
+    end)
+    for _, op in ipairs(buckets.create) do
+        local ok_parent, parent_err = ensure_parent_tracked(op.path, created_dirs, created_dir_set)
+        if not ok_parent then
+            return abort(parent_err or ("failed to create parent for " .. op.path))
+        end
+        if fs.exists(op.path) then
+            return abort("target exists: " .. op.path)
+        end
+        local ok, err
+        if op.kind == "directory" then
+            ok, err = uv.fs_mkdir(op.path, 493)
+        else
+            ok, err = fs_ops.create_empty_file(op.path)
+        end
+        if not ok then
+            return abort(err or ("failed to create " .. op.path))
+        end
+        table.insert(created_paths, op.path)
     end
 
     for _, op in ipairs(buckets.rename) do
@@ -408,8 +453,13 @@ function M.apply_ops(ops)
         if fs.exists(op.dst) then
             return abort("target exists: " .. op.dst)
         end
-        table.insert(created_paths, op.dst)
-        local ok, err = copy_path(op.src, op.dst, op._source_stat)
+        local source = staged_by_source[op.src]
+        local src = source and (source.materialized == "rename" and source.dst or source.temp)
+            or op.src
+        local ok, err, created = copy_path(src, op.dst, op._source_stat)
+        if ok or created then
+            table.insert(created_paths, op.dst)
+        end
         if not ok then
             return abort(err or ("failed to copy " .. op.src))
         end
@@ -431,31 +481,13 @@ function M.apply_ops(ops)
             if not is_cross_device(tostring(err or "")) then
                 return abort(err or ("failed to move " .. op.src))
             end
-            item.materialized = "copy"
-            local copy_ok, copy_err = copy_path(item.temp, op.dst, op._source_stat)
+            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, op._source_stat)
+            if copy_ok or created then
+                item.materialized = "copy"
+            end
             if not copy_ok then
                 return abort(copy_err or ("failed to move " .. op.src))
             end
-        end
-    end
-
-    for _, op in ipairs(buckets.create) do
-        local ok_parent, parent_err = ensure_parent_tracked(op.path, created_dirs, created_dir_set)
-        if not ok_parent then
-            return abort(parent_err or ("failed to create parent for " .. op.path))
-        end
-        if fs.exists(op.path) then
-            return abort("target exists: " .. op.path)
-        end
-        table.insert(created_paths, op.path)
-        local ok, err
-        if op.kind == "directory" then
-            ok, err = fs_ops.mkdir_p(op.path)
-        else
-            ok, err = fs_ops.create_empty_file(op.path)
-        end
-        if not ok then
-            return abort(err or ("failed to create " .. op.path))
         end
     end
 

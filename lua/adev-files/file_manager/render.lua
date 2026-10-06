@@ -5,13 +5,16 @@ local clipboard = require "adev-files.clipboard"
 local git = require "adev-files.git"
 local icons = require "adev-files.icon"
 local listing = require "adev-files.file_manager.listing"
+local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
+local plan = require "adev-files.sync.plan"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
 local win = require "adev-files.file_manager.window"
 
 ---@type table<string, string>
 local GIT_LABEL = {
+    U = "U",
     M = "M",
     A = "A",
     D = "D",
@@ -22,6 +25,7 @@ local GIT_LABEL = {
 
 ---@type table<string, string>
 local GIT_HL = {
+    U = "adevFilesGitConflict",
     M = "adevFilesGitModified",
     A = "adevFilesGitAdded",
     D = "adevFilesGitDeleted",
@@ -81,7 +85,7 @@ local function summary_chunks(summary)
     end
 
     local has_git = false
-    for _, code in ipairs { "M", "A", "D", "R", "C", "?" } do
+    for _, code in ipairs { "U", "M", "A", "D", "R", "C", "?" } do
         if summary.git_counts[code] and summary.git_counts[code] > 0 then
             if not has_git then
                 table.insert(chunks, { "  •  Git ", "Comment" })
@@ -171,192 +175,119 @@ local function add_virtual_text(buf, root)
         return
     end
 
-    local entries, err = view.parse_buffer(buf)
-    if err then
-        return
-    end
+    local entries = view.parse_buffer(buf, { tolerant = true })
 
     update_title(buf, root, entries)
 
-    local original_lines = state.get_original_lines(buf)
-    local original_by_path = {}
-    local original_row_by_path = {}
-    for row, o in pairs(original_lines) do
-        if o.abs_path then
-            original_by_path[o.abs_path] = o.entry
-            original_row_by_path[o.abs_path] = row
-        end
-    end
+    local ops, plan_error, row_changes = plan.plan_ops(buf)
+    row_changes = row_changes or {}
+    vim.bo[buf].modified = not st.needs_refresh and (plan_error ~= nil or (ops and #ops > 0))
+        or false
 
-    local consumed = {}
-    local matched = {}
-    for _, item in ipairs(entries) do
-        if not item.deleted then
-            local abs_path = path.join_abs(root, item.entry.fs_name)
-            if original_by_path[abs_path] then
-                local orig_row = original_row_by_path[abs_path]
-                if orig_row then
-                    consumed[orig_row] = true
-                end
-                matched[item.row] = true
-            end
-        end
-    end
-
-    local original_by_name = {}
-    for row, o in pairs(original_lines) do
-        if not consumed[row] then
-            local name = o.entry.fs_name
-            original_by_name[name] = original_by_name[name] or {}
-            table.insert(
-                original_by_name[name],
-                { row = row, entry = o.entry, abs_path = o.abs_path }
-            )
-        end
-    end
-
-    for _, item in ipairs(entries) do
-        if not item.deleted and not matched[item.row] then
-            local candidates = original_by_name[item.entry.fs_name]
-            if candidates and #candidates > 0 then
-                for i, c in ipairs(candidates) do
-                    if c.entry.kind == item.entry.kind then
-                        consumed[c.row] = true
-                        matched[item.row] = true
-                        table.remove(candidates, i)
-                        break
-                    end
-                end
-            end
+    -- Conceal every ID, including temporarily invalid rows during editing.
+    for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+        local _, _, prefix_length = parse.strip_id(line)
+        if prefix_length > 0 then
+            vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
+                end_col = prefix_length,
+                conceal = "",
+            })
         end
     end
 
     local clip_sources = build_clipboard_sources()
-
-    local pending_delete = {}
-    local pending_by_path = {}
-    if st.pending_ops then
-        for _, op in ipairs(st.pending_ops) do
-            if op.type == "delete" and op.path then
-                pending_delete[op.path] = true
-            elseif (op.type == "copy" or op.type == "move") and op.src then
-                if op.dst then
-                    local dst = path.abs(op.dst)
-                    pending_by_path[dst] = pending_by_path[dst] or {}
-                    table.insert(pending_by_path[dst], op)
-                end
-            end
+    local move_sources = {}
+    for _, op in ipairs(ops or {}) do
+        if op.type == "move" then
+            move_sources[op.src] = true
         end
     end
-
     local selection_marks = state.get_selection_marks(buf)
     local git_status = state.get_git_status(buf)
 
     for _, item in ipairs(entries) do
-        local parsed = item.entry
-        local row = item.row
-        if parsed then
-            local abs_path = path.join_abs(root, parsed.fs_name)
-            local icon, hl = icons.get_entry_icon(parsed.name)
-            local virt_text = {}
+        local parsed, row = item.entry, item.row
+        local change = row_changes[row] or {}
+        local original = change.original or st.model.original_by_id[parsed.id]
+        local op = change.op
+        local abs_path = path.join_abs(root, parsed.fs_name)
+        local source_path = original and original.abs_path or abs_path
+        local stat = uv.fs_lstat(source_path)
+        local icon, hl = icons.get_entry_icon(parsed.name)
+        local virt_text = {}
 
-            local stat = uv.fs_lstat(abs_path)
-            if stat then
-                local perm_str = format_mode(stat.mode)
-                if perm_str then
-                    for i = 1, 9 do
-                        local ch = perm_str:sub(i, i)
-                        local hl = ch == "r" and "adevFilesPermRead"
-                            or ch == "w" and "adevFilesPermWrite"
-                            or ch == "x" and "adevFilesPermExec"
-                            or "adevFilesPermDash"
-                        table.insert(virt_text, { ch, hl })
-                    end
-                    table.insert(virt_text, { " ", "Comment" })
+        if stat then
+            local perm_str = format_mode(stat.mode)
+            if perm_str then
+                for i = 1, 9 do
+                    local ch = perm_str:sub(i, i)
+                    local perm_hl = ch == "r" and "adevFilesPermRead"
+                        or ch == "w" and "adevFilesPermWrite"
+                        or ch == "x" and "adevFilesPermExec"
+                        or "adevFilesPermDash"
+                    table.insert(virt_text, { ch, perm_hl })
                 end
+                table.insert(virt_text, { " ", "Comment" })
             end
+        end
+        if selection_marks[row] then
+            table.insert(virt_text, { "● ", "adevFilesPendingMark" })
+        end
+        if stat and stat.type == "link" then
+            table.insert(virt_text, { "@ ", "adevFilesSymlink" })
+        end
+        local entry_prefix = icon ~= "" and (icon .. " ") or "  "
+        if parsed.kind == "directory" then
+            entry_prefix = "▸ " .. entry_prefix
+        end
+        table.insert(virt_text, { entry_prefix, hl ~= "" and hl or "Normal" })
+        vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+            virt_text = virt_text,
+            virt_text_pos = "inline",
+        })
 
-            if selection_marks[row] then
-                table.insert(virt_text, { "● ", "adevFilesPendingMark" })
-            end
-            if stat and stat.type == "link" then
-                table.insert(virt_text, { "@ ", "adevFilesSymlink" })
-            end
-            local entry_prefix = icon ~= "" and (icon .. " ") or "  "
-            if parsed.kind == "directory" then
-                entry_prefix = "▸ " .. entry_prefix
-            end
-            table.insert(virt_text, { entry_prefix, hl ~= "" and hl or "Normal" })
-            vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
-                virt_text = virt_text,
-                virt_text_pos = "inline",
-            })
+        local suffix = {}
+        local lookup_name = original and original.fs_name or parsed.fs_name
+        local gs, gs_hl = git_indicator(git.get_file_status(git_status, lookup_name))
+        if gs then
+            table.insert(suffix, { "[" .. gs .. "]", gs_hl })
+        end
 
-            local suffix = {}
-            local original = original_by_path[abs_path]
-            if not original and not matched[item.row] then
-                local orig_line = original_lines[row]
-                if orig_line and not consumed[row] then
-                    original = orig_line.entry
-                end
-            end
-            local lookup_name = (original and parsed.fs_name ~= original.fs_name)
-                    and original.fs_name
-                or parsed.fs_name
-            local gs, gs_hl = git_indicator(git.get_file_status(git_status, lookup_name))
-            if gs then
-                table.insert(suffix, { "[" .. gs .. "]", gs_hl })
-            end
-
-            local deleted_item = pending_delete[abs_path]
-            local clip_mode = clip_sources[abs_path]
-
-            if not deleted_item then
-                if original then
-                    if parsed.fs_name ~= original.fs_name and gs ~= "R" then
-                        table.insert(suffix, { " [renamed]", "adevFilesPendingRenamed" })
-                    end
-                elseif
-                    not gs
-                    and not clip_mode
-                    and (not pending_by_path[abs_path] or #pending_by_path[abs_path] == 0)
-                then
-                    table.insert(suffix, { " [new]", "adevFilesPendingNew" })
-                end
-            end
-
-            if deleted_item and not clip_mode then
+        if op then
+            if op.type == "create" then
+                table.insert(suffix, { " [new]", "adevFilesPendingNew" })
+            elseif op.type == "rename" then
+                table.insert(suffix, { " [renamed]", "adevFilesPendingRenamed" })
+            elseif op.type == "delete" then
                 table.insert(suffix, { " [deleted]", "adevFilesPendingDelete" })
-            end
-
-            if clip_mode then
-                local label = clip_mode == "move" and " [moved]" or " [copied]"
-                local hl_name = clip_mode == "move" and "adevFilesPendingMove"
+            elseif op.type == "copy" or op.type == "move" then
+                local src_rel = path.relpath(root, op.src)
+                local label = op.type == "move" and " [moved from " or " [copied from "
+                local label_hl = op.type == "move" and "adevFilesPendingMove"
                     or "adevFilesPendingCopy"
-                table.insert(suffix, { label, hl_name })
+                table.insert(suffix, { label .. src_rel .. "]", label_hl })
             end
+        end
 
-            local pending_ops = pending_by_path[abs_path]
-            if pending_ops and #pending_ops > 0 then
-                for _, op in ipairs(pending_ops) do
-                    local src_rel = path.relpath(root, op.src or "")
-                    local label = op.type == "move" and " [moved from " or " [copied from "
-                    local hl_name = op.type == "move" and "adevFilesPendingMove"
-                        or "adevFilesPendingCopy"
-                    table.insert(suffix, { label .. src_rel .. "]", hl_name })
-                end
-            end
-
-            if #suffix > 0 then
-                vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
-                    virt_text = suffix,
-                    virt_text_pos = "eol",
-                })
-            end
+        local clip_mode = clip_sources[source_path] or (move_sources[source_path] and "move")
+        if
+            clip_mode
+            and (not op or (op.type ~= "delete" and op.type ~= "copy" and op.type ~= "move"))
+        then
+            table.insert(suffix, {
+                clip_mode == "move" and " [moved]" or " [copied]",
+                clip_mode == "move" and "adevFilesPendingMove" or "adevFilesPendingCopy",
+            })
+        end
+        if #suffix > 0 then
+            vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+                virt_text = suffix,
+                virt_text_pos = "eol",
+            })
         end
     end
 
-    local summary = listing.summarize(buf, entries)
+    local summary = listing.summarize(buf, entries, ops or {})
     vim.api.nvim_buf_set_extmark(buf, ns, 0, 0, {
         virt_text = title_chunks(),
         virt_text_pos = "overlay",
@@ -381,13 +312,13 @@ end
 
 ---@param buf integer
 ---@param root string
-function M.render(buf, root)
+function M.render(buf, root, opts)
     local st = state.get(buf)
-    local opts = {}
+    opts = opts or {}
     if st then
         opts.show_hidden = st.show_hidden
     end
-    view.render(buf, root, opts)
+    return view.render(buf, root, opts)
 end
 
 return M

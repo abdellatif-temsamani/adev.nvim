@@ -1,4 +1,6 @@
 local M = {}
+local parse = require "adev-files.parse"
+local uv = vim.uv or vim.loop
 
 ---@param root string
 ---@param name string
@@ -49,9 +51,9 @@ end
 ---@param opts? { show_hidden?: boolean }
 ---@return string[]
 function M.build_lines(root, opts)
-    local files, err = vim.fs.dir(root)
-    if not files then
-        return {}
+    local scan, err = uv.fs_scandir(root)
+    if not scan then
+        return nil, tostring(err)
     end
 
     local show_hidden = opts and opts.show_hidden or false
@@ -59,11 +61,15 @@ function M.build_lines(root, opts)
     -- Collect file entries
     local dirs = {}
     local files_list = {}
-    for fname, ftype in files do
+    while true do
+        local fname, ftype = uv.fs_scandir_next(scan)
+        if not fname then
+            break
+        end
         if not show_hidden and fname:sub(1, 1) == "." then
             goto continue
         end
-        local entry_name = fname
+        local entry_name = parse.format_name(fname)
         local is_dir = is_directory(root, fname, ftype)
         if is_dir and entry_name:sub(-1) ~= "/" then
             entry_name = entry_name .. "/"
@@ -103,7 +109,7 @@ end
 ---@param buf integer
 ---@param entries { row: integer, entry: AdevFilesEntry }[]
 ---@return AdevFilesSummary
-function M.summarize(buf, entries)
+function M.summarize(buf, entries, ops)
     local st = require("adev-files.state").get(buf)
     local dir_count = 0
     local file_count = 0
@@ -114,9 +120,9 @@ function M.summarize(buf, entries)
             file_count = file_count + 1
         end
     end
-    local pending = st and st.pending_ops or {}
+    local pending = ops or require("adev-files.sync.plan").plan_ops(buf) or {}
     local git_counts = {}
-    local git_status = st and st.git_status
+    local git_status = st and st.git_files
     if git_status then
         for _, s in pairs(git_status) do
             git_counts[s] = (git_counts[s] or 0) + 1

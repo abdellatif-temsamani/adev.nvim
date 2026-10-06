@@ -3,15 +3,10 @@ local M = {}
 ---@param root string
 ---@return string
 function M.normalize_root(root)
-    root = root or "./"
-    if root == "" then
-        return "./"
-    end
+    root = vim.fn.fnamemodify(root and root ~= "" and root or ".", ":p")
+    root = vim.fs.normalize(root, { expand_env = false })
     if root:sub(-1) ~= "/" then
         root = root .. "/"
-    end
-    if root == ".//" then
-        root = "./"
     end
     return root
 end
@@ -34,9 +29,6 @@ function M.parent_root(root)
     local r = root:gsub("/$", "")
     if r == "" then
         return "/"
-    end
-    if r == "." then
-        return "./"
     end
     local parent = vim.fs.dirname(r)
     if not parent or parent == "" or parent == "." then

@@ -27,7 +27,7 @@ function M.copy_file(src, dst)
     end
 
     if uv.fs_copyfile then
-        local ok, err_name, err_msg = uv.fs_copyfile(src, dst)
+        local ok, err_name, err_msg = uv.fs_copyfile(src, dst, 1)
         if not ok then
             return false, (err_name or "fs_copyfile") .. ": " .. (err_msg or "")
         end
@@ -38,7 +38,7 @@ function M.copy_file(src, dst)
     if not in_fd then
         return false, (in_err_name or "fs_open") .. ": " .. (in_err_msg or "")
     end
-    local out_fd, out_err_name, out_err_msg = uv.fs_open(dst, "w", 420)
+    local out_fd, out_err_name, out_err_msg = uv.fs_open(dst, "wx", 420)
     if not out_fd then
         uv.fs_close(in_fd)
         return false, (out_err_name or "fs_open") .. ": " .. (out_err_msg or "")
@@ -51,16 +51,23 @@ function M.copy_file(src, dst)
         if not data then
             uv.fs_close(in_fd)
             uv.fs_close(out_fd)
-            return false, (read_err_name or "fs_read") .. ": " .. (read_err_msg or "")
+            return false, (read_err_name or "fs_read") .. ": " .. (read_err_msg or ""), true
         end
         if data == "" then
             break
         end
-        local _, write_err_name, write_err_msg = uv.fs_write(out_fd, data, off)
-        if write_err_name then
-            uv.fs_close(in_fd)
-            uv.fs_close(out_fd)
-            return false, (write_err_name or "fs_write") .. ": " .. (write_err_msg or "")
+        local written = 0
+        while written < #data do
+            local n, write_err_name, write_err_msg =
+                uv.fs_write(out_fd, data:sub(written + 1), off + written)
+            if not n or n == 0 then
+                uv.fs_close(in_fd)
+                uv.fs_close(out_fd)
+                return false,
+                    (write_err_name or "fs_write") .. ": " .. (write_err_msg or "short write"),
+                    true
+            end
+            written = written + n
         end
         off = off + #data
     end

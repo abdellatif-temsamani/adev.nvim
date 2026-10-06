@@ -1,3 +1,4 @@
+local index = require "adev-files.sync.index"
 local planner = require "adev-files.core.planner"
 local state = require "adev-files.state"
 local view = require "adev-files.core.view"
@@ -23,23 +24,32 @@ end
 ---@field src? string
 ---@field dst? string
 ---@field dst_id? integer
+---@field row? integer
 
 ---@param buf integer
----@return AdevFilesOp[]|nil, string|nil
+---@return AdevFilesOp[]|nil, string|nil, table<integer, AdevFilesRowChange>?
 function M.plan_ops(buf)
     local st = state.get(buf)
     if not st then
         return nil, "missing state"
     end
-
+    if st.needs_refresh then
+        return nil, "Changes were saved; refresh the directory before editing again"
+    end
+    index.restore_ids(buf)
     local entries, err = view.parse_buffer(buf)
     if err then
+        st.plan_error = err
+        st.change_ops = nil
+        st.row_changes = {}
         return nil, err
     end
-
-    local original_lines = state.get_original_lines(buf)
-    local ops, plan_err, updated_pending =
-        planner.plan(original_lines, entries, st.root, state.get_pending_ops(buf), buf)
+    index.reindex(buf)
+    local ops, plan_err, updated_pending, changes =
+        planner.plan(st.model, entries, state.get_pending_ops(buf))
+    st.plan_error = plan_err
+    st.change_ops = ops
+    st.row_changes = changes or {}
     if plan_err then
         return nil, plan_err
     end
@@ -47,7 +57,7 @@ function M.plan_ops(buf)
         state.set_pending_ops(buf, updated_pending)
     end
 
-    return ops, nil
+    return ops, nil, changes
 end
 
 ---@param buf integer

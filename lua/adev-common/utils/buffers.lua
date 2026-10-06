@@ -18,6 +18,9 @@ function M.create(content, opts)
     opts = vim.tbl_deep_extend("force", {}, M.buf_defaults, opts or {})
 
     local buf = vim.api.nvim_create_buf(opts.listed, opts.scratch)
+    if opts.bo.swapfile ~= nil then
+        vim.bo[buf].swapfile = opts.bo.swapfile
+    end
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, content)
 
     vim.iter(opts.bo):each(

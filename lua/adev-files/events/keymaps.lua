@@ -118,24 +118,6 @@ function M.attach(buf)
         end
 
         local lines = {}
-        local pending = state.get_pending_ops(buf)
-        if #pending > 0 then
-            table.insert(lines, "Changes staged:")
-            for _, op in ipairs(pending) do
-                if op.type == "create" then
-                    table.insert(lines, "  created:    " .. rel(op.path))
-                elseif op.type == "delete" then
-                    table.insert(lines, "  deleted:    " .. rel(op.path))
-                elseif op.type == "rename" then
-                    table.insert(lines, "  renamed:    " .. rel(op.src) .. "  ->  " .. rel(op.dst))
-                elseif op.type == "move" then
-                    table.insert(lines, "  moved:      " .. rel(op.src) .. "  ->  " .. rel(op.dst))
-                elseif op.type == "copy" then
-                    table.insert(lines, "  copied:     " .. rel(op.src) .. "  ->  " .. rel(op.dst))
-                end
-            end
-        end
-
         local ops, err = require("adev-files.sync").plan_ops(buf)
         if err then
             table.insert(lines, "")

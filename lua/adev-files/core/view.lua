@@ -9,8 +9,16 @@ local M = {}
 ---@param opts? { show_hidden?: boolean }
 ---@return string[]
 function M.render(buf, root, opts)
+    local entries, err
+    if opts and opts.lines then
+        entries = opts.lines
+    else
+        entries, err = listing.build_lines(root, opts)
+    end
+    if not entries then
+        return nil, err
+    end
     state.clear_selection_marks(buf)
-    local entries = listing.build_lines(root, opts)
     if #entries == 0 then
         entries = { "" }
     end
@@ -28,18 +36,23 @@ end
 
 ---@param buf integer
 ---@return { row: integer, entry: AdevFilesEntry, deleted: boolean }[]|nil, string|nil
-function M.parse_buffer(buf)
+function M.parse_buffer(buf, opts)
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     local entries = {}
 
     for i, line in ipairs(lines) do
         if i == 1 then
+            if line ~= "" and not (opts and opts.tolerant) then
+                return nil, "the header row must remain empty"
+            end
             goto continue
         end
         local _, deleted = parse.strip_delete_marker(line)
         local entry, err = parse.parse_line(line)
         if err then
-            return nil, string.format("line %d: %s", i, err)
+            if not (opts and opts.tolerant) then
+                return nil, string.format("line %d: %s", i, err)
+            end
         end
         if entry then
             table.insert(entries, { row = i - 1, entry = entry, deleted = deleted })

@@ -2,6 +2,8 @@ if vim.b.current_syntax then
     return
 end
 
+vim.cmd [[syntax match adevFilesEntryId "^/\d\+ " conceal]]
+
 vim.cmd [[syntax match adevFilesHelp "^│.*$" contains=adevFilesHelpKey]]
 
 vim.cmd [[syntax match adevFilesHelpKey "\c<CR>" contained containedin=adevFilesHelp]]
@@ -51,5 +53,6 @@ vim.api.nvim_set_hl(0, "adevFilesGitDeleted", { link = "DiffDelete", default = t
 vim.api.nvim_set_hl(0, "adevFilesGitRenamed", { link = "DiffText", default = true })
 vim.api.nvim_set_hl(0, "adevFilesGitCopied", { link = "Special", default = true })
 vim.api.nvim_set_hl(0, "adevFilesGitUntracked", { link = "Comment", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitConflict", { link = "DiagnosticError", default = true })
 
 vim.b.current_syntax = "adev_files"

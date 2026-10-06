@@ -1,154 +1,160 @@
-local marks = require "adev-files.core.marks"
-local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
 
 local M = {}
 
----@param original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
----@param current_entries {row: integer, entry: AdevFilesEntry, deleted: boolean}[]
----@param root string
+---@class AdevFilesRowChange
+---@field original? AdevFilesNodeSnapshot
+---@field op? AdevFilesOp
+
+--- Compile one plan for both the display and the write handler. Entry identity
+--- comes from the buffer text, never from an entry's current row number.
+---@param model AdevFilesModel
+---@param entries {row: integer, entry: AdevFilesEntry, deleted: boolean}[]
 ---@param pending_ops AdevFilesOp[]
----@param buf integer
----@return AdevFilesOp[]|nil, string|nil, AdevFilesOp[]|nil
-function M.plan(original_lines, current_entries, root, pending_ops, buf)
-    local ops = {}
-    local original_by_name = {}
-    local original_by_path = {}
-    local consumed_originals = {}
+---@return AdevFilesOp[]|nil, string?, AdevFilesOp[]?, table<integer, AdevFilesRowChange>?
+function M.plan(model, entries, pending_ops)
+    local ops, updated_pending, changes = {}, {}, {}
+    local originals = model.original_by_id
+    local by_id, seen_paths, pending_ids = {}, {}, {}
+    local delete_paths, move_sources, destinations = {}, {}, {}
 
-    for row, orig in pairs(original_lines) do
-        local name = orig.entry.fs_name
-        original_by_name[name] = original_by_name[name] or {}
-        table.insert(
-            original_by_name[name],
-            { row = row, entry = orig.entry, abs_path = orig.abs_path }
-        )
-        original_by_path[orig.abs_path] = row
-    end
-
-    local updated_pending = {}
-    local pending_dst_paths = {}
-    local pending_move_src_paths = {}
-    local pending_delete_paths = {}
     for _, op in ipairs(pending_ops or {}) do
-        if op.type == "delete" then
-            local p = path.abs(op.path or "")
-            if p ~= "" then
-                pending_delete_paths[p] = true
-                table.insert(ops, { type = "delete", path = p, kind = op.kind })
-                table.insert(updated_pending, op)
-            end
-        elseif op.type == "copy" or op.type == "move" then
-            local cloned = vim.deepcopy(op)
-            if cloned.src then
-                cloned.src = path.abs(cloned.src)
-            end
-
-            if cloned.dst_id and buf and vim.api.nvim_buf_is_valid(buf) then
-                local row = marks.row_for_node(buf, cloned.dst_id)
-                if row then
-                    local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
-                    if line then
-                        local clean = parse.strip_delete_marker(line)
-                        local entry = select(1, parse.parse_line(clean))
-                        if entry then
-                            cloned.dst = path.join_abs(root, entry.fs_name)
-                        end
-                    end
-                end
-            end
-
-            if cloned.dst then
-                cloned.dst = path.abs(cloned.dst)
-                pending_dst_paths[cloned.dst] = true
-                if cloned.type == "move" and cloned.src then
-                    pending_move_src_paths[cloned.src] = true
-                end
-                table.insert(
-                    ops,
-                    { type = op.type, src = cloned.src, dst = cloned.dst, kind = op.kind }
-                )
-                table.insert(updated_pending, cloned)
-            end
-        else
-            table.insert(updated_pending, op)
+        if op.dst_id then
+            pending_ids[op.dst_id] = op
         end
     end
 
-    local matched_current = {}
-
-    for _, item in ipairs(current_entries) do
+    for _, item in ipairs(entries) do
+        local entry = item.entry
+        local abs = path.join_abs(model.root, entry.fs_name)
         if not item.deleted then
-            local candidates = original_by_name[item.entry.fs_name]
-            if candidates and #candidates > 0 then
-                local match_idx
-                for i, c in ipairs(candidates) do
-                    if c.entry.kind == item.entry.kind then
-                        match_idx = i
-                        break
-                    end
+            if seen_paths[abs] then
+                return nil, "duplicate path: " .. entry.fs_name
+            end
+            seen_paths[abs] = true
+        end
+        if entry.id then
+            if not originals[entry.id] and not pending_ids[entry.id] then
+                return nil, string.format("line %d: unknown entry ID", item.row + 1)
+            end
+            by_id[entry.id] = by_id[entry.id] or {}
+            table.insert(by_id[entry.id], item)
+        end
+        changes[item.row] = { original = originals[entry.id] }
+    end
+
+    local function add(op, row)
+        op.row = row
+        table.insert(ops, op)
+        if row then
+            changes[row] = changes[row] or {}
+            changes[row].op = op
+        end
+    end
+
+    for _, op in ipairs(pending_ops or {}) do
+        local cloned = vim.deepcopy(op)
+        if cloned.type == "copy" or cloned.type == "move" then
+            local items = cloned.dst_id and by_id[cloned.dst_id] or nil
+            if items and #items > 1 then
+                return nil, "pasted entry ID appears more than once"
+            end
+            local item = items and items[1] or nil
+            if item and not item.deleted then
+                cloned.dst = path.join_abs(model.root, item.entry.fs_name)
+                cloned.src = path.abs(cloned.src)
+                cloned.kind = item.entry.kind
+                destinations[item.row] = true
+                if cloned.type == "move" then
+                    move_sources[cloned.src] = true
                 end
-                if match_idx then
-                    local match = table.remove(candidates, match_idx)
-                    consumed_originals[match.row] = true
-                    matched_current[item.row] = true
+                add({
+                    type = cloned.type,
+                    src = cloned.src,
+                    dst = cloned.dst,
+                    kind = cloned.kind,
+                    dst_id = cloned.dst_id,
+                }, item.row)
+            elseif not cloned.dst_id and cloned.dst then
+                -- Allow callers to stage operations without a buffer entry.
+                cloned.src = path.abs(cloned.src)
+                cloned.dst = path.abs(cloned.dst)
+                if cloned.type == "move" then
+                    move_sources[cloned.src] = true
                 end
+                add(vim.deepcopy(cloned))
+            end
+            -- Retain the intent so undoing removal of a destination restores it.
+            -- Only destinations present in the buffer are included in the plan.
+            table.insert(updated_pending, cloned)
+        elseif cloned.type == "delete" then
+            cloned.path = path.abs(cloned.path)
+            delete_paths[cloned.path] = true
+            table.insert(updated_pending, cloned)
+        else
+            return nil, "unsupported staged operation: " .. tostring(cloned.type)
+        end
+    end
+
+    for _, id in ipairs(vim.tbl_keys(originals)) do
+        local original = originals[id]
+        local items = by_id[id] or {}
+        local live = {}
+        local retained
+        for _, item in ipairs(items) do
+            if not item.deleted and not delete_paths[original.abs_path] then
+                if item.entry.kind ~= original.kind then
+                    return nil, "cannot change entry type: " .. original.fs_name
+                end
+                if item.entry.fs_name == original.fs_name then
+                    retained = item
+                else
+                    table.insert(live, item)
+                end
+            end
+        end
+        if move_sources[original.abs_path] then
+            -- A staged move owns its source, even when the source row is marked.
+        elseif delete_paths[original.abs_path] or (not retained and #live == 0) then
+            local row = items[1] and items[1].row or nil
+            add({ type = "delete", path = original.abs_path, kind = original.kind }, row)
+            delete_paths[original.abs_path] = nil
+        else
+            for i, item in ipairs(live) do
+                add({
+                    type = not retained and i == 1 and "rename" or "copy",
+                    src = original.abs_path,
+                    dst = path.join_abs(model.root, item.entry.fs_name),
+                    kind = original.kind,
+                }, item.row)
             end
         end
     end
 
-    for _, item in ipairs(current_entries) do
-        if not item.deleted and not matched_current[item.row] then
-            local orig = original_lines[item.row]
-            if orig and not consumed_originals[item.row] then
-                consumed_originals[item.row] = true
-                matched_current[item.row] = true
-                if item.entry.fs_name ~= orig.entry.fs_name then
-                    table.insert(ops, {
-                        type = "rename",
-                        src = orig.abs_path,
-                        dst = path.join_abs(root, item.entry.fs_name),
-                        kind = item.entry.kind,
-                    })
-                end
-            else
-                local abs_path = path.join_abs(root, item.entry.fs_name)
-                if not pending_dst_paths[abs_path] then
-                    table.insert(ops, {
-                        type = "create",
-                        path = abs_path,
-                        kind = item.entry.kind,
-                    })
-                end
+    for p in pairs(delete_paths) do
+        local row
+        for _, item in ipairs(entries) do
+            if path.join_abs(model.root, item.entry.fs_name) == p then
+                row = item.row
+                break
             end
+        end
+        add({ type = "delete", path = p }, row)
+    end
+
+    for _, item in ipairs(entries) do
+        if not item.entry.id and not item.deleted and not destinations[item.row] then
+            local abs = path.join_abs(model.root, item.entry.fs_name)
+            add({ type = "create", path = abs, kind = item.entry.kind }, item.row)
         end
     end
 
-    for row, orig in pairs(original_lines) do
-        if not consumed_originals[row] then
-            if
-                not pending_move_src_paths[orig.abs_path]
-                and not pending_delete_paths[orig.abs_path]
-            then
-                local still_exists = false
-                for _, item in ipairs(current_entries) do
-                    if not item.deleted and item.entry.fs_name == orig.entry.fs_name then
-                        still_exists = true
-                        break
-                    end
-                end
-                if not still_exists then
-                    table.insert(ops, {
-                        type = "delete",
-                        path = orig.abs_path,
-                        kind = orig.entry.kind,
-                    })
-                end
-            end
-        end
-    end
-
-    return ops, nil, updated_pending
+    table.sort(ops, function(a, b)
+        local ak = (a.path or a.src or "") .. "\0" .. (a.dst or "") .. "\0" .. a.type
+        local bk = (b.path or b.src or "") .. "\0" .. (b.dst or "") .. "\0" .. b.type
+        return ak < bk
+    end)
+    return ops, nil, updated_pending, changes
 end
 
 return M

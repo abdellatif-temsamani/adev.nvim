@@ -31,7 +31,7 @@ function M.create_empty_file(path)
         end
     end
 
-    local fd, err_name, err_msg = uv.fs_open(path, "w", 420)
+    local fd, err_name, err_msg = uv.fs_open(path, "wx", 420)
     if not fd then
         return false, (err_name or "fs_open") .. ": " .. (err_msg or "")
     end

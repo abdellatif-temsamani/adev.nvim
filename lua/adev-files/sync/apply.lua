@@ -36,7 +36,7 @@ end
 function M.apply_ops_with_confirm(buf, ops, opts)
     opts = opts or {}
     local st = state.get(buf)
-    if not st or st.applying then
+    if not st or st.applying or st.confirming then
         return
     end
 
@@ -59,7 +59,17 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         lines = merged
     end
 
+    local root = st.root
+    local changedtick = vim.api.nvim_buf_get_changedtick(buf)
+    local modifiable = vim.bo[buf].modifiable
+    st.confirming = true
+    vim.bo[buf].modifiable = false
     confirmation.open(lines, { title = opts.title or "adev-files" }, function(confirmed)
+        if not vim.api.nvim_buf_is_valid(buf) or state.get(buf) ~= st then
+            return
+        end
+        st.confirming = false
+        vim.bo[buf].modifiable = modifiable
         if not confirmed then
             if opts.on_cancel then
                 opts.on_cancel()
@@ -70,6 +80,10 @@ function M.apply_ops_with_confirm(buf, ops, opts)
 
         local st2 = state.get(buf)
         if not st2 or st2.applying then
+            return
+        end
+        if st2.root ~= root or vim.api.nvim_buf_get_changedtick(buf) ~= changedtick then
+            utils.err_notify("Changes were edited while confirming; write again", "adev-files")
             return
         end
 
@@ -90,7 +104,23 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         end
 
         -- Refresh after clearing `applying`, otherwise refresh is a no-op.
-        view.refresh(buf)
+        state.clear_pending_ops(buf)
+        for _, op in ipairs(ops) do
+            if op.type == "move" then
+                require("adev-files.clipboard").remove_by_src(op.src)
+            end
+        end
+        st2.needs_refresh = true
+        st2.refresh_modifiable = modifiable
+        if not view.refresh(buf, { force = true }) then
+            vim.bo[buf].modifiable = false
+            vim.bo[buf].modified = false
+            utils.notify(
+                "Changes saved. Refresh the directory when it becomes available",
+                vim.log.levels.WARN,
+                "adev-files"
+            )
+        end
 
         -- Jump cursor to the first newly created entry
         local create_ops = {}
@@ -105,8 +135,8 @@ function M.apply_ops_with_confirm(buf, ops, opts)
                 local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
                 local target_row = nil
                 for i, line in ipairs(buf_lines) do
-                    local stripped = line:gsub("/$", "")
-                    if stripped == target_fname then
+                    local entry = require("adev-files.parse").parse_line(line)
+                    if entry and entry.fs_name == target_fname then
                         target_row = i
                         break
                     end

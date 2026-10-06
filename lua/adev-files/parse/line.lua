@@ -5,6 +5,40 @@ local M = {}
 
 local DELETE_MARK = "  #del"
 
+--- Entry IDs travel with the text, independently of row positions. They are
+--- concealed by the renderer and resolved against the filesystem snapshot.
+---@param line string
+---@return string, integer?, integer
+function M.strip_id(line)
+    local id, name = (line or ""):match "^/(%d+) (.*)$"
+    if id then
+        return name, tonumber(id), #id + 2
+    end
+    return line or "", nil, 0
+end
+
+---@param line string
+---@param id integer
+---@return string
+function M.with_id(line, id)
+    local name = M.strip_id(line)
+    return string.format("/%d %s", id, name)
+end
+
+---@param name string
+---@return string
+function M.format_name(name)
+    if
+        name:find '[\\"%c]'
+        or name:match "^%s"
+        or name:match "%s$"
+        or vim.endswith(name, DELETE_MARK)
+    then
+        return vim.json.encode(name)
+    end
+    return name
+end
+
 ---@param line string
 ---@return string, boolean
 function M.strip_delete_marker(line)
@@ -46,6 +80,7 @@ function M.mark_delete(line)
 end
 
 ---@class AdevFilesEntry
+---@field id? integer
 ---@field kind 'file'|'directory'
 ---@field name string     -- display name (directories end with '/')
 ---@field fs_name string  -- filesystem name (no trailing '/')
@@ -55,24 +90,16 @@ end
 ---@return AdevFilesEntry|nil, string|nil
 function M.parse_line(line)
     line = M.strip_delete_marker(line)
+    local id
+    line, id = M.strip_id(line)
+    if id and (id < 1 or id > 2147483647 or id % 1 ~= 0) then
+        return nil, "invalid entry ID"
+    end
     line = trim.trim(line or "")
     if line == "" then
-        return nil, nil
-    end
-
-    if line:sub(1, 1) == "[" and line:sub(-1) == "]" then
-        return nil, nil
-    end
-    if line:match "^│" then
-        return nil, nil
-    end
-    if line:match "^=+$" then
-        return nil, nil
-    end
-
-    -- Check for root: prefix (skip these lines)
-    local prefix, rest = line:match "^(%a+)%s*:%s*(.*)$"
-    if prefix == "root" then
+        if id then
+            return nil, "entry has no filename"
+        end
         return nil, nil
     end
 
@@ -102,12 +129,20 @@ function M.parse_line(line)
     if kind == "directory" then
         fs_name = name:sub(1, -2)
     end
+    if fs_name:sub(1, 1) == '"' then
+        local ok, decoded = pcall(vim.json.decode, fs_name)
+        if not ok or type(decoded) ~= "string" then
+            return nil, "invalid quoted filename"
+        end
+        fs_name = decoded
+    end
 
     if not validate.is_valid_rel_path(fs_name) then
         return nil, "invalid path: '" .. fs_name .. "'"
     end
 
     return {
+        id = id,
         kind = kind,
         name = name,
         fs_name = fs_name,

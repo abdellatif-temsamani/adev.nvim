@@ -93,6 +93,8 @@ Per-buffer state (`state.lua`) holds:
 | `applying` | boolean | Whether ops are being applied |
 | `pending_ops` | AdevFilesOp[] | Staged file operations |
 | `original_lines` | table<integer, {entry, abs_path}> | Snapshot of original buffer lines |
+| `model.original_by_id` | table<integer, AdevFilesNodeSnapshot> | Immutable identity and source path for each original entry |
+| `confirming` | boolean | Whether a confirmation dialog owns the buffer |
 | `show_hidden` | boolean | Show hidden files |
 | `selection_marks` | table<integer, true> | Row→mark for multi-file selection |
 
@@ -110,14 +112,37 @@ Two modes:
 
 A custom in-memory clipboard (`clipboard.lua`) stores `{mode: "copy"|"move", items: AdevFilesClipboardItem[]}`. Items are collected via `selection.lua` and applied on paste. Selection marks are cleared after paste.
 
+Save or revert a pending rename before copying or cutting that entry. A mixed
+selection containing a pending rename is rejected without changing the clipboard.
+An earlier clipboard entry also cannot paste a source that is being renamed.
+
 ## Pending Ops Flow
 
 1. Buffer is rendered from model (`core/view.lua`)
 2. User edits lines (rename, add, delete) or uses clipboard/delete commands
-3. Diffs are computed against `original_lines` snapshot
-4. Pending ops are staged via `sync/plan.lua`
+3. Concealed IDs move with entry text; diffs compare those IDs with the immutable model snapshot
+4. `sync/plan.lua` compiles one operation plan for labels, counts, change navigation, the changes window, and writes
 5. On `:write`, `sync/apply.lua` executes all staged ops
 6. Icons and pipe-delimited labels update in real time
+
+Moving a line keeps its identity. A renamed entry retains its contents, and an
+additional line with the same identity represents a copy. `<leader>nu` restores
+the original name and identity, clearing the pending label. Whole-line edits
+retain the identity captured by the buffer's edit notification.
+
+Refresh and hidden-file toggles preserve unsaved changes and require saving or
+discarding them before replacing the listing. Navigation asks before discarding
+pending operations. Write confirmation locks editing until it is applied or
+cancelled; a failed operation keeps the plan available for correction.
+If the directory cannot be read after a successful save, editing pauses until a
+refresh succeeds so saved operations cannot be applied again.
+
+Names with whitespace, quotes, backslashes, or control characters use JSON string
+escaping in the listing and decode to their exact filesystem names on save.
+
+Git status is collected asynchronously using NUL-separated records. Filenames
+are parsed without quoting ambiguity, conflicts are reported, directory labels
+aggregate descendant status, and summary counts count changed files once.
 
 ## Highlight Groups
 

@@ -1,50 +1,42 @@
+local parse = require "adev-files.parse.line"
 local state = require "adev-files.state"
 
 local M = {}
+local next_id = 1
 
 ---@param buf integer
 ---@param row integer
 ---@return integer
 function M.ensure_row(buf, row)
-    local ns = state.ns()
-    local existing = vim.api.nvim_buf_get_extmarks(buf, ns, { row, 0 }, { row, -1 }, { limit = 1 })
-    if #existing > 0 then
-        return existing[1][1]
+    local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
+    local _, id = parse.strip_id(line)
+    if not id then
+        id = next_id
+        next_id = next_id + 1
+        vim.api.nvim_buf_set_text(buf, row, 0, row, 0, { string.format("/%d ", id) })
     end
-    return vim.api.nvim_buf_set_extmark(buf, ns, row, 0, { right_gravity = false })
+    next_id = math.max(next_id, id + 1)
+    vim.api.nvim_buf_set_extmark(buf, state.ns(), row, 0, { id = id })
+    return id
 end
 
 ---@param buf integer
 ---@param entries { row: integer, entry: AdevFilesEntry, deleted: boolean }[]
 ---@return table<integer, integer>, table<integer, integer>
 function M.sync(buf, entries)
-    local ns = state.ns()
-    local row_set = {}
-    for _, item in ipairs(entries) do
-        row_set[item.row] = true
-    end
-
+    M.clear(buf)
     local row_to_id = {}
     local id_to_row = {}
-    local existing = vim.api.nvim_buf_get_extmarks(buf, ns, 0, -1, {})
-    for _, mark in ipairs(existing) do
-        local id = mark[1]
-        local row = mark[2]
-        if row_set[row] and not row_to_id[row] then
-            row_to_id[row] = id
-            id_to_row[id] = row
-        else
-            vim.api.nvim_buf_del_extmark(buf, ns, id)
-        end
-    end
-
     for _, item in ipairs(entries) do
-        if not row_to_id[item.row] then
-            local id = vim.api.nvim_buf_set_extmark(buf, ns, item.row, 0, {
-                right_gravity = false,
-            })
-            row_to_id[item.row] = id
+        -- Negative IDs only identify new, uncommitted rows in the projection.
+        -- Existing and pasted entries carry their stable ID in the buffer.
+        local id = item.entry.id or -(item.row + 1)
+        row_to_id[item.row] = id
+        if not id_to_row[id] then
             id_to_row[id] = item.row
+            if id > 0 then
+                vim.api.nvim_buf_set_extmark(buf, state.ns(), item.row, 0, { id = id })
+            end
         end
     end
 
@@ -55,11 +47,13 @@ end
 ---@param node_id integer
 ---@return integer|nil
 function M.row_for_node(buf, node_id)
-    local pos = vim.api.nvim_buf_get_extmark_by_id(buf, state.ns(), node_id, {})
-    if not pos or not pos[1] then
-        return nil
+    for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+        local _, id = parse.strip_id(line)
+        if id == node_id then
+            return i - 1
+        end
     end
-    return pos[1]
+    return nil
 end
 
 ---@param buf integer
