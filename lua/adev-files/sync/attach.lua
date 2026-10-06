@@ -1,6 +1,7 @@
 local utils = require "adev-common.utils"
 
 local apply = require "adev-files.sync.apply"
+local clipboard = require "adev-files.clipboard"
 local index = require "adev-files.sync.index"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
@@ -59,6 +60,7 @@ function M.attach(buf, root)
         group = group,
         buffer = buf,
         callback = function(args)
+            clipboard.clear()
             state.clear(args.buf)
         end,
     })
