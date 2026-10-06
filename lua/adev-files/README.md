@@ -15,7 +15,8 @@ set `replace_netrw = false` to opt out.
 - **Toggle hidden files**
 - **In-buffer help** — press `?` in an adev-files buffer
 - **File creation/rename/deletion** — via `<leader>na`, `<leader>nr`, `<leader>nd`
-- **Git commands** — `<leader>ns` for git status and commit --amend
+- **Pending changes** — `<leader>ns` to inspect staged filesystem operations
+- **Permissions** — `<leader>nz` to change permissions on current or marked entries
 
 ## Configuration
 
@@ -36,19 +37,50 @@ set `replace_netrw = false` to opt out.
 
 | Key | Action |
 |-----|--------|
-| `<CR>` | Open file / enter directory |
-| `-` | Go to parent directory |
-| `u` | Go to root directory |
-| `H` | Toggle hidden files |
-| `r` | Refresh listing |
-| `?` | Toggle help window |
-| `dd` | Stage delete |
-| `yy` | Copy file to clipboard |
-| `Y` | Cut file to clipboard |
-| `p` | Paste from clipboard |
-| `d` | Paste destination label toggle |
-| `R` | Revert staged operation on line |
-| `<Esc>` | Clear selection / cancel |
+| `<CR>` / `L` / `<Right>` | Open file / enter directory |
+| `<BS>` / `H` / `<Left>` | Go to parent directory |
+| `=` | Go to initial root directory |
+| `<leader>nq` | Quit |
+| `q` | Close floating file manager |
+| `<leader>nh` | Toggle hidden files |
+| `<Tab>` | Toggle mark on current line |
+| `<leader>nm` | Clear all marks |
+| `v` / `V` / `<C-v>` | Character / line / block selection |
+| `<leader>ny` | Copy current, marked, or visually selected entries |
+| `<leader>nx` | Cut current, marked, or visually selected entries |
+| `<leader>np` | Paste into current directory |
+| `<leader>bs` / `:write` | Apply staged changes |
+| `<leader>nu` | Revert current line |
+| `<leader>nc` | Reset all (discard changes) |
+| `<leader>nj` | Jump to next changed entry |
+| `<leader>nk` | Jump to previous changed entry |
+| `<leader>ns` | View pending changes |
+| `<leader>nd` | Stage delete of current, marked, or visually selected entries |
+| `<leader>nz` | Change permissions of current or marked entries |
+| `?` | Open help menu |
+
+Edit entry names to rename them, or add lines to create files and directories.
+Permissions accept octal (`755`) or symbolic (`rwxr-xr-x`) input and apply
+immediately, without `:write`.
+
+In help and pending changes popups, use `j` / `k` / `<C-d>` / `<C-u>` to scroll
+and `q` / `<Esc>` to close. In confirmation popups, `y` / `<CR>` confirms and
+`n` / `q` / `<Esc>` cancels. The permissions guide also supports `q` when focused.
+
+Inside the file manager, `u`, `<C-r>`, `K`, `J`, `dd`, `yy`, `D`, and
+`<leader>bq` are disabled. Use the mappings above for reverting, deleting,
+copying, and quitting.
+
+## Global keymaps (outside file manager)
+
+| Key | Action |
+|-----|--------|
+| `<leader>no` | Open file manager |
+| `<leader>na` | Create file / directory (prompt) |
+| `<leader>nr` | Rename current file (prompt) |
+| `<leader>nd` | Delete current file (confirm) |
+
+`<leader>no`, `<leader>na`, and `<leader>nr` are disabled inside the file manager.
 
 ## Commands
 

@@ -3,7 +3,7 @@ if vim.b.current_syntax then
 end
 
 vim.cmd [[syntax match adevFilesHelpTitle "^  adev-files$"]]
-vim.cmd [[syntax match adevFilesHelpSection "^  \w\+\ze$"]]
+vim.cmd [[syntax match adevFilesHelpSection "^  [A-Z].*$"]]
 vim.cmd [[syntax match adevFilesHelpKey "\%(^    \)\zs.\{-}\ze\s\{2,\}"]]
 vim.cmd [[syntax match adevFilesHelpDesc "\%(^    .\{-}\s\{2,\}\)\zs.\+$"]]
 
