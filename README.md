@@ -148,7 +148,11 @@ consider:
 | `<leader>na` | Create file              |
 | `<leader>nr` | Rename current file      |
 | `<leader>nd` | Delete current file      |
-| `<leader>ns` | Git status / commit amend |
+| `<leader>ns` | View pending changes     |
+| `<leader>nz` | Change file permissions  |
+
+Press `?` inside adev-files for the full help menu, or see the
+[complete keymap reference](lua/adev-files/README.md#keymaps-buffer-local).
 
 ### LSP Keymaps
 

@@ -342,31 +342,52 @@ In-buffer mappings:
 | H / <bs> / <Left>    | Parent directory                            |
 | =                    | Go to initial root                          |
 | <leader>nq           | Quit                                        |
+| q                    | Close floating file manager                 |
 | <leader>nh           | Toggle hidden files                         |
 |                      |                                             |
 | Selection (multi-file)                         |
 | <TAB>                | Toggle mark on current line                 |
 | <leader>nm           | Clear all marks                             |
+| v / V / <C-v>        | Character / line / block selection          |
 |                      |                                             |
 | Clipboard (normal/visual)                      |
 | <leader>ny           | Copy selection                              |
 | <leader>nx           | Cut/move selection                          |
-| <leader>np           | Paste at cursor / into directory            |
+| <leader>np           | Paste into current directory                |
 |                      |                                             |
 | Edits                                         |
+| <leader>bs / :write  | Apply staged changes                        |
 | <leader>nu           | Revert current line                         |
 | <leader>nc           | Reset all (discard changes)                 |
+| <leader>nj           | Jump to next changed entry                  |
+| <leader>nk           | Jump to previous changed entry              |
+| <leader>ns           | View pending changes                        |
 |                      |                                             |
-| <leader>nd           | Delete (normal/visual)                      |
+| <leader>nd           | Stage delete (current / marked / visual)    |
+| <leader>nz           | Change permissions (current / marked)       |
 | ?                    | Open in-buffer help                         |
+
+Permissions accept octal (755) or symbolic (rwxr-xr-x) input and apply
+immediately, without :write.
+
+Help and pending changes popups: j/k or <C-d>/<C-u> scroll; q/<Esc> close.
+Confirmation popups: y/<CR> confirms; n/q/<Esc> cancels.
+Permissions guide: q closes the guide when focused.
+
+Inside the file manager, u, <C-r>, K, J, dd, yy, D and <leader>bq are disabled.
+Use <leader>nu/<leader>nc to revert, <leader>nd to delete, <leader>ny to copy,
+and <leader>nq to quit.
 
 Global commands (outside file manager):
 
 | Mapping              | Description                                |
 |----------------------|--------------------------------------------|
-| <leader>na           | Create file (prompt)                        |
+| <leader>no           | Open file manager                           |
+| <leader>na           | Create file / directory (prompt)            |
 | <leader>nr           | Rename current file (prompt)                |
 | <leader>nd           | Delete current file (confirm)               |
+
+<leader>no, <leader>na and <leader>nr are disabled inside the file manager.
 
 USAGE							*adev-files-usage*
 
