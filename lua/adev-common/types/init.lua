@@ -4,7 +4,7 @@
 ---@field auto_update_check boolean?  Check for updates on startup [non-blocking] (default: `true`)
 ---@field lazy LazyOpts?  Lazy.Nvim package manager options
 ---@field lsp LspOpts?  LSP options
----@field ai_assistant AiAssistantOpts?  AI assistant options
+---@field ai_assistant AiAssistantOpts?  AI assistant options (deprecated)
 ---@field colorscheme string?  Theme to use (default: `"catppuccin"`) to use a custom theme, is must be installed first in `custom-plugins`
 ---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
 ---@field ui UiOpts?  UI options
