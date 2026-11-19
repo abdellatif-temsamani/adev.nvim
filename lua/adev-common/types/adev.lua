@@ -1,6 +1,6 @@
 ---@class Adev
 ---@field git string
----@field ai_assistant AiAssistantOpts?
+---@field ai_assistant AiAssistantOpts? AI assistant configuration (deprecated)
 ---@field catppuccin CatppuccinOpts?  catppuccin.nvim options
 ---@field ui UiOpts?  UI options
 ---@field flags AdevFlags  Feature flags
