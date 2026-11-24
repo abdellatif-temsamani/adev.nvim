@@ -62,47 +62,60 @@ function M.open(root)
 end
 
 function M.create_file()
-    vim.ui.input(
-        { prompt = "New path (relative to cwd, append / for directory): " },
-        function(input)
-            if not input or input == "" then
-                return
-            end
-            local is_dir = input:sub(-1) == "/"
-            local path = vim.fn.fnamemodify(input, ":p")
-            if is_dir then
-                local ok, err = fs_ops.mkdir_p(path)
-                if ok then
-                    vim.notify("Created directory: " .. input, vim.log.levels.INFO, "adev-files")
-                else
-                    vim.notify(
-                        "Failed to create directory: " .. tostring(err),
-                        vim.log.levels.ERROR,
-                        "adev-files"
-                    )
-                end
-                return
-            end
-            local dir = vim.fn.fnamemodify(path, ":h")
-            if vim.fn.isdirectory(dir) == 0 then
-                vim.fn.mkdir(dir, "p")
-            end
-            if vim.fn.filereadable(path) == 0 then
-                local fd, ferr = vim.loop.fs_open(path, "w", 420)
-                if not fd then
-                    vim.notify(
-                        "Failed to create file: " .. path .. " - " .. tostring(ferr),
-                        vim.log.levels.ERROR,
-                        "adev-files"
-                    )
-                    return
-                end
-                vim.loop.fs_close(fd)
-            end
-            vim.cmd("edit " .. vim.fn.fnameescape(path))
-            vim.notify("Created: " .. input, vim.log.levels.INFO, "adev-files")
+    local st = require("adev-files.state").get(vim.api.nvim_get_current_buf())
+    local base = st and st.root or vim.fn.getcwd()
+    local prompt = st and "New path (relative to file manager root, append / for directory): "
+        or "New path (relative to cwd, append / for directory): "
+    vim.ui.input({ prompt = prompt }, function(input)
+        if not input or input == "" then
+            return
         end
-    )
+        local is_dir = input:sub(-1) == "/"
+        local rel = is_dir and input:sub(1, -2) or input
+        local validation = require "adev-files.validation"
+        local ok_rel, rel_err = validation.validate_rel_dir(rel)
+        if not ok_rel or rel_err ~= rel:gsub("^%s+", ""):gsub("%s+$", "") then
+            vim.notify(
+                "Invalid path: " .. tostring(rel_err or "invalid path"),
+                vim.log.levels.ERROR,
+                "adev-files"
+            )
+            return
+        end
+        local clean_rel = rel_err
+        local abs_path = require("adev-files.utils.fs.path").join_abs(base, clean_rel)
+        if is_dir then
+            local ok, err = fs_ops.mkdir_p(abs_path)
+            if ok then
+                vim.notify("Created directory: " .. input, vim.log.levels.INFO, "adev-files")
+            else
+                vim.notify(
+                    "Failed to create directory: " .. tostring(err),
+                    vim.log.levels.ERROR,
+                    "adev-files"
+                )
+            end
+            return
+        end
+        local dir = vim.fn.fnamemodify(abs_path, ":h")
+        if vim.fn.isdirectory(dir) == 0 then
+            vim.fn.mkdir(dir, "p")
+        end
+        if vim.fn.filereadable(abs_path) == 0 then
+            local fd, ferr = vim.loop.fs_open(abs_path, "w", 420)
+            if not fd then
+                vim.notify(
+                    "Failed to create file: " .. abs_path .. " - " .. tostring(ferr),
+                    vim.log.levels.ERROR,
+                    "adev-files"
+                )
+                return
+            end
+            vim.loop.fs_close(fd)
+        end
+        vim.cmd("edit " .. vim.fn.fnameescape(abs_path))
+        vim.notify("Created: " .. input, vim.log.levels.INFO, "adev-files")
+    end)
 end
 
 function M.rename_file()
@@ -113,12 +126,28 @@ function M.rename_file()
         return
     end
     local old_name = vim.fn.fnamemodify(file, ":t")
-    vim.ui.input({ prompt = "Rename to: ", default = old_name }, function(input)
+    local st = require("adev-files.state").get(buf)
+    local prompt = st and "Rename to (name only): " or "Rename to: "
+    vim.ui.input({ prompt = prompt, default = old_name }, function(input)
         if not input or input == "" or input == old_name then
             return
         end
+        local validation = require "adev-files.validation"
+        local clean = input:gsub("^%s+", ""):gsub("%s+$", "")
+        if clean == "" or clean:find("/", 1, true) or clean == "." or clean == ".." then
+            vim.notify(
+                "Invalid name: use a single name without path separators",
+                vim.log.levels.ERROR,
+                "adev-files"
+            )
+            return
+        end
+        if not validation.is_valid_rel_path(clean) then
+            vim.notify("Invalid name: " .. input, vim.log.levels.ERROR, "adev-files")
+            return
+        end
         local dir = vim.fn.fnamemodify(file, ":h")
-        local new_path = dir .. "/" .. input
+        local new_path = dir .. "/" .. clean
         local ok, err = fs_ops.rename_path(file, new_path)
         if ok then
             vim.api.nvim_buf_set_name(buf, new_path)
@@ -131,7 +160,7 @@ function M.rename_file()
                 vim.cmd "silent write!"
             end)
             vim.notify(
-                "Renamed: " .. old_name .. " -> " .. input,
+                "Renamed: " .. old_name .. " -> " .. clean,
                 vim.log.levels.INFO,
                 "adev-files"
             )

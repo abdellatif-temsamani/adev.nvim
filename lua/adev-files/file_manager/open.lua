@@ -43,7 +43,10 @@ function M.open(root, opts)
     local previous_buf = vim.fn.bufnr "#"
     root = root or utils.files.get_dirname()
     root = roots.normalize_root(root)
-    local lines = listing.build_lines(root)
+    local lines, list_err = listing.build_lines(root)
+    if not lines then
+        error(string.format("cannot read %s: %s", root, tostring(list_err or "unknown error")))
+    end
     local current_mode = opts.mode == "current"
 
     local buf

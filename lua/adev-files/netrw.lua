@@ -53,6 +53,8 @@ end
 
 function M.teardown()
     pcall(vim.api.nvim_del_augroup_by_name, GROUP)
+    -- Runtime toggling back to netrw in the same session is not fully supported;
+    -- netrw globals stay disabled and restart is required to restore netrw.
 end
 
 return M
