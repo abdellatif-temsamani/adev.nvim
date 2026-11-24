@@ -344,6 +344,7 @@ In-buffer mappings:
 | <leader>nq           | Quit                                        |
 | q                    | Close floating file manager                 |
 | <leader>nh           | Toggle hidden files                         |
+| <leader>nf           | Refresh directory listing                   |
 |                      |                                             |
 | Selection (multi-file)                         |
 | <TAB>                | Toggle mark on current line                 |

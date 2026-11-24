@@ -120,6 +120,11 @@ function M.open_or_enter(buf)
     local cfg = config.get_config() or {}
     local open_files = cfg.open_files or {}
     if not open_files.enabled then
+        utils.notify_once(
+            "File opening is disabled. Set `core_plugins.adev_files.opts.open_files.enabled = true` to open files with <CR>, or keep browsing directories here.",
+            vim.log.levels.INFO,
+            "adev-files"
+        )
         return
     end
 

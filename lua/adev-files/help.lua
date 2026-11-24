@@ -19,6 +19,7 @@ local function content()
         entry("<leader>nq", "quit"),
         entry("q", "close floating file manager"),
         entry("<leader>nh", "toggle hidden files"),
+        entry("<leader>nf", "refresh directory"),
         "",
         "  Selection",
         entry("<TAB>", "toggle mark on current line"),

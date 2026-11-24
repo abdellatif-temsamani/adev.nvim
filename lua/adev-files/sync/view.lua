@@ -82,20 +82,31 @@ local function render_snapshot(buf, st)
 end
 
 ---@param buf integer
----@param opts? { force?: boolean }
+---@param opts? { force?: boolean, silent?: boolean, notify?: boolean }
 ---@return boolean
 function M.refresh(buf, opts)
+    opts = opts or {}
     local st = state.get(buf)
     if not st or st.applying or st.confirming then
         return false
     end
-    if not (opts and opts.force) and M.has_changes(buf) then
+    if not opts.force and M.has_changes(buf) then
         render.add_virtual_text(buf, st.root)
         M.refresh_git_status(buf)
-        utils.notify("Save or discard changes before refreshing", vim.log.levels.WARN, "adev-files")
+        if not opts.silent then
+            utils.notify(
+                "Save or discard changes before refreshing",
+                vim.log.levels.WARN,
+                "adev-files"
+            )
+        end
         return false
     end
-    return render_snapshot(buf, st)
+    local ok = render_snapshot(buf, st)
+    if ok and opts.notify then
+        utils.notify("Directory refreshed", vim.log.levels.INFO, "adev-files")
+    end
+    return ok
 end
 
 ---@param buf integer
