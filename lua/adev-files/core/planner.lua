@@ -3,6 +3,47 @@ local path = require "adev-files.utils.fs.path"
 
 local M = {}
 
+local function add_rows(rows, seen, row)
+    if row and not seen[row] then
+        seen[row] = true
+        table.insert(rows, row)
+    end
+end
+
+local function rows_from_items(items)
+    local rows, seen = {}, {}
+    for _, item in ipairs(items or {}) do
+        add_rows(rows, seen, item.row)
+    end
+    return rows
+end
+
+--- Resolve the operation indices in an op_validation error back to buffer rows.
+local function rows_from_validation_error(ops, err)
+    local rows, seen = {}, {}
+    local function add_index(index)
+        add_rows(rows, seen, ops[tonumber(index)] and ops[tonumber(index)].row)
+    end
+    for index in err:gmatch "operations?%s+(%d+)" do
+        add_index(index)
+    end
+    for first, second in err:gmatch "operations%s+(%d+)%s+and%s+(%d+)" do
+        add_index(first)
+        add_index(second)
+    end
+    if err:find("directory into itself", 1, true) then
+        local dst = err:match "into itself: (.*)$"
+        if dst then
+            for _, op in ipairs(ops) do
+                if (op.dst or op.path) == dst then
+                    add_rows(rows, seen, op.row)
+                end
+            end
+        end
+    end
+    return rows
+end
+
 ---@class AdevFilesRowChange
 ---@field original? AdevFilesNodeSnapshot
 ---@field op? AdevFilesOp
@@ -12,7 +53,7 @@ local M = {}
 ---@param model AdevFilesModel
 ---@param entries {row: integer, entry: AdevFilesEntry, deleted: boolean}[]
 ---@param pending_ops AdevFilesOp[]
----@return AdevFilesOp[]|nil, string?, AdevFilesOp[]?, table<integer, AdevFilesRowChange>?
+---@return AdevFilesOp[]|nil, string?, AdevFilesOp[]?, table<integer, AdevFilesRowChange>?, integer[]?
 function M.plan(model, entries, pending_ops)
     local ops, updated_pending, changes = {}, {}, {}
     local originals = model.original_by_id
@@ -30,13 +71,21 @@ function M.plan(model, entries, pending_ops)
         local abs = path.join_abs(model.root, entry.fs_name)
         if not item.deleted then
             if seen_paths[abs] then
-                return nil, "duplicate path: " .. entry.fs_name
+                return nil,
+                    "duplicate path: " .. entry.fs_name,
+                    nil,
+                    nil,
+                    { seen_paths[abs], item.row }
             end
-            seen_paths[abs] = true
+            seen_paths[abs] = item.row
         end
         if entry.id then
             if not originals[entry.id] and not pending_ids[entry.id] then
-                return nil, string.format("line %d: unknown entry ID", item.row + 1)
+                return nil,
+                    string.format("line %d: unknown entry ID", item.row + 1),
+                    nil,
+                    nil,
+                    { item.row }
             end
             by_id[entry.id] = by_id[entry.id] or {}
             table.insert(by_id[entry.id], item)
@@ -58,7 +107,11 @@ function M.plan(model, entries, pending_ops)
         if cloned.type == "copy" or cloned.type == "move" then
             local items = cloned.dst_id and by_id[cloned.dst_id] or nil
             if items and #items > 1 then
-                return nil, "pasted entry ID appears more than once"
+                return nil,
+                    "pasted entry ID appears more than once",
+                    nil,
+                    nil,
+                    rows_from_items(items)
             end
             local item = items and items[1] or nil
             cloned.src = path.abs(cloned.src)
@@ -69,16 +122,24 @@ function M.plan(model, entries, pending_ops)
                 local source_id = model.original_by_path[cloned.src]
                 local source_original = source_id and originals[source_id] or nil
                 if source_original then
+                    local conflict_rows, seen = {}, {}
+                    local conflict_message
                     for _, source_item in ipairs(by_id[source_id] or {}) do
                         if source_item.deleted then
-                            return nil,
-                                "cannot delete the source of a pending move; cancel the move first"
-                        end
-                        if source_item.entry.fs_name ~= source_original.fs_name then
-                            return nil,
-                                "cannot rename the source of a pending move; "
+                            conflict_message = conflict_message
+                                or "cannot delete the source of a pending move; cancel the move first"
+                            add_rows(conflict_rows, seen, source_item.row)
+                            add_rows(conflict_rows, seen, item and item.row)
+                        elseif source_item.entry.fs_name ~= source_original.fs_name then
+                            conflict_message = conflict_message
+                                or "cannot rename the source of a pending move; "
                                     .. "cancel the move or rename the destination row instead"
+                            add_rows(conflict_rows, seen, source_item.row)
+                            add_rows(conflict_rows, seen, item and item.row)
                         end
+                    end
+                    if conflict_message then
+                        return nil, conflict_message, nil, nil, conflict_rows
                     end
                 end
             end
@@ -86,7 +147,10 @@ function M.plan(model, entries, pending_ops)
             if item and not item.deleted then
                 if cloned.kind and item.entry.kind ~= cloned.kind then
                     return nil,
-                        "cannot change the entry type of a pasted entry: " .. item.entry.fs_name
+                        "cannot change the entry type of a pasted entry: " .. item.entry.fs_name,
+                        nil,
+                        nil,
+                        { item.row }
                 end
                 cloned.dst = path.join_abs(model.root, item.entry.fs_name)
                 cloned.kind = item.entry.kind
@@ -124,7 +188,11 @@ function M.plan(model, entries, pending_ops)
             delete_paths[cloned.path] = true
             table.insert(updated_pending, cloned)
         else
-            return nil, "unsupported staged operation: " .. tostring(cloned.type)
+            return nil,
+                "unsupported staged operation: " .. tostring(cloned.type),
+                nil,
+                nil,
+                { cloned.row }
         end
     end
 
@@ -136,7 +204,11 @@ function M.plan(model, entries, pending_ops)
         for _, item in ipairs(items) do
             if not item.deleted and not delete_paths[original.abs_path] then
                 if item.entry.kind ~= original.kind then
-                    return nil, "cannot change entry type: " .. original.fs_name
+                    return nil,
+                        "cannot change entry type: " .. original.fs_name,
+                        nil,
+                        nil,
+                        { item.row }
                 end
                 if item.entry.fs_name == original.fs_name then
                     retained = item
@@ -183,7 +255,7 @@ function M.plan(model, entries, pending_ops)
 
     local _, validation_err = op_validation.validate_structural(ops)
     if validation_err then
-        return nil, validation_err
+        return nil, validation_err, nil, nil, rows_from_validation_error(ops, validation_err)
     end
 
     table.sort(ops, function(a, b)

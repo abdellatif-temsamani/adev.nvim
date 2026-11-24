@@ -34,6 +34,29 @@ local GIT_HL = {
     ["?"] = "adevFilesGitUntracked",
 }
 
+local function error_rows_label(rows)
+    if not rows or #rows == 0 then
+        return nil
+    end
+    local numbered = {}
+    for _, row in ipairs(rows) do
+        table.insert(numbered, tostring(row + 1))
+    end
+    return " (rows " .. table.concat(numbered, ", ") .. ")"
+end
+
+local function apply_plan_error_highlights(buf, ns, rows)
+    if not rows or #rows == 0 then
+        return
+    end
+    local line_count = vim.api.nvim_buf_line_count(buf)
+    for _, row in ipairs(rows) do
+        if row >= 0 and row < line_count then
+            vim.api.nvim_buf_add_highlight(buf, ns, "adevFilesPlanError", row, 0, -1)
+        end
+    end
+end
+
 local function format_mode(mode)
     if not mode then
         return nil
@@ -181,6 +204,8 @@ local function add_virtual_text(buf, root)
 
     local ops, plan_error, row_changes = plan.plan_ops(buf)
     row_changes = row_changes or {}
+    local error_rows = st.plan_error_rows or {}
+    apply_plan_error_highlights(buf, ns, error_rows)
     vim.bo[buf].modified = not st.needs_refresh and (plan_error ~= nil or (ops and #ops > 0))
         or false
 
@@ -296,13 +321,15 @@ local function add_virtual_text(buf, root)
         close_box(summary_chunks(summary)),
     }
     if plan_error then
-        table.insert(
-            header_lines,
-            close_box {
-                { "│ error  ", "Comment" },
-                { plan_error, "ErrorMsg" },
-            }
-        )
+        local error_chunks = {
+            { "│ error  ", "Comment" },
+            { plan_error, "ErrorMsg" },
+        }
+        local rows_label = error_rows_label(error_rows)
+        if rows_label then
+            table.insert(error_chunks, { rows_label, "adevFilesPlanError" })
+        end
+        table.insert(header_lines, close_box(error_chunks))
     end
     table.insert(header_lines, {
         { "╰" .. string.rep("─", HEADER_WIDTH - 2) .. "╯", "Comment" },

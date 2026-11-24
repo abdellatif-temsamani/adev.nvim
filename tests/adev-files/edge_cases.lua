@@ -14,6 +14,7 @@ local delete_events = require "adev-files.events.delete"
 local executor = require "adev-files.core.executor"
 local open = require "adev-files.file_manager.open"
 local plan = require "adev-files.sync.plan"
+local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
 local utils = require "adev-common.utils"
 local validation = require "adev-files.core.op_validation"
@@ -89,6 +90,39 @@ local function cursor_row(buf, text)
     vim.api.nvim_set_current_buf(buf)
     vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
     return row
+end
+
+local function header_error_text(buf)
+    local marks = vim.api.nvim_buf_get_extmarks(buf, state.display_ns(), 0, 0, { details = true })
+    local chunks = {}
+    for _, mark in ipairs(marks) do
+        for _, virt_line in ipairs(mark[4].virt_lines or {}) do
+            for _, chunk in ipairs(virt_line) do
+                table.insert(chunks, chunk[1])
+            end
+        end
+    end
+    return table.concat(chunks, "")
+end
+
+local function plan_error_highlight_rows(buf)
+    local marks = vim.api.nvim_buf_get_extmarks(buf, state.display_ns(), 0, -1, { details = true })
+    local rows = {}
+    for _, mark in ipairs(marks) do
+        if mark[4].hl_group == "adevFilesPlanError" then
+            table.insert(rows, mark[2])
+        end
+    end
+    table.sort(rows)
+    return rows
+end
+
+local function row_set(rows)
+    local set = {}
+    for _, row in ipairs(rows or {}) do
+        set[row] = true
+    end
+    return set
 end
 
 local function has_op(ops, kind, src, dst, path)
@@ -190,6 +224,16 @@ local function test_move_source_rename_rejected()
     check(
         err and err:find("cannot rename the source of a pending move", 1, true) ~= nil,
         "move source rename error message: " .. tostring(err)
+    )
+
+    render.add_virtual_text(buf, dir)
+    local highlighted = row_set(plan_error_highlight_rows(buf))
+    local source_row = row_with(buf, "Renamed.txt")
+    check(source_row ~= nil, "renamed move source row should still be visible")
+    check(highlighted[source_row], "move source conflict row should be highlighted")
+    check(
+        header_error_text(buf):find("(rows ", 1, true) ~= nil,
+        "header should list rows for a move source conflict"
     )
 end
 
@@ -495,10 +539,85 @@ local function test_nested_destination_rejected()
     )
 end
 
+local function test_plan_error_highlights_duplicate_path()
+    local dir = reset_dir "plan-error-highlight-duplicate"
+    write_file(dir .. "/A.txt", "alpha")
+    write_file(dir .. "/B.txt", "beta")
+    local buf = new_manager(dir)
+
+    local a_row = row_with(buf, "A.txt")
+    local b_row = row_with(buf, "B.txt")
+    check(a_row ~= nil and b_row ~= nil, "duplicate path test needs both rows")
+    if not a_row or not b_row then
+        return
+    end
+    local original_b = lines(buf)[b_row + 1]
+    set_row(buf, b_row, (original_b:gsub("B.txt", "A.txt", 1)))
+
+    render.add_virtual_text(buf, dir)
+    local st = state.get(buf)
+    check(
+        st.plan_error and st.plan_error:find("duplicate path", 1, true) ~= nil,
+        "duplicate path should still fail the plan: " .. tostring(st.plan_error)
+    )
+    local error_rows = st.plan_error_rows or {}
+    local reported = row_set(error_rows)
+    check(reported[a_row] and reported[b_row], "both duplicate rows should be reported")
+    local numbered = {}
+    for _, row in ipairs(error_rows) do
+        table.insert(numbered, tostring(row + 1))
+    end
+    check(
+        header_error_text(buf):find("(rows " .. table.concat(numbered, ", ") .. ")", 1, true) ~= nil,
+        "header should list every conflicting row"
+    )
+    local highlighted = row_set(plan_error_highlight_rows(buf))
+    check(highlighted[a_row] and highlighted[b_row], "both duplicate rows should be highlighted")
+
+    set_row(buf, b_row, original_b)
+    render.add_virtual_text(buf, dir)
+    st = state.get(buf)
+    check(st.plan_error == nil, "fixing the duplicate path should clear the plan error")
+    eq(#(st.plan_error_rows or {}), 0, "fixing the duplicate path should clear error rows")
+    eq(#plan_error_highlight_rows(buf), 0, "fixing the duplicate path should clear highlights")
+    check(
+        header_error_text(buf):find("(rows ", 1, true) == nil,
+        "fixing the duplicate path should clear header rows"
+    )
+end
+
+local function test_plan_error_highlights_parse_error()
+    local dir = reset_dir "plan-error-highlight-parse"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    local row = row_with(buf, "A.txt")
+    check(row ~= nil, "parse error test needs a row")
+    if not row then
+        return
+    end
+    set_row(buf, row, "/0 A.txt")
+
+    render.add_virtual_text(buf, dir)
+    local st = state.get(buf)
+    check(
+        st.plan_error and st.plan_error:find("line " .. (row + 1), 1, true) ~= nil,
+        "parse error should name the offending line: " .. tostring(st.plan_error)
+    )
+    eq(#(st.plan_error_rows or {}), 1, "parse error should report one row")
+    eq(st.plan_error_rows[1], row, "parse error should use a zero-based buffer row")
+    check(
+        header_error_text(buf):find("(rows " .. (row + 1) .. ")", 1, true) ~= nil,
+        "header should list the parse-error row"
+    )
+    check(row_set(plan_error_highlight_rows(buf))[row], "parse-error row should be highlighted")
+end
+
 local tests = {
     test_copy_then_swap_rename,
     test_copy_with_pending_rename,
     test_move_source_rename_rejected,
+    test_plan_error_highlights_duplicate_path,
+    test_plan_error_highlights_parse_error,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_marker_cancels_pending,
