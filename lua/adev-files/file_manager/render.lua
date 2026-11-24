@@ -316,7 +316,16 @@ local function add_virtual_text(buf, root)
                 local label = op.type == "move" and " [moved from " or " [copied from "
                 local label_hl = op.type == "move" and "adevFilesPendingMove"
                     or "adevFilesPendingCopy"
-                table.insert(suffix, { label .. src_rel .. "]", label_hl })
+                local win = vim.fn.bufwinid(buf)
+                local max_width = 40
+                if win and win ~= -1 then
+                    max_width = math.max(20, vim.api.nvim_win_get_width(win) - 50)
+                end
+                local display_src = src_rel
+                if #display_src > max_width then
+                    display_src = "..." .. display_src:sub(-(max_width - 3))
+                end
+                table.insert(suffix, { label .. display_src .. "]", label_hl })
             end
         end
 
