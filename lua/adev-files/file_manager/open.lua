@@ -92,7 +92,8 @@ function M.open(root, opts)
         pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_buf", previous_buf)
     end
 
-    -- Try to position cursor on the file that was active before opening
+    -- Try to position cursor on the file that was active before opening,
+    -- or on the file under the cursor in the previous window.
     local target_row = 2
     local ok_prev, prev_buf = pcall(vim.api.nvim_win_get_buf, prev_win)
     if ok_prev and prev_buf and vim.api.nvim_buf_is_valid(prev_buf) then
@@ -102,10 +103,30 @@ function M.open(root, opts)
             if fname ~= "" then
                 local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
                 for i, line in ipairs(buf_lines) do
-                    local stripped = line:gsub("/$", "")
+                    local stripped = line:gsub("/$", ""):gsub("^/%d+ ", "")
                     if stripped == fname then
                         target_row = i
                         break
+                    end
+                end
+            end
+        end
+    end
+    -- If no previous buffer match, try to find the file under the cursor
+    if target_row == 2 then
+        local ok, cur_win = pcall(vim.api.nvim_get_current_win)
+        if ok and cur_win then
+            local ok2, cur_line = pcall(vim.api.nvim_win_get_cur_line, cur_win)
+            if ok2 and cur_line then
+                local cur_fname = vim.fn.fnamemodify(cur_line, ":t")
+                if cur_fname ~= "" then
+                    local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+                    for i, line in ipairs(buf_lines) do
+                        local entry_name = line:gsub("/$", ""):gsub("^/%d+ ", "")
+                        if entry_name == cur_fname then
+                            target_row = i
+                            break
+                        end
                     end
                 end
             end
