@@ -116,6 +116,17 @@ local function header_error_text(buf)
     return table.concat(chunks, "")
 end
 
+local function buffer_virt_text(buf)
+    local marks = vim.api.nvim_buf_get_extmarks(buf, state.display_ns(), 0, -1, { details = true })
+    local chunks = {}
+    for _, mark in ipairs(marks) do
+        for _, chunk in ipairs(mark[4].virt_text or {}) do
+            table.insert(chunks, chunk[1])
+        end
+    end
+    return table.concat(chunks, "")
+end
+
 local function plan_error_highlight_rows(buf)
     local marks = vim.api.nvim_buf_get_extmarks(buf, state.display_ns(), 0, -1, { details = true })
     local rows = {}
@@ -161,6 +172,7 @@ local function test_copy_then_swap_rename()
 
     local pasted = row_with(buf, "A_1.txt")
     check(pasted ~= nil, "copy+paste should create A_1.txt row")
+    eq(clipboard.get(), nil, "paste should consume the clipboard")
     set_row(buf, row_with(buf, "A.txt"), "A_old.txt")
     set_row(buf, pasted, "A.txt")
 
@@ -179,13 +191,43 @@ local function test_copy_then_swap_rename()
     check(ok, "copy+swap apply failed: " .. tostring(apply_err))
     eq(read_file(dir .. "/A_old.txt"), "alpha", "renamed original content")
     eq(read_file(dir .. "/A.txt"), "alpha", "same-path copy content")
+end
 
-    clipboard.apply_path_changes(ops)
-    local clip = clipboard.get()
-    check(clip and clip.items and clip.items[1], "clipboard should survive apply")
-    if clip and clip.items[1] then
-        eq(clip.items[1].src, dir .. "/A_old.txt", "clipboard source should follow rename")
-    end
+local function test_paste_consumes_clipboard()
+    local dir = reset_dir "paste-clears-clipboard"
+    write_file(dir .. "/A.txt", "alpha")
+    write_file(dir .. "/B.txt", "beta")
+    vim.fn.mkdir(dir .. "/dest", "p")
+    local buf = new_manager(dir)
+
+    cursor_row(buf, "A.txt")
+    clipboard_events.set_clipboard(buf, "copy")
+    check(buffer_virt_text(buf):find("[copied]", 1, true) ~= nil, "copy marker before paste")
+    clipboard_events.paste(buf, "")
+    eq(clipboard.get(), nil, "copy+paste should clear the clipboard")
+    check(buffer_virt_text(buf):find("[copied]", 1, true) == nil, "copy marker after paste")
+    check(
+        buffer_virt_text(buf):find("[copied from", 1, true) ~= nil,
+        "pasted row should keep its pending copy marker"
+    )
+
+    cursor_row(buf, "B.txt")
+    clipboard_events.set_clipboard(buf, "move")
+    clipboard_events.paste(buf, "dest")
+    eq(clipboard.get(), nil, "cut+paste should clear the clipboard")
+end
+
+local function test_failed_paste_keeps_clipboard()
+    local dir = reset_dir "paste-failure-clipboard"
+    vim.fn.mkdir(dir .. "/sub", "p")
+    write_file(dir .. "/sub/file.txt", "alpha")
+    local buf = new_manager(dir)
+
+    cursor_row(buf, "sub/")
+    clipboard_events.set_clipboard(buf, "copy")
+    clipboard_events.paste(buf, "sub")
+    check(clipboard.get() ~= nil, "a rejected paste must not clear the clipboard")
+    clipboard.clear()
 end
 
 local function test_copy_with_pending_rename()
@@ -992,6 +1034,8 @@ end
 
 local tests = {
     test_copy_then_swap_rename,
+    test_paste_consumes_clipboard,
+    test_failed_paste_keeps_clipboard,
     test_copy_with_pending_rename,
     test_move_source_rename_rejected,
     test_plan_error_highlights_duplicate_path,

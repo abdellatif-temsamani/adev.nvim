@@ -385,6 +385,9 @@ In-buffer mappings:
 Permissions accept octal (755) or symbolic (rwxr-xr-x) input and apply
 immediately, without :write.
 
+Paste consumes the clipboard; copy or cut again to paste the same entries
+elsewhere. A rejected paste leaves the clipboard intact.
+
 Help and pending changes popups: j/k/<C-d>/<C-u> scroll, gg/G jump, q/<Esc> close.
 Confirmation popups: y/<CR> confirms; n/q/<Esc> cancels.
 Permissions guide: q closes the guide when focused.

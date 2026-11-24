@@ -10,7 +10,7 @@ set `replace_netrw = false` to opt out.
 - **Floating file manager** — open via `<leader>no`
 - **Pending operations** — staged changes shown with virtual labels (`[new]`, `[renamed]`, `[deleted]`, `[copied from ...]`, `[moved from ...]`)
 - **Multi-selection** — visual mode selection or TAB marks for batch operations
-- **Clipboard** — copy/cut/paste files in-memory with visual labels
+- **Clipboard** — copy/cut/paste files in-memory with visual labels; pasting consumes the clipboard
 - **Git integration** — per-file git status indicators with color-coded suffixes; directories show aggregated status (`[M+]` when only descendants changed), and `[C]` is included in header counts. Use `<leader>nf` for full refresh or `<leader>ng` for git-only refresh; status also refreshes on focus/enter when the buffer has no staged edits.
 - **Replace netrw caveat** — runtime `replace_netrw=false` teardown removes adev-files directory autocmds, but restoring netrw in the same session requires restarting Neovim.
 - **Toggle hidden files**
@@ -82,7 +82,8 @@ Edits are staged in the buffer and validated before writing:
 - Renaming a copied entry, or copying an entry with a pending rename, is supported. A same-path copy is allowed when a rename or move relocates the source in the same save, so copies and renames can swap names safely.
 - A pending move's source cannot be renamed or deleted. Rename or delete the destination row, or cancel the move first.
 - Adding `#del` to a pasted row, or deleting that row, cancels the paste. Adding `#del` to a real existing entry stages that entry for deletion (for example `/12 notes.txt  #del` shows as a pending delete/change until saved).
-- After a successful save, clipboard entries follow renamed or moved sources and are removed when their source is deleted.
+- A successful paste consumes the clipboard; copy or cut again to paste the same entries elsewhere. A rejected paste leaves the clipboard intact.
+- After a successful save, clipboard entries that were not pasted follow renamed or moved sources and are removed when their source is deleted.
 - Structural conflicts such as overlapping edits, nested destinations, changing a file into a directory, or pasting a directory into itself appear in the header and block writing.
 
 Paste appends `_1`, `_2`, and so on when a name is already occupied. Names marked for deletion still count as occupied until the save completes. Renaming a newly created directory does not rewrite child rows entered under its old name; update those rows too before saving.
