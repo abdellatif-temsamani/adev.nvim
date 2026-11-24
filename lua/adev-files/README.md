@@ -11,7 +11,7 @@ set `replace_netrw = false` to opt out.
 - **Pending operations** — staged changes shown with virtual labels (`|copy|`, `|move|`, `|delete|`, `|new|`, `|renamed|`)
 - **Multi-selection** — visual mode selection or TAB marks for batch operations
 - **Clipboard** — copy/cut/paste files in-memory with visual labels
-- **Git integration** — per-file git status indicators with color-coded suffixes
+- **Git integration** — per-file git status indicators with color-coded suffixes; directories show aggregated status (`[M+]` when only descendants changed), and `[C]` is included in header counts. Use `<leader>nf` for full refresh or `<leader>ng` for git-only refresh; status also refreshes on focus/enter when the buffer has no staged edits.
 - **Toggle hidden files**
 - **In-buffer help** — press `?` in an adev-files buffer
 - **File creation/rename/deletion** — via `<leader>na`, `<leader>nr`, `<leader>nd`
@@ -45,6 +45,7 @@ set `replace_netrw = false` to opt out.
 | `q` | Close floating file manager |
 | `<leader>nh` | Toggle hidden files |
 | `<leader>nf` | Refresh directory listing |
+| `<leader>ng` | Refresh git status |
 | `<leader>ne` | Jump to next plan error |
 | `<Tab>` | Toggle mark on current line |
 | `<leader>nm` | Clear all marks |

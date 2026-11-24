@@ -40,7 +40,7 @@ function M.refresh_git_status(buf)
     local root = st.root
     st.git_generation = st.git_generation + 1
     local generation = st.git_generation
-    git.fetch_status(root, function(status, files)
+    git.fetch_status(root, function(status, files, meta)
         if not vim.api.nvim_buf_is_valid(buf) then
             return
         end
@@ -48,7 +48,19 @@ function M.refresh_git_status(buf)
         if current ~= st or current.root ~= root or current.git_generation ~= generation then
             return
         end
-        state.set_git_status(buf, status, files)
+        local prev_available = current.git_available
+        local prev_reason = current.git_reason
+        state.set_git_status(buf, status, files, meta)
+        if meta and meta.available == false then
+            local reason = meta.reason or "git status unavailable"
+            if prev_available ~= false or prev_reason ~= reason then
+                utils.notify_once(
+                    "Git status unavailable: " .. reason,
+                    vim.log.levels.WARN,
+                    "adev-files"
+                )
+            end
+        end
         render.add_virtual_text(buf, root)
     end)
 end

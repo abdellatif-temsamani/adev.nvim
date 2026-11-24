@@ -105,6 +105,7 @@ end
 ---@field pending integer
 ---@field show_hidden boolean
 ---@field git_counts table<string, integer>
+---@field git_available boolean|nil
 
 ---@param buf integer
 ---@param entries { row: integer, entry: AdevFilesEntry }[]
@@ -134,6 +135,7 @@ function M.summarize(buf, entries, ops)
         pending = #pending,
         show_hidden = st and st.show_hidden or false,
         git_counts = git_counts,
+        git_available = st and st.git_available,
     }
 end
 

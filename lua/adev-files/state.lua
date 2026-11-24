@@ -17,9 +17,11 @@ local model = require "adev-files.core.model"
 ---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
 ---@field show_hidden boolean
 ---@field selection_marks table<integer, true>
----@field git_status table<string, string>|nil  -- rel_path -> status char
----@field git_files table<string, string>|nil
+---@field git_status table<string, string>|nil  -- rel_path -> status char (includes directory aggregates)
+---@field git_files table<string, string>|nil -- direct file statuses only
 ---@field git_generation integer
+---@field git_available boolean|nil
+---@field git_reason? string
 ---@field change_ops AdevFilesOp[]|nil
 ---@field row_changes table<integer, AdevFilesRowChange>
 ---@field plan_error string|nil
@@ -62,6 +64,8 @@ function M.init(buf, root)
             git_status = nil,
             git_files = nil,
             git_generation = 0,
+            git_available = nil,
+            git_reason = nil,
             change_ops = nil,
             row_changes = {},
             plan_error_rows = {},
@@ -79,6 +83,8 @@ function M.init(buf, root)
     states[buf].git_status = nil
     states[buf].git_files = nil
     states[buf].git_generation = (states[buf].git_generation or 0) + 1
+    states[buf].git_available = nil
+    states[buf].git_reason = nil
     states[buf].change_ops = nil
     states[buf].row_changes = {}
     states[buf].plan_error = nil
@@ -252,13 +258,19 @@ function M.get_git_status(buf)
 end
 
 ---@param buf integer
----@param status table<string, string>
-function M.set_git_status(buf, status, files)
+---@param status table<string, string>|nil
+---@param files? table<string, string>|nil
+---@param meta? AdevFilesGitMeta
+function M.set_git_status(buf, status, files, meta)
     if not states[buf] then
         return
     end
     states[buf].git_status = status
     states[buf].git_files = files
+    if meta then
+        states[buf].git_available = meta.available
+        states[buf].git_reason = meta.reason
+    end
 end
 
 ---@param buf integer

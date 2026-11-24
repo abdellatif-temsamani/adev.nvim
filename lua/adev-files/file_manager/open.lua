@@ -146,11 +146,18 @@ function M.open(root, opts)
         end)
     end
 
-    git.fetch_status(root, function(status)
+    git.fetch_status(root, function(status, files, meta)
         if not vim.api.nvim_buf_is_valid(buf) then
             return
         end
-        state.set_git_status(buf, status)
+        state.set_git_status(buf, status, files, meta)
+        if meta and meta.available == false then
+            utils.notify_once(
+                "Git status unavailable: " .. (meta.reason or "git status unavailable"),
+                vim.log.levels.WARN,
+                "adev-files"
+            )
+        end
         render.add_virtual_text(buf, root)
     end)
 

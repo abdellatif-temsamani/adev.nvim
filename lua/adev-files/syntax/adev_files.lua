@@ -52,7 +52,7 @@ vim.api.nvim_set_hl(0, "adevFilesGitAdded", { link = "DiffAdd", default = true }
 vim.api.nvim_set_hl(0, "adevFilesGitDeleted", { link = "DiffDelete", default = true })
 vim.api.nvim_set_hl(0, "adevFilesGitRenamed", { link = "DiffText", default = true })
 vim.api.nvim_set_hl(0, "adevFilesGitCopied", { link = "Special", default = true })
-vim.api.nvim_set_hl(0, "adevFilesGitUntracked", { link = "Comment", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGitUntracked", { link = "DiagnosticHint", default = true })
 vim.api.nvim_set_hl(0, "adevFilesGitConflict", { link = "DiagnosticError", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPlanError", { link = "DiagnosticError", default = true })
 
