@@ -176,25 +176,39 @@ function M.chmod_entry(buf)
             return
         end
         local ok_count = 0
+        local failures = {}
         for _, item in ipairs(items) do
             local ok, err = uv.fs_chmod(item.src, mode)
             if ok then
                 ok_count = ok_count + 1
             else
+                local name = path.relpath(st.root, item.src)
+                table.insert(failures, name)
                 vim.notify(
-                    "Chmod failed: " .. path.relpath(st.root, item.src) .. " - " .. tostring(err),
+                    "Chmod failed: " .. name .. " - " .. tostring(err),
                     vim.log.levels.ERROR,
                     "adev-files"
                 )
             end
         end
-        if ok_count > 0 then
+        if ok_count > 0 or #failures > 0 then
+            local msg = string.format(
+                "Chmod %s: %d applied, %d failed",
+                format_mode(mode),
+                ok_count,
+                #failures
+            )
+            if #failures > 0 then
+                msg = msg .. ": " .. table.concat(failures, ", ")
+            end
             vim.notify(
-                "Chmod: " .. format_mode(mode) .. " (" .. ok_count .. " items)",
-                vim.log.levels.INFO,
+                msg,
+                #failures > 0 and vim.log.levels.WARN or vim.log.levels.INFO,
                 "adev-files"
             )
-            render.add_virtual_text(buf, st.root)
+            if ok_count > 0 then
+                render.add_virtual_text(buf, st.root)
+            end
         end
     end)
 end

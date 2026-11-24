@@ -45,6 +45,7 @@ set `replace_netrw = false` to opt out.
 | `q` | Close floating file manager |
 | `<leader>nh` | Toggle hidden files |
 | `<leader>nf` | Refresh directory listing |
+| `<leader>ne` | Jump to next plan error |
 | `<Tab>` | Toggle mark on current line |
 | `<leader>nm` | Clear all marks |
 | `v` / `V` / `<C-v>` | Character / line / block selection |
