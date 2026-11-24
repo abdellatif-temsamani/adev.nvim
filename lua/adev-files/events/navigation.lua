@@ -193,7 +193,13 @@ function M.open_or_enter(buf)
         elseif prev_win and vim.api.nvim_win_is_valid(prev_win) then
             vim.api.nvim_set_current_win(prev_win)
         end
-        vim.cmd(cmd .. " " .. vim.fn.fnameescape(path))
+        -- nvim_cmd passes the path as a single argument, so names containing
+        -- newlines or quotes survive (Ex command strings cannot represent them).
+        local opened, open_err = pcall(vim.api.nvim_cmd, { cmd = cmd, args = { path } }, {})
+        if not opened then
+            utils.err_notify("Cannot open " .. path .. ": " .. tostring(open_err), "adev-files")
+            return
+        end
         if manager_mode ~= "current" and manager_win and vim.api.nvim_win_is_valid(manager_win) then
             vim.api.nvim_win_close(manager_win, true)
         end

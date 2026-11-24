@@ -64,13 +64,25 @@ local function format_mode(mode)
     local perm = mode % 512
     local result = {}
     local bits = { 256, 128, 64, 32, 16, 8, 4, 2, 1 }
+    local chars = { "r", "w", "x", "r", "w", "x", "r", "w", "x" }
+    -- Setuid, setgid and sticky bits live above the 9 permission bits.
+    local setuid = mode % 4096 >= 2048
+    local setgid = mode % 4096 >= 1024
+    local sticky = mode % 4096 >= 512
     for i = 1, 9 do
+        local ch = "-"
         if perm >= bits[i] then
             perm = perm - bits[i]
-            result[i] = ({ "r", "w", "x", "r", "w", "x", "r", "w", "x" })[i]
-        else
-            result[i] = "-"
+            ch = chars[i]
         end
+        if i == 3 and setuid then
+            ch = ch == "x" and "s" or "S"
+        elseif i == 6 and setgid then
+            ch = ch == "x" and "s" or "S"
+        elseif i == 9 and sticky then
+            ch = ch == "x" and "t" or "T"
+        end
+        result[i] = ch
     end
     return table.concat(result)
 end
@@ -275,7 +287,7 @@ local function add_virtual_text(buf, root)
                     local ch = perm_str:sub(i, i)
                     local perm_hl = ch == "r" and "adevFilesPermRead"
                         or ch == "w" and "adevFilesPermWrite"
-                        or ch == "x" and "adevFilesPermExec"
+                        or (ch == "x" or ch == "s" or ch == "S" or ch == "t" or ch == "T") and "adevFilesPermExec"
                         or "adevFilesPermDash"
                     table.insert(virt_text, { ch, perm_hl })
                 end
@@ -322,8 +334,11 @@ local function add_virtual_text(buf, root)
                     max_width = math.max(20, vim.api.nvim_win_get_width(win) - 50)
                 end
                 local display_src = src_rel
-                if #display_src > max_width then
-                    display_src = "..." .. display_src:sub(-(max_width - 3))
+                if vim.fn.strdisplaywidth(display_src) > max_width then
+                    local keep = math.max(1, max_width - 3)
+                    local count = vim.fn.strchars(display_src)
+                    display_src = "..."
+                        .. vim.fn.strcharpart(display_src, math.max(0, count - keep), keep)
                 end
                 table.insert(suffix, { label .. display_src .. "]", label_hl })
             end
