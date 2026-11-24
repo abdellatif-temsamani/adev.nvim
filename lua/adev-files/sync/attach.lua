@@ -6,6 +6,7 @@ local index = require "adev-files.sync.index"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
 local state = require "adev-files.state"
+local view = require "adev-files.sync.view"
 
 local parse = require "adev-files.parse"
 
@@ -62,6 +63,32 @@ function M.attach(buf, root)
         callback = function(args)
             clipboard.clear()
             state.clear(args.buf)
+        end,
+    })
+
+    vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
+        group = group,
+        buffer = buf,
+        callback = function(args)
+            local b = args.buf
+            local s = state.get(b)
+            if not s or s.applying or s.confirming then
+                return
+            end
+            vim.schedule(function()
+                if not vim.api.nvim_buf_is_valid(b) then
+                    return
+                end
+                local current = state.get(b)
+                if not current or current.applying or current.confirming then
+                    return
+                end
+                if view.has_changes(b) then
+                    view.refresh_git_status(b)
+                    return
+                end
+                view.refresh(b, { silent = true })
+            end)
         end,
     })
 

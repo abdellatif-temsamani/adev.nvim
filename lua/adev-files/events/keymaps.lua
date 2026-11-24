@@ -69,6 +69,10 @@ function M.attach(buf)
         sync_view.toggle_hidden(buf)
     end, { desc = "Toggle hidden files" })
 
+    set_keymap("n", "<leader>nf", function()
+        sync_view.refresh(buf, { notify = true })
+    end, { desc = "Refresh directory" })
+
     set_keymap("n", "<tab>", function()
         selection.toggle_mark(buf)
     end, { desc = "Toggle mark on current line" })
