@@ -10,6 +10,16 @@ local state = require "adev-files.state"
 local M = {}
 
 ---@param buf integer
+---@return integer|nil
+local function cursor_row(buf)
+    local win = vim.fn.bufwinid(buf)
+    if win == -1 then
+        return nil
+    end
+    return vim.api.nvim_win_get_cursor(win)[1]
+end
+
+---@param buf integer
 ---@return integer[]
 local function selected_rows(buf)
     local mode = vim.fn.mode()
@@ -17,7 +27,7 @@ local function selected_rows(buf)
     if mode == "v" or mode == "V" or mode == "\22" then
         -- The active selection anchor is independent of the previous '< / '>.
         local first = vim.fn.getpos("v")[2]
-        local last = vim.api.nvim_win_get_cursor(0)[1]
+        local last = cursor_row(buf) or first
         if first > last then
             first, last = last, first
         end
@@ -30,7 +40,10 @@ local function selected_rows(buf)
             table.insert(rows, row)
         end
         if #rows == 0 then
-            table.insert(rows, vim.api.nvim_win_get_cursor(0)[1] - 1)
+            local current = cursor_row(buf)
+            if current then
+                table.insert(rows, current - 1)
+            end
         end
     end
     table.sort(rows)
@@ -110,7 +123,15 @@ function M.toggle_mark(buf)
     if not st or st.applying or st.confirming then
         return
     end
-    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local current = cursor_row(buf)
+    if not current then
+        return
+    end
+    local row = current - 1
+    if row < 1 then
+        utils.notify("Cannot mark the header row", vim.log.levels.INFO, "adev-files")
+        return
+    end
     local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
     local entry = parse.parse_line(line)
     if not entry or not entry.id then

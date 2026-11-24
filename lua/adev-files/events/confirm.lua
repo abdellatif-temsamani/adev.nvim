@@ -7,12 +7,13 @@ local M = {}
 
 ---@param buf integer
 ---@param destination string|fun(ok:boolean):nil
----@param cb? fun(ok: boolean): nil
+---@param cb fun(ok: boolean): nil
 function M.confirm_discard_if_modified(buf, destination, cb)
     if type(destination) == "function" then
         cb = destination
         destination = nil
     end
+    cb = cb or function() end
 
     local st = state.get(buf)
     if not st or st.applying or st.confirming then
@@ -35,6 +36,10 @@ function M.confirm_discard_if_modified(buf, destination, cb)
         footer = "y/<CR>: discard    n/q/<Esc>: keep editing",
     }, function(confirmed)
         if not vim.api.nvim_buf_is_valid(buf) or state.get(buf) ~= st then
+            st.confirming = false
+            if vim.api.nvim_buf_is_valid(buf) then
+                vim.bo[buf].modifiable = modifiable
+            end
             cb(false)
             return
         end
