@@ -8,12 +8,16 @@ local script = source:sub(1, 1) == "@" and source:sub(2) or source
 local root = vim.fn.fnamemodify(script, ":p:h:h:h")
 vim.opt.rtp:append(root)
 
+local attach = require "adev-files.sync.attach"
 local chmod = require "adev-files.events.chmod"
 local clipboard = require "adev-files.clipboard"
 local clipboard_events = require "adev-files.events.clipboard"
+local confirm_events = require "adev-files.events.confirm"
+local confirmation = require "adev-files.utils.confirmation"
 local delete_events = require "adev-files.events.delete"
 local executor = require "adev-files.core.executor"
 local git = require "adev-files.git"
+local listing = require "adev-files.file_manager.listing"
 local open = require "adev-files.file_manager.open"
 local path_validation = require "adev-files.validation"
 local plan = require "adev-files.sync.plan"
@@ -21,6 +25,7 @@ local render = require "adev-files.file_manager.render"
 local root = require "adev-files.root"
 local selection = require "adev-files.events.selection"
 local state = require "adev-files.state"
+local sync_view = require "adev-files.sync.view"
 local utils = require "adev-common.utils"
 local validation = require "adev-files.core.op_validation"
 local view = require "adev-files.core.view"
@@ -897,6 +902,94 @@ local function test_header_row_cannot_be_marked()
     eq(next(state.get_selection_marks(buf)), nil, "the virtual header row must not be markable")
 end
 
+local function test_reattach_replaces_on_lines_callback()
+    local dir = reset_dir "attach-idempotent"
+    write_file(dir .. "/A.txt", "alpha")
+    local real_attach = vim.api.nvim_buf_attach
+    local real_detach = vim.api.nvim_buf_detach
+    local active = 0
+    vim.api.nvim_buf_attach = function(buf, send_buffer, opts)
+        active = active + 1
+        local ok = real_attach(buf, send_buffer, opts)
+        if not ok then
+            active = active - 1
+        end
+        return ok
+    end
+    vim.api.nvim_buf_detach = function(buf)
+        local ok = real_detach(buf)
+        if ok then
+            active = active - 1
+        end
+        return ok
+    end
+
+    local ok, err = pcall(function()
+        local buf = new_manager(dir)
+        attach.attach(buf, dir)
+        eq(active, 1, "reattaching a manager must replace the old buffer callback")
+    end)
+    vim.api.nvim_buf_attach = real_attach
+    vim.api.nvim_buf_detach = real_detach
+    if not ok then
+        fail("reattach regression crashed: " .. tostring(err))
+    end
+end
+
+local function test_confirmation_restores_modifiable_when_state_replaced()
+    local dir = reset_dir "confirm-state-replaced"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    set_row(buf, row_with(buf, "A.txt"), "Changed.txt")
+    local original_open = confirmation.open
+    confirmation.open = function(_, _, cb)
+        state.init(buf, dir)
+        cb(true)
+    end
+    local called = nil
+    confirm_events.confirm_discard_if_modified(buf, "/tmp/destination", function(ok)
+        called = ok
+    end)
+    confirmation.open = original_open
+    eq(vim.bo[buf].modifiable, true, "stale confirmation must restore modifiable")
+    eq(called, false, "stale confirmation must not discard against a replaced state")
+end
+
+local function test_failed_refresh_keeps_buffer_read_only()
+    local dir = reset_dir "refresh-failure"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    local st = state.get(buf)
+    st.needs_refresh = true
+    st.refresh_modifiable = false
+    local original_build = listing.build_lines
+    listing.build_lines = function()
+        return nil, "simulated listing failure"
+    end
+    local ok = sync_view.refresh(buf, { force = true })
+    listing.build_lines = original_build
+    eq(ok, false, "refresh should report the listing failure")
+    eq(vim.bo[buf].modifiable, false, "failed refresh must keep the buffer read-only")
+    eq(st.needs_refresh, true, "failed refresh must keep needs_refresh")
+    eq(st.refresh_modifiable, nil, "failed refresh must not keep stale refresh intent")
+end
+
+local function test_scandir_next_error_is_surfaced()
+    local dir = reset_dir "scandir-error"
+    write_file(dir .. "/A.txt", "alpha")
+    local real_next = vim.uv.fs_scandir_next
+    vim.uv.fs_scandir_next = function()
+        return nil, nil, "simulated scandir error"
+    end
+    local lines, err = listing.build_lines(dir)
+    vim.uv.fs_scandir_next = real_next
+    eq(lines, nil, "scandir_next error must fail the listing")
+    check(
+        err and err:find("simulated scandir error", 1, true) ~= nil,
+        "scandir_next error must be reported: " .. tostring(err)
+    )
+end
+
 local tests = {
     test_copy_then_swap_rename,
     test_copy_with_pending_rename,
@@ -914,6 +1007,10 @@ local tests = {
     test_chmod_accepts_four_digit_mode,
     test_clipboard_chained_relocations,
     test_header_row_cannot_be_marked,
+    test_reattach_replaces_on_lines_callback,
+    test_confirmation_restores_modifiable_when_state_replaced,
+    test_failed_refresh_keeps_buffer_read_only,
+    test_scandir_next_error_is_surfaced,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_marker_cancels_pending,
