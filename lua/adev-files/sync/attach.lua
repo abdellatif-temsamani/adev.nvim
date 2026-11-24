@@ -13,7 +13,7 @@ local parse = require "adev-files.parse"
 local M = {}
 
 ---@type table<integer, boolean>
-local detachments = {}
+local attached = {}
 ---@type table<integer, table<integer, { conceallevel: integer, concealcursor: string }>>
 local window_options = {}
 
@@ -37,11 +37,6 @@ end
 ---@param buf integer
 ---@param root string
 function M.attach(buf, root)
-    -- Re-attaching must not stack a second on_lines callback on the buffer.
-    if detachments[buf] then
-        pcall(vim.api.nvim_buf_detach, buf)
-        detachments[buf] = nil
-    end
     for win in pairs(window_options) do
         if vim.api.nvim_win_is_valid(win) and vim.fn.winbufnr(win) == buf then
             restore_window_options(win)
@@ -55,6 +50,13 @@ function M.attach(buf, root)
     end
     index.reindex(buf)
     render.add_virtual_text(buf, root)
+
+    -- Neovim has no public buffer-detach API, so guard registration instead:
+    -- re-attaching refreshes state but must not stack another on_lines handler.
+    if attached[buf] then
+        return
+    end
+    attached[buf] = true
 
     local group = vim.api.nvim_create_augroup("adev_files_" .. buf, { clear = true })
 
@@ -97,10 +99,7 @@ function M.attach(buf, root)
         group = group,
         buffer = buf,
         callback = function(args)
-            if detachments[args.buf] then
-                pcall(vim.api.nvim_buf_detach, args.buf)
-                detachments[args.buf] = nil
-            end
+            attached[args.buf] = nil
             for win in pairs(window_options) do
                 restore_window_options(win)
             end
@@ -169,7 +168,7 @@ function M.attach(buf, root)
         local _, id = parse.strip_id(line)
         ids_by_row[i - 1] = id
     end
-    local attached = vim.api.nvim_buf_attach(buf, false, {
+    local attached_ok = vim.api.nvim_buf_attach(buf, false, {
         on_lines = function(_, b, _, first, last, new_last)
             local current = state.get(b)
             if not current then
@@ -216,11 +215,11 @@ function M.attach(buf, root)
             schedule_update()
         end,
         on_detach = function(_, b)
-            detachments[b] = nil
+            attached[b] = nil
         end,
     })
-    if attached then
-        detachments[buf] = true
+    if not attached_ok then
+        attached[buf] = nil
     end
     vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
         group = group,
