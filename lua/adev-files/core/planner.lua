@@ -114,6 +114,13 @@ function M.plan(model, entries, pending_ops)
                     rows_from_items(items)
             end
             local item = items and items[1] or nil
+            if type(cloned.src) ~= "string" or cloned.src == "" then
+                return nil,
+                    "staged " .. tostring(cloned.type) .. " operation is missing src",
+                    nil,
+                    nil,
+                    { cloned.row }
+            end
             cloned.src = path.abs(cloned.src)
 
             -- A move owns its source row. Renaming that row would be silently
@@ -168,13 +175,21 @@ function M.plan(model, entries, pending_ops)
                 -- Retain the intent so undoing removal of a destination restores it.
                 table.insert(updated_pending, cloned)
             elseif not cloned.dst_id and cloned.dst then
-                -- Allow callers to stage operations without a buffer entry.
+                -- A staged operation without a destination entry is a one-shot
+                -- filesystem intent. Emit it once; retaining it would recreate
+                -- the same operation on every later plan.
+                if type(cloned.dst) ~= "string" or cloned.dst == "" then
+                    return nil,
+                        "staged " .. tostring(cloned.type) .. " operation is missing dst",
+                        nil,
+                        nil,
+                        { cloned.row }
+                end
                 cloned.dst = path.abs(cloned.dst)
                 if cloned.type == "move" then
                     move_sources[cloned.src] = true
                 end
                 add(vim.deepcopy(cloned))
-                table.insert(updated_pending, cloned)
             elseif item and item.deleted then
                 -- Deleting a pasted destination cancels the paste. It must not
                 -- remain as an invisible pending operation.
@@ -184,6 +199,9 @@ function M.plan(model, entries, pending_ops)
                 table.insert(updated_pending, cloned)
             end
         elseif cloned.type == "delete" then
+            if type(cloned.path) ~= "string" or cloned.path == "" then
+                return nil, "staged delete operation is missing path", nil, nil, { cloned.row }
+            end
             cloned.path = path.abs(cloned.path)
             delete_paths[cloned.path] = true
             table.insert(updated_pending, cloned)

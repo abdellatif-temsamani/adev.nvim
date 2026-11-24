@@ -64,7 +64,15 @@ function M.apply_ops_with_confirm(buf, ops, opts)
 
     local fs_n = count_fs_ops(ops)
     if fs_n == 0 then
-        view.refresh(buf)
+        if not view.refresh(buf) then
+            vim.bo[buf].modifiable = false
+            vim.bo[buf].modified = false
+            utils.notify(
+                "No changes saved. Refresh the directory when it becomes available",
+                vim.log.levels.WARN,
+                "adev-files"
+            )
+        end
         return
     end
 
@@ -87,11 +95,15 @@ function M.apply_ops_with_confirm(buf, ops, opts)
     st.confirming = true
     vim.bo[buf].modifiable = false
     confirmation.open(lines, { title = opts.title or "adev-files" }, function(confirmed)
-        if not vim.api.nvim_buf_is_valid(buf) or state.get(buf) ~= st then
+        if not vim.api.nvim_buf_is_valid(buf) then
+            return
+        end
+        -- Restore editability even when another attachment replaced the state.
+        vim.bo[buf].modifiable = modifiable
+        if state.get(buf) ~= st then
             return
         end
         st.confirming = false
-        vim.bo[buf].modifiable = modifiable
         if not confirmed then
             if opts.on_cancel then
                 opts.on_cancel()

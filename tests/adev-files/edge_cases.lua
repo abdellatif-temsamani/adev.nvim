@@ -525,6 +525,48 @@ local function test_duplicate_destination_rejected()
     )
 end
 
+local function test_directory_rename_then_create_inside()
+    local dir = reset_dir "rename-dir-create-inside"
+    vim.fn.mkdir(dir .. "/old", "p")
+    local _, err = validation.validate_structural {
+        { type = "rename", src = dir .. "/old", dst = dir .. "/new", kind = "directory" },
+        { type = "create", path = dir .. "/new/file.txt", kind = "file" },
+    }
+    check(err == nil, "creating inside a renamed directory should be valid: " .. tostring(err))
+end
+
+local function test_malformed_staged_op_rejected_before_abs()
+    local dir = reset_dir "malformed-staged"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    plan.stage_ops(buf, {
+        { type = "copy", dst = dir .. "/B.txt", kind = "file" },
+    })
+    local ops, err = plan.plan_ops(buf)
+    check(ops == nil, "staged copy without src must not reach path.abs")
+    check(err and err:find("missing src", 1, true) ~= nil, "missing src error: " .. tostring(err))
+end
+
+local function test_staged_op_without_dst_id_runs_once()
+    local dir = reset_dir "staged-one-shot"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    plan.stage_ops(buf, {
+        { type = "copy", src = dir .. "/A.txt", dst = dir .. "/B.txt", kind = "file" },
+    })
+
+    local first = plan.plan_ops(buf)
+    check(
+        has_op(first, "copy", dir .. "/A.txt", dir .. "/B.txt"),
+        "one-shot staged copy should be planned once"
+    )
+    local second = plan.plan_ops(buf)
+    check(
+        not has_op(second, "copy", dir .. "/A.txt", dir .. "/B.txt"),
+        "one-shot staged copy must not be regenerated on the next plan"
+    )
+end
+
 local function test_relative_symlink_copy_is_rebased()
     local uv = vim.uv or vim.loop
     local fs = require "adev-files.utils.fs"
@@ -672,6 +714,9 @@ local tests = {
     test_nested_destination_rejected,
     test_relative_symlink_copy_is_rebased,
     test_symlink_to_directory_copies_contents,
+    test_directory_rename_then_create_inside,
+    test_malformed_staged_op_rejected_before_abs,
+    test_staged_op_without_dst_id_runs_once,
 }
 
 for _, test in ipairs(tests) do

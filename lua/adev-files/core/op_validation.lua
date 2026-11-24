@@ -175,12 +175,11 @@ function M.validate_structural(ops)
             for _, other in ipairs(destination_list) do
                 local other_is_parent = is_subpath(other.path, dst)
                 local current_is_parent = is_subpath(dst, other.path)
-                local allowed = (
-                    other_is_parent
-                    and other.type == "create"
-                    and other.kind == "directory"
-                )
-                    or (current_is_parent and op.type == "create" and op.kind == "directory")
+                -- A directory destination may be created directly or be the
+                -- result of renaming another directory. Children planned into
+                -- it are valid in both cases.
+                local allowed = (other_is_parent and other.kind == "directory")
+                    or (current_is_parent and op.kind == "directory")
                 if (other_is_parent or current_is_parent) and not allowed then
                     return nil,
                         string.format(
