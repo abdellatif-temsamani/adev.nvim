@@ -13,7 +13,7 @@ function M.floating_window(opts)
     ---@type snacks.win.Config
     opts = vim.tbl_deep_extend("force", {}, M.floating_defaults, opts or {})
     assert(opts.buf, "floating_window requires opts.buf")
-    vim.keymap.set("", "q", "<cmd>bwipeout<CR>", { buffer = opts.buf })
+    vim.keymap.set("n", "q", "<cmd>bwipeout<CR>", { buffer = opts.buf, silent = true })
 
     -- Resolve border at call time so Adev config is available
     local border = (Adev and Adev.ui and Adev.ui.border) or opts.border or "single"
