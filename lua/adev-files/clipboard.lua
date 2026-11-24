@@ -54,4 +54,73 @@ function M.remove_by_src(abs_path)
     end
 end
 
+---@param base string
+---@param child string
+---@return boolean
+local function is_under(base, child)
+    if base == "/" then
+        return child:sub(1, 1) == "/"
+    end
+    return child == base or child:sub(1, #base + 1) == base .. "/"
+end
+
+--- Keep clipboard entries usable after paths move or disappear.
+---@param ops AdevFilesOp[]
+function M.apply_path_changes(ops)
+    if not clip or not clip.items then
+        return
+    end
+
+    local deleted = {}
+    local relocations = {}
+    for _, op in ipairs(ops or {}) do
+        if op.type == "delete" and op.path then
+            table.insert(deleted, path.abs(op.path))
+        elseif (op.type == "rename" or op.type == "move") and op.src and op.dst then
+            table.insert(relocations, { src = path.abs(op.src), dst = path.abs(op.dst) })
+        end
+    end
+
+    local kept = {}
+    local seen = {}
+    for _, item in ipairs(clip.items) do
+        local src = path.abs(item.src)
+        local removed = false
+        for _, deleted_path in ipairs(deleted) do
+            if is_under(deleted_path, src) then
+                removed = true
+                break
+            end
+        end
+
+        if not removed then
+            local matched = nil
+            for _, relocation in ipairs(relocations) do
+                if
+                    is_under(relocation.src, src)
+                    and (not matched or #relocation.src > #matched.src)
+                then
+                    matched = relocation
+                end
+            end
+            if matched then
+                src = matched.dst .. src:sub(#matched.src + 1)
+            end
+
+            if not seen[src] then
+                seen[src] = true
+                local remapped = vim.deepcopy(item)
+                remapped.src = src
+                table.insert(kept, remapped)
+            end
+        end
+    end
+
+    if #kept == 0 then
+        clip = nil
+    else
+        clip.items = kept
+    end
+end
+
 return M

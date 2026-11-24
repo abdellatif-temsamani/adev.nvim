@@ -288,17 +288,29 @@ local function add_virtual_text(buf, root)
     end
 
     local summary = listing.summarize(buf, entries, ops or {})
+    local header_lines = {
+        close_box {
+            { "│ root  ", "Comment" },
+            { root, "Directory" },
+        },
+        close_box(summary_chunks(summary)),
+    }
+    if plan_error then
+        table.insert(
+            header_lines,
+            close_box {
+                { "│ error  ", "Comment" },
+                { plan_error, "ErrorMsg" },
+            }
+        )
+    end
+    table.insert(header_lines, {
+        { "╰" .. string.rep("─", HEADER_WIDTH - 2) .. "╯", "Comment" },
+    })
     vim.api.nvim_buf_set_extmark(buf, ns, 0, 0, {
         virt_text = title_chunks(),
         virt_text_pos = "overlay",
-        virt_lines = {
-            close_box {
-                { "│ root  ", "Comment" },
-                { root, "Directory" },
-            },
-            close_box(summary_chunks(summary)),
-            { { "╰" .. string.rep("─", HEADER_WIDTH - 2) .. "╯", "Comment" } },
-        },
+        virt_lines = header_lines,
         virt_lines_above = false,
     })
 end

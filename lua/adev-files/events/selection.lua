@@ -1,3 +1,4 @@
+local index = require "adev-files.sync.index"
 local parse = require "adev-files.parse"
 local path = require "adev-files.utils.fs.path"
 local plan = require "adev-files.sync.plan"
@@ -34,13 +35,16 @@ local function selected_rows(buf)
     return rows
 end
 
-local function collect(buf, existing_only)
+local function collect(buf, existing_only, mode)
     local st = state.get(buf)
     if not st then
         return {}, {}, 0
     end
+    -- A whole-line edit can temporarily remove the concealed ID. Recover it
+    -- before resolving originals so copy/cut actions see the correct identity.
+    index.restore_ids(buf)
     local renamed = {}
-    if existing_only then
+    if existing_only and mode ~= "copy" then
         local ops, err = plan.plan_ops(buf)
         if not ops then
             return {}, {}, 0, err
@@ -62,7 +66,7 @@ local function collect(buf, existing_only)
             if entry and not deleted then
                 local original = st.model.original_by_id[entry.id]
                 if existing_only and original and renamed[original.abs_path] then
-                    return {}, {}, 0, "Save or revert the pending rename before copying or cutting"
+                    return {}, {}, 0, "Save or revert the pending rename before cutting this entry"
                 end
                 if existing_only and not original then
                     skipped = skipped + 1
@@ -85,9 +89,10 @@ local function collect(buf, existing_only)
 end
 
 ---@param buf integer
+---@param mode? 'copy'|'move'
 ---@return AdevFilesClipboardItem[], integer, string?
-function M.collect_entries(buf)
-    local items, _, skipped, err = collect(buf, true)
+function M.collect_entries(buf, mode)
+    local items, _, skipped, err = collect(buf, true, mode)
     return items, skipped, err
 end
 
