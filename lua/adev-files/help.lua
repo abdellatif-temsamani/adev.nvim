@@ -64,8 +64,9 @@ local function content()
         entry("<leader>nd", "stage delete (current / marked / visual)"),
         "",
         "  Permissions",
-        entry("<leader>nz", "change permissions (current / marked)"),
-        "    Enter 755 or rwxr-xr-x; applies immediately.",
+        entry("<leader>nz", "change permissions (current / marked / visual)"),
+        "    Enter octal 755 or 4755 (special bits), or rwxr-xr-x.",
+        "    Invalid input is reported without changing files.",
         "",
         "  Global (outside file manager)",
         entry("<leader>no", "open file manager"),
@@ -81,7 +82,8 @@ local function content()
         "  Git",
         "    [M]=modified [A]=added [D]=deleted [R]=renamed [C]=copied",
         "    [?]=untracked [U]=conflict [M+]=aggregated directory status",
-        "    Git n/a in header means git status is unavailable.",
+        "    Git n/a in header means git status is unavailable; the reason is",
+        "    reported once and stale markers are cleared. Editing still works.",
         "",
         "  Help and popups",
         entry("?", "open this help menu"),
@@ -101,8 +103,8 @@ local function content()
 end
 
 function M.open()
-    local buf = vim.api.nvim_create_buf(false, true)
-    if not buf then
+    local ok, buf = pcall(vim.api.nvim_create_buf, false, true)
+    if not ok or not buf then
         return
     end
 
@@ -115,20 +117,24 @@ function M.open()
     local lines = content()
     local width = 64
     for _, line in ipairs(lines) do
-        width = math.max(width, #line + 2)
+        width = math.max(width, vim.fn.strdisplaywidth(line) + 2)
     end
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
 
-    local help_win = window.floating_window {
+    local win_ok, help_win = pcall(window.floating_window, {
         buf = buf,
         title = "adev-files help [j/k: scroll, gg/G: jump, q/Esc: close]",
         width = width,
         height = math.min(#lines + 2, math.max(1, vim.o.lines - 4), 40),
         wo = { wrap = false, cursorline = true },
-    }
+    })
+    if not win_ok or not help_win then
+        pcall(vim.api.nvim_buf_delete, buf, { force = true })
+        return
+    end
 
-    if help_win and vim.api.nvim_win_is_valid(help_win) then
+    if vim.api.nvim_win_is_valid(help_win) then
         vim.api.nvim_win_set_cursor(help_win, { 1, 0 })
     end
 

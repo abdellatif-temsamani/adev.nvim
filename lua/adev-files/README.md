@@ -32,7 +32,7 @@ return {
       replace_netrw = true, -- replace netrw as default directory browser
       opts = {
         open_files = {
-          enabled = false, -- auto-open files on cursor line
+          enabled = false, -- false disables <CR> file opening entirely
           method = "edit", -- edit | split | vsplit | tabedit
         },
       },

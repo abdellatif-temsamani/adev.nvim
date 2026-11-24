@@ -5,6 +5,7 @@ end
 -- Buffer lines contain concealed entry IDs followed by editable filenames.
 -- Header, icons, git markers, and pending labels are rendered via extmarks.
 vim.cmd [[syntax match adevFilesEntryId "^/\d\+ " conceal]]
+vim.api.nvim_set_hl(0, "adevFilesEntryId", { link = "Comment", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingDelete", { link = "adevFilesGitDeleted", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingCopy", { link = "adevFilesGitCopied", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingMove", { link = "adevFilesGitModified", default = true })

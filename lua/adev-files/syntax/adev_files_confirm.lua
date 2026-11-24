@@ -4,9 +4,6 @@ end
 
 vim.cmd "silent! runtime lua/adev-files/syntax/adev_files.lua"
 
-vim.cmd "silent! syntax clear adevFilesOp"
-vim.cmd "silent! syntax clear adevFilesOpValue"
-
 vim.cmd [[syn match adevFilesCreate "^create:" contained]]
 vim.cmd [[syn match adevFilesDelete "^delete:" contained]]
 vim.cmd [[syn match adevFilesRename "^rename:" contained]]
@@ -21,7 +18,6 @@ vim.cmd [[syn match adevFilesDeleteLine "^delete:.*$" contains=adevFilesDelete,a
 vim.cmd [[syn match adevFilesRenameLine "^rename:.*$" contains=adevFilesRename,adevFilesArrow,adevFilesSrcPath,adevFilesDstPath]]
 vim.cmd [[syn match adevFilesCopyLine   "^copy:.*$"   contains=adevFilesCopy,adevFilesArrow,adevFilesSrcPath,adevFilesDstPath]]
 vim.cmd [[syn match adevFilesMoveLine   "^move:.*$"   contains=adevFilesMove,adevFilesArrow,adevFilesSrcPath,adevFilesDstPath]]
-vim.cmd [[syn match adevFilesFooter "^[yn</].*$"]]
 
 vim.api.nvim_set_hl(0, "adevFilesCreate", { link = "DiffAdd", default = true })
 vim.api.nvim_set_hl(0, "adevFilesDelete", { link = "DiffDelete", default = true })
@@ -32,6 +28,5 @@ vim.api.nvim_set_hl(0, "adevFilesArrow", { link = "Operator", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPath", { link = "String", default = true })
 vim.api.nvim_set_hl(0, "adevFilesSrcPath", { link = "Comment", default = true })
 vim.api.nvim_set_hl(0, "adevFilesDstPath", { link = "String", default = true })
-vim.api.nvim_set_hl(0, "adevFilesFooter", { link = "Comment", default = true })
 
 vim.b.current_syntax = "adev_files_confirm"

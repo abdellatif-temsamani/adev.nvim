@@ -28,32 +28,44 @@ lua/adev-files/
 │   ├── delete.lua              # Delete command handler
 │   ├── revert.lua              # Revert line / undo staged ops
 │   ├── selection.lua           # Entry collection (visual + mark-based)
+│   ├── chmod.lua               # Permission change handler
 │   ├── confirm.lua             # Confirm/cancel confirmation dialog
 │   ├── navigation.lua          # Directory navigation (enter, parent, root)
+│   ├── register.lua            # Buffer-local autocmd/keymap registration
 │   └── validate.lua            # Destination validation for paste
 │
 ├── file_manager/
-│   ├── listing.lua             # Buffer content rendering (header, rows, footer)
-│   ├── render.lua              # Virtual text: icons, suffix labels, marks
+│   ├── listing.lua             # Build editable listing lines from the filesystem
+│   ├── render.lua              # Render lines, icons, labels and virtual text
 │   ├── window.lua              # Floating window creation and title updates
 │   ├── open.lua                # Open file manager for a directory
 │   └── roots.lua               # Root directory normalization
 │
 ├── sync/
+│   ├── init.lua                # Re-exports plan/ops helpers
 │   ├── view.lua                # Refresh, reset, toggle-hidden, set-root
 │   ├── plan.lua                # Stage, unstage, and retrieve pending ops
 │   ├── index.lua               # Snapshot original lines for diffing
-│   └── apply.lua               # Apply staged ops (write handler)
+│   ├── apply.lua               # Apply staged ops (write handler)
+│   ├── attach.lua              # Buffer attachment and live edit tracking
+│   ├── format.lua              # Confirmation popup text formatting
+│   └── fs_ops.lua              # Re-exports filesystem helpers
 │
 ├── parse/
-│   └── line.lua                # Line parsing: entry vs delete-marker
+│   ├── init.lua                # Re-exports line parsing helpers
+│   ├── line.lua                # Line parsing: entry vs delete-marker
+│   ├── trim.lua                # Concealed-ID and label trimming
+│   └── validate.lua            # Re-exports path validation
 │
 ├── utils/
 │   ├── fs/
 │   │   ├── path.lua            # Path utilities (join, abs, relpath, normalize)
 │   │   ├── copy_file.lua       # File copy via libuv
 │   │   ├── copy_dir.lua        # Recursive directory copy
-│   │   └── symlink.lua         # Symlink copy support
+│   │   ├── symlink.lua         # Symlink copy support
+│   │   ├── mkdir.lua           # Recursive directory creation
+│   │   ├── stat.lua            # stat/lstat/exists helpers
+│   │   ├── uv.lua              # libuv shim
 │   │   └── init.lua            # FS utility exports
 │   └── confirmation.lua        # Confirmation dialog helper
 │
@@ -62,21 +74,31 @@ lua/adev-files/
 │   └── directory.lua           # Directory icon
 │
 └── syntax/
-    ├── adev_files.vim          # Buffer syntax highlighting
-    └── adev_files_help.vim     # Help window syntax highlighting
+    ├── adev_files.lua          # Buffer syntax highlighting
+    ├── adev_files_help.lua     # Help window syntax highlighting
+    ├── adev_files_confirm.lua  # Confirmation popup highlighting
+    └── adev_changes.lua        # Changes popup highlighting
 ```
 
 ## Configuration
+
+The plugin can be configured directly:
 
 ```lua
 require("adev-files").setup({
     replace_netrw = true, -- default
     open_files = {
-        enabled = false,
+        enabled = false, -- file opening with <CR> is disabled by default
         method = "edit", -- edit, split, vsplit, or tabedit
     },
 })
 ```
+
+When used through a distribution that wraps plugins, pass the same table as
+`core_plugins.adev_files.opts`; the wrapper forwards it to `setup()`. The
+`open_files.enabled` flag controls whether `<CR>` opens a file at all. When it
+is `false`, `<CR>` only navigates into directories; it does not auto-open files
+on the cursor line.
 
 With `replace_netrw = true`, opening a directory through `nvim .` or
 `:edit path/to/directory` opens adev-files in the current window. Calling
@@ -97,7 +119,7 @@ Per-buffer state (`state.lua`) holds:
 | `model.original_by_id` | table<integer, AdevFilesNodeSnapshot> | Immutable identity and source path for each original entry |
 | `confirming` | boolean | Whether a confirmation dialog owns the buffer |
 | `show_hidden` | boolean | Show hidden files |
-| `selection_marks` | table<integer, true> | Row→mark for multi-file selection |
+| `selection_ids` | table<integer, true> | Entry IDs marked for batch operations |
 
 ## Keymaps
 
@@ -108,6 +130,12 @@ All file manager keymaps use `<leader>n` prefix. See `:help adev-files-keymaps`.
 Two modes:
 - **Visual mode** — select a range, then use `<leader>ny`/`<leader>nx`/`<leader>nd`
 - **Normal mode marks** — press `<TAB>` on each line to toggle a mark (`●` prefix), then use clipboard/delete commands on all marked entries
+
+Both modes are accepted by permission changes: `<leader>nz` applies to the
+current entry, marked entries, or a visual selection. Modes may be four-digit
+octal (`4755`, including setuid/setgid/sticky) or symbolic (`rwxr-xr-x`).
+Names and modes that cannot be parsed are reported without changing the
+filesystem.
 
 ## Clipboard
 
@@ -129,7 +157,7 @@ Paste appends `_1`, `_2`, and so on when a name is occupied, including names mar
 4. `sync/plan.lua` compiles one operation plan for labels, counts, change navigation, the changes window, and writes
 5. `core/op_validation.lua` rejects overlapping edits, duplicate/nested destinations, entry-kind changes, and directories pasted into themselves; the error is shown in the header and blocks writing
 6. On `:write`, `sync/apply.lua` executes all staged ops and remaps clipboard sources after success
-7. Icons and pipe-delimited labels update in real time
+7. Icons and bracketed labels (`[copied from ...]`, `[moved from ...]`) update in real time
 
 Moving a line keeps its identity. A renamed entry retains its contents, and an
 additional line with the same identity represents a copy. A copied row may be
@@ -152,13 +180,29 @@ Git status is collected asynchronously using NUL-separated records. Filenames
 are parsed without quoting ambiguity, conflicts are reported, directory labels
 aggregate descendant status, and summary counts count changed files once.
 
+Git is optional: if `vim.system` is unavailable, the configured executable is
+missing, or a status call times out or fails, the manager shows one actionable
+message and continues to browse and edit without status markers. Stale markers
+are cleared rather than left visible from an earlier refresh. `:checkhealth
+adev-files` reports the actual prerequisites (Neovim API, configured Git
+executable and a usable temp directory).
+
+Filesystem errors name the affected path and the underlying reason; an
+unreadable root is reported instead of raising, and a partially applied write is
+rolled back before the error is shown.
+
 ## Highlight Groups
 
-Defined in `syntax/adev_files.vim`:
+Defined in `syntax/adev_files.lua` as default links; override any link in your
+colorscheme if needed:
 
 | Group | Usage |
 |-------|-------|
-| `adevFilesPendingCopy` | `| copy |` label (DiffAdd bold) |
-| `adevFilesPendingMove` | `| move |` label (DiffDelete bold) |
-| `adevFilesPendingDelete` | `| delete |` label |
-| `adevFilesPendingMark` | `●` selection mark (Special bold) |
+| `adevFilesPendingCopy` | `[copied from ...]` label (links to `adevFilesGitCopied`) |
+| `adevFilesPendingMove` | `[moved from ...]` label (links to `adevFilesGitModified`) |
+| `adevFilesPendingNew` | `[new]` label (links to `adevFilesGitAdded`) |
+| `adevFilesPendingRenamed` | `[renamed]` label (links to `adevFilesGitRenamed`) |
+| `adevFilesPendingDelete` | `[deleted]` label (links to `adevFilesGitDeleted`) |
+| `adevFilesPendingMark` | `●` selection mark (links to `Special`) |
+| `adevFilesPlanError` | Invalid-line highlight (links to `DiagnosticError`) |
+| `adevFilesGitModified` / `adevFilesGitAdded` / `adevFilesGitDeleted` / `adevFilesGitRenamed` / `adevFilesGitCopied` / `adevFilesGitUntracked` / `adevFilesGitConflict` | Git status markers |
