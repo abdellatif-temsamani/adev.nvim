@@ -320,6 +320,7 @@ local function add_virtual_text(buf, root)
         },
         close_box(summary_chunks(summary)),
     }
+
     if plan_error then
         local error_chunks = {
             { "│ error  ", "Comment" },

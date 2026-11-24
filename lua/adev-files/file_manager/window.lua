@@ -37,12 +37,18 @@ end
 ---@param total integer
 function M.set_title_from_state(buf, root, total)
     total = total or 0
+    local title = title_for_root(root, total)
+    local ok_mode, mode = pcall(vim.api.nvim_buf_get_var, buf, "adev_files_mode")
     for _, win_id in ipairs(vim.api.nvim_list_wins()) do
         if vim.api.nvim_win_is_valid(win_id) and vim.api.nvim_win_get_buf(win_id) == buf then
             local ok, cfg = pcall(vim.api.nvim_win_get_config, win_id)
-            if ok and cfg then
-                cfg.title = title_for_root(root, total)
+            if ok and cfg and cfg.relative ~= "" then
+                cfg.title = title
                 pcall(vim.api.nvim_win_set_config, win_id, cfg)
+            elseif ok_mode and mode == "current" then
+                pcall(function()
+                    vim.wo[win_id].winbar = title
+                end)
             end
             return
         end
