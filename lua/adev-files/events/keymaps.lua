@@ -73,6 +73,11 @@ function M.attach(buf)
         sync_view.refresh(buf, { notify = true })
     end, { desc = "Refresh directory" })
 
+    set_keymap("n", "<leader>ng", function()
+        sync_view.refresh_git_status(buf)
+        utils.notify("Git status refreshed", vim.log.levels.INFO, "adev-files")
+    end, { desc = "Refresh git status" })
+
     set_keymap("n", "<tab>", function()
         selection.toggle_mark(buf)
     end, { desc = "Toggle mark on current line" })

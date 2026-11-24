@@ -77,13 +77,32 @@ end
 
 local HEADER_WIDTH = 72
 
----@param status string|nil
+---@param st AdevFilesState|nil
+---@param entry AdevFilesEntry
+---@param original table|nil
 ---@return string|nil, string|nil
-local function git_indicator(status)
+local function git_indicator(st, entry, original)
+    local git_status = st and st.git_status
+    if not git_status then
+        return nil, nil
+    end
+    local lookup_name = original and original.fs_name or entry.fs_name
+    local status = git.get_file_status(git_status, lookup_name)
     if not status then
         return nil, nil
     end
-    return GIT_LABEL[status], GIT_HL[status]
+    local label = GIT_LABEL[status]
+    local hl = GIT_HL[status]
+    if not label then
+        return nil, nil
+    end
+    if entry.kind == "directory" then
+        local direct = st.git_files and st.git_files[lookup_name:gsub("/$", "")] or nil
+        if direct ~= status then
+            label = label .. "+"
+        end
+    end
+    return label, hl
 end
 
 ---@param summary AdevFilesSummary
@@ -107,17 +126,21 @@ local function summary_chunks(summary)
         table.insert(chunks, { "  •  hidden", "Comment" })
     end
 
-    local has_git = false
-    for _, code in ipairs { "U", "M", "A", "D", "R", "C", "?" } do
-        if summary.git_counts[code] and summary.git_counts[code] > 0 then
-            if not has_git then
-                table.insert(chunks, { "  •  Git ", "Comment" })
-                has_git = true
+    if summary.git_available == false then
+        table.insert(chunks, { "  •  Git n/a", "WarningMsg" })
+    else
+        local has_git = false
+        for _, code in ipairs { "U", "M", "A", "D", "R", "C", "?" } do
+            if summary.git_counts[code] and summary.git_counts[code] > 0 then
+                if not has_git then
+                    table.insert(chunks, { "  •  Git ", "Comment" })
+                    has_git = true
+                end
+                table.insert(chunks, {
+                    string.format("%s:%d ", code, summary.git_counts[code]),
+                    GIT_HL[code] or "Comment",
+                })
             end
-            table.insert(chunks, {
-                string.format("%s:%d ", code, summary.git_counts[code]),
-                GIT_HL[code] or "Comment",
-            })
         end
     end
 
@@ -272,8 +295,7 @@ local function add_virtual_text(buf, root)
         })
 
         local suffix = {}
-        local lookup_name = original and original.fs_name or parsed.fs_name
-        local gs, gs_hl = git_indicator(git.get_file_status(git_status, lookup_name))
+        local gs, gs_hl = git_indicator(st, parsed, original)
         if gs then
             table.insert(suffix, { "[" .. gs .. "]", gs_hl })
         end

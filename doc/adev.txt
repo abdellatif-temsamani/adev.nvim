@@ -303,6 +303,8 @@ FEATURES						*adev-files-features*
 - Multi-selection via visual mode or normal-mode marks
 - Edit entries in-place with pending-ops and confirm dialog
 - Visual labels for pending operations (| copy |, | move |, | delete |, | new |, | renamed |)
+- Git status markers: [M] modified, [A] added, [D] deleted, [R] renamed, [C] copied, [?] untracked, [U] conflict; directories show aggregated descendant status as [X+]; header shows Git n/a when unavailable
+- Git status auto-refreshes on FocusGained/BufEnter when buffer has no staged edits; use <leader>nf for full refresh or <leader>ng for git-only refresh
 - Toggle hidden files visibility
 - In-buffer help system
 
@@ -345,6 +347,7 @@ In-buffer mappings:
 | q                    | Close floating file manager                 |
 | <leader>nh           | Toggle hidden files                         |
 | <leader>nf           | Refresh directory listing                   |
+| <leader>ng           | Refresh git status                          |
 | <leader>ne           | Jump to next plan error                     |
 |                      |                                             |
 | Selection (multi-file)                         |

@@ -55,9 +55,13 @@ local function parse_porcelain(output, root, git_root)
     return result, files
 end
 
+---@class AdevFilesGitMeta
+---@field available boolean
+---@field reason? string
+
 --- Both repository discovery and status collection run asynchronously.
 ---@param root string
----@param callback fun(status: table<string, string>, files?: table<string, string>)
+---@param callback fun(status: table<string, string>, files?: table<string, string>, meta?: AdevFilesGitMeta)
 function M.fetch_status(root, callback)
     local executable = Adev and Adev.git or "git"
     root = path.norm_real(root)
@@ -75,13 +79,23 @@ function M.fetch_status(root, callback)
     end
 
     run({ executable, "rev-parse", "--show-toplevel" }, root, function(result)
-        if not result or result.code ~= 0 then
-            callback({}, {})
+        if not result then
+            callback(
+                {},
+                {},
+                { available = false, reason = "git command unavailable: " .. executable }
+            )
+            return
+        end
+        if result.code ~= 0 then
+            local stderr = (result.stderr or ""):gsub("[\r\n]+$", "")
+            local reason = stderr ~= "" and stderr or "not a git repository"
+            callback({}, {}, { available = false, reason = reason })
             return
         end
         local git_root = (result.stdout or ""):gsub("[\r\n]+$", "")
         if git_root == "" then
-            callback({}, {})
+            callback({}, {}, { available = false, reason = "not a git repository" })
             return
         end
         run(
@@ -98,11 +112,24 @@ function M.fetch_status(root, callback)
             },
             git_root,
             function(status_result)
-                if not status_result or status_result.code ~= 0 then
-                    callback({}, {})
+                if not status_result then
+                    callback(
+                        {},
+                        {},
+                        { available = false, reason = "git command unavailable: " .. executable }
+                    )
                     return
                 end
-                callback(parse_porcelain(status_result.stdout or "", root, git_root))
+                if status_result.code ~= 0 then
+                    local stderr = (status_result.stderr or ""):gsub("[\r\n]+$", "")
+                    callback({}, {}, {
+                        available = false,
+                        reason = stderr ~= "" and stderr or "git status failed",
+                    })
+                    return
+                end
+                local status, files = parse_porcelain(status_result.stdout or "", root, git_root)
+                callback(status, files, { available = true })
             end
         )
     end)
