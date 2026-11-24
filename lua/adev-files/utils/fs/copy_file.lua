@@ -7,14 +7,15 @@ local M = {}
 
 ---@param src string
 ---@param dst string
----@return boolean, string?
-function M.copy_file(src, dst)
+---@param follow_symlink? boolean Copy the link target instead of the link itself.
+---@return boolean, string?, boolean?
+function M.copy_file(src, dst, follow_symlink)
     if stat.exists(dst) then
         return false, "target exists: " .. dst
     end
 
     local st = stat.lstat(src)
-    if st and st.type == "link" then
+    if st and st.type == "link" and not follow_symlink then
         return symlink.copy_symlink(src, dst)
     end
 
@@ -29,7 +30,7 @@ function M.copy_file(src, dst)
     if uv.fs_copyfile then
         local ok, err_name, err_msg = uv.fs_copyfile(src, dst, 1)
         if not ok then
-            return false, (err_name or "fs_copyfile") .. ": " .. (err_msg or "")
+            return false, (err_name or "fs_copyfile") .. ": " .. (err_msg or ""), true
         end
         return true
     end

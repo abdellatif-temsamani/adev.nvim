@@ -1,6 +1,11 @@
+local select = require "adev-common.ui.select"
+
+local clipboard = require "adev-files.clipboard"
 local file_manager = require "adev-files.file_manager"
 local fs_ops = require "adev-files.sync.fs_ops"
-local select = require "adev-common.ui.select"
+local path = require "adev-files.utils.fs.path"
+local uv = vim.uv or vim.loop
+
 local M = {}
 
 ---@class FilesProps
@@ -98,23 +103,55 @@ function M.create_file()
             return
         end
         local dir = vim.fn.fnamemodify(abs_path, ":h")
-        if vim.fn.isdirectory(dir) == 0 then
-            vim.fn.mkdir(dir, "p")
+        local ok_mkdir, mkdir_err = fs_ops.mkdir_p(dir)
+        if not ok_mkdir then
+            vim.notify(
+                "Failed to create directory: " .. tostring(mkdir_err),
+                vim.log.levels.ERROR,
+                "adev-files"
+            )
+            return
         end
-        if vim.fn.filereadable(abs_path) == 0 then
-            local fd, ferr = vim.loop.fs_open(abs_path, "w", 420)
+
+        local existed = vim.fn.filereadable(abs_path) == 1 or vim.fn.isdirectory(abs_path) == 1
+        if not existed then
+            local fd, ferr_name, ferr_msg = uv.fs_open(abs_path, "wx", 420)
             if not fd then
                 vim.notify(
-                    "Failed to create file: " .. abs_path .. " - " .. tostring(ferr),
+                    "Failed to create file: "
+                        .. abs_path
+                        .. " - "
+                        .. tostring(ferr_name or ferr_msg),
                     vim.log.levels.ERROR,
                     "adev-files"
                 )
                 return
             end
-            vim.loop.fs_close(fd)
+            local ok_close, close_err = uv.fs_close(fd)
+            if not ok_close then
+                vim.notify(
+                    "Failed to close new file: " .. abs_path .. " - " .. tostring(close_err),
+                    vim.log.levels.ERROR,
+                    "adev-files"
+                )
+                return
+            end
         end
-        vim.cmd("edit " .. vim.fn.fnameescape(abs_path))
-        vim.notify("Created: " .. input, vim.log.levels.INFO, "adev-files")
+
+        local ok_edit, edit_err = pcall(vim.cmd, "edit " .. vim.fn.fnameescape(abs_path))
+        if not ok_edit then
+            vim.notify(
+                "Failed to open " .. abs_path .. ": " .. tostring(edit_err),
+                vim.log.levels.ERROR,
+                "adev-files"
+            )
+            return
+        end
+        vim.notify(
+            (existed and "Opened: " or "Created: ") .. input,
+            vim.log.levels.INFO,
+            "adev-files"
+        )
     end)
 end
 
@@ -147,26 +184,50 @@ function M.rename_file()
             return
         end
         local dir = vim.fn.fnamemodify(file, ":h")
-        local new_path = dir .. "/" .. clean
+        local new_path = path.join_abs(dir, clean)
         local ok, err = fs_ops.rename_path(file, new_path)
-        if ok then
-            vim.api.nvim_buf_set_name(buf, new_path)
+        if not ok then
+            vim.notify("Rename failed: " .. tostring(err), vim.log.levels.ERROR, "adev-files")
+            return
+        end
+
+        -- The filesystem move is committed first; if the buffer cannot follow
+        -- it, move the file back so the name on disk and the name in the editor
+        -- never disagree.
+        local buffer_ok, buffer_err = pcall(vim.api.nvim_buf_set_name, buf, new_path)
+        if buffer_ok then
             -- Renaming a buffer makes Neovim treat the destination as a new
             -- file. Since the filesystem move already created it, the next
             -- regular :write would otherwise ask whether to overwrite it.
             -- Writing once with ! also preserves any edits made before the
             -- rename and refreshes Neovim's file metadata for later writes.
-            vim.api.nvim_buf_call(buf, function()
+            buffer_ok, buffer_err = pcall(vim.api.nvim_buf_call, buf, function()
                 vim.cmd "silent write!"
             end)
+        end
+
+        if not buffer_ok then
+            local rollback_ok, rollback_err = fs_ops.rename_path(new_path, file)
+            if rollback_ok then
+                pcall(vim.api.nvim_buf_set_name, buf, file)
+            end
             vim.notify(
-                "Renamed: " .. old_name .. " -> " .. clean,
-                vim.log.levels.INFO,
+                rollback_ok and ("Rename failed: " .. tostring(buffer_err))
+                    or (
+                        "Renamed on disk to "
+                        .. new_path
+                        .. ", but the buffer could not follow: "
+                        .. tostring(buffer_err)
+                        .. "; rollback failed: "
+                        .. tostring(rollback_err)
+                    ),
+                vim.log.levels.ERROR,
                 "adev-files"
             )
-        else
-            vim.notify("Rename failed: " .. tostring(err), vim.log.levels.ERROR, "adev-files")
+            return
         end
+
+        vim.notify("Renamed: " .. old_name .. " -> " .. clean, vim.log.levels.INFO, "adev-files")
     end)
 end
 
@@ -188,10 +249,14 @@ function M.delete_file()
         if is_dir then
             ok, err = fs_ops.rm_rf(file)
         else
-            ok, err = vim.loop.fs_unlink(file)
+            local pcall_ok, unlink_ok, unlink_err = pcall(uv.fs_unlink, file)
+            ok, err = pcall_ok and unlink_ok == true, unlink_err
         end
         if ok then
-            vim.cmd("bwipeout! " .. buf)
+            clipboard.remove_by_src(file)
+            if vim.api.nvim_buf_is_valid(buf) then
+                pcall(vim.cmd, "bwipeout! " .. buf)
+            end
             vim.notify("Deleted: " .. name, vim.log.levels.INFO, "adev-files")
         else
             vim.notify("Delete failed: " .. tostring(err), vim.log.levels.ERROR, "adev-files")

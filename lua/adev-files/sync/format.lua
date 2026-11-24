@@ -25,24 +25,43 @@ function M.format_ops(st, ops)
                 local stat = uv.fs_stat(op.path)
                 if stat and stat.type == "directory" then
                     local count = 0
+                    local scan_errors = {}
                     local function walk(dir)
-                        local handle = uv.fs_scandir(dir)
+                        local handle, scan_err = uv.fs_scandir(dir)
                         if not handle then
+                            table.insert(
+                                scan_errors,
+                                "fs_scandir " .. dir .. ": " .. tostring(scan_err)
+                            )
                             return
                         end
                         while true do
-                            local name, typ = uv.fs_scandir_next(handle)
+                            local name, typ, next_err = uv.fs_scandir_next(handle)
                             if not name then
+                                local detail = next_err or (type(typ) == "string" and typ or nil)
+                                if detail then
+                                    table.insert(
+                                        scan_errors,
+                                        "fs_scandir_next " .. dir .. ": " .. tostring(detail)
+                                    )
+                                end
                                 break
                             end
                             count = count + 1
                             if typ == "directory" then
-                                walk(dir .. "/" .. name)
+                                walk(vim.fs.joinpath(dir, name))
                             end
                         end
                     end
                     walk(op.path)
-                    prefix = string.format("recursive delete (%d descendants): ", count)
+                    prefix = string.format(
+                        "recursive delete (%s%d descendants): ",
+                        #scan_errors > 0 and "at least " or "",
+                        count
+                    )
+                    if #scan_errors > 0 then
+                        p = p .. " (incomplete scan: " .. table.concat(scan_errors, "; ") .. ")"
+                    end
                 end
             end
             table.insert(lines, prefix .. p)

@@ -7,10 +7,15 @@ local uv = require "adev-files.utils.fs.uv"
 
 local M = {}
 
+---@param dir string
+local function remove_partial(dir)
+    pcall(vim.fn.delete, dir, "rf")
+end
+
 ---@param src_dir string
 ---@param dst_dir string
----@return boolean, string?
-function M.copy_dir_recursive(src_dir, dst_dir)
+---@return boolean, string?, boolean?
+local function copy_dir(src_dir, dst_dir)
     if stat.exists(dst_dir) then
         return false, "target exists: " .. dst_dir
     end
@@ -24,61 +29,67 @@ function M.copy_dir_recursive(src_dir, dst_dir)
     end
     local ok, err = uv.fs_mkdir(dst_dir, 493)
     if not ok then
-        return false, tostring(err)
+        return false, "fs_mkdir " .. dst_dir .. ": " .. tostring(err)
     end
 
     local fd, scan_err = uv.fs_scandir(src_dir)
     if not fd then
-        return false, "fs_scandir: " .. tostring(scan_err), true
+        return false, "fs_scandir " .. src_dir .. ": " .. tostring(scan_err), true
     end
 
     while true do
-        local name, typ = uv.fs_scandir_next(fd)
+        local name, typ, next_err = uv.fs_scandir_next(fd)
         if not name then
+            -- uv versions differ on which return slot carries the error.
+            local detail = next_err or (type(typ) == "string" and typ or nil)
+            if detail then
+                return false, "fs_scandir_next " .. src_dir .. ": " .. tostring(detail), true
+            end
             break
         end
 
-        local src = src_dir .. "/" .. name
-        local dst = dst_dir .. "/" .. name
+        local src = path.join_abs(src_dir, name)
+        local dst = path.join_abs(dst_dir, name)
+        local copied, copy_err, created
 
         if typ == "directory" then
-            local ok2, err2 = M.copy_dir_recursive(src, dst)
-            if not ok2 then
-                return false, err2, true
-            end
+            copied, copy_err, created = copy_dir(src, dst)
         elseif typ == "file" then
-            local ok2, err2 = copy_file.copy_file(src, dst)
-            if not ok2 then
-                return false, err2, true
-            end
+            copied, copy_err, created = copy_file.copy_file(src, dst)
         elseif typ == "link" then
-            local ok2, err2 = symlink.copy_symlink(src, dst)
-            if not ok2 then
-                return false, err2, true
-            end
+            copied, copy_err, created = symlink.copy_symlink(src, dst)
         else
             local st = stat.lstat(src)
             if st and st.type == "directory" then
-                local ok2, err2 = M.copy_dir_recursive(src, dst)
-                if not ok2 then
-                    return false, err2, true
-                end
+                copied, copy_err, created = copy_dir(src, dst)
             elseif st and st.type == "file" then
-                local ok2, err2 = copy_file.copy_file(src, dst)
-                if not ok2 then
-                    return false, err2, true
-                end
+                copied, copy_err, created = copy_file.copy_file(src, dst)
             elseif st and st.type == "link" then
-                local ok2, err2 = symlink.copy_symlink(src, dst)
-                if not ok2 then
-                    return false, err2, true
-                end
+                copied, copy_err, created = symlink.copy_symlink(src, dst)
             else
                 return false, "unsupported entry type: " .. tostring(typ), true
             end
         end
+
+        if not copied then
+            return false, copy_err, true
+        end
     end
 
+    return true
+end
+
+---@param src_dir string
+---@param dst_dir string
+---@return boolean, string?, boolean?
+function M.copy_dir_recursive(src_dir, dst_dir)
+    local ok, err, created = copy_dir(src_dir, dst_dir)
+    if not ok then
+        if created then
+            remove_partial(dst_dir)
+        end
+        return false, err, created
+    end
     return true
 end
 

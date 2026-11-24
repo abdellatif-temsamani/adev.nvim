@@ -525,6 +525,43 @@ local function test_duplicate_destination_rejected()
     )
 end
 
+local function test_relative_symlink_copy_is_rebased()
+    local uv = vim.uv or vim.loop
+    local fs = require "adev-files.utils.fs"
+    local dir = reset_dir "symlink-rebase"
+    local src_dir = dir .. "/src"
+    local dst_dir = dir .. "/dst"
+    vim.fn.mkdir(src_dir .. "/sub", "p")
+    vim.fn.mkdir(dst_dir, "p")
+    write_file(src_dir .. "/target.txt", "alpha")
+    uv.fs_symlink("../target.txt", src_dir .. "/sub/link.txt")
+
+    local ok, err = fs.copy_dir_recursive(src_dir, dst_dir .. "/copy")
+    check(ok, "copy_dir_recursive with a relative symlink failed: " .. tostring(err))
+    eq(
+        table.concat(vim.fn.readfile(dst_dir .. "/copy/sub/link.txt"), "\n"),
+        "alpha",
+        "copied relative symlink should resolve against its new directory"
+    )
+end
+
+local function test_symlink_to_directory_copies_contents()
+    local uv = vim.uv or vim.loop
+    local dir = reset_dir "symlink-dir-copy"
+    vim.fn.mkdir(dir .. "/real", "p")
+    write_file(dir .. "/real/file.txt", "alpha")
+    uv.fs_symlink("real", dir .. "/alias")
+
+    local buf = new_manager(dir)
+    check(row_with(buf, "alias/") ~= nil, "symlink to a directory should be listed as a directory")
+
+    local ok, err = executor.apply_ops {
+        { type = "copy", src = dir .. "/alias", dst = dir .. "/alias-copy", kind = "directory" },
+    }
+    check(ok, "copying a symlink listed as a directory failed: " .. tostring(err))
+    eq(read_file(dir .. "/alias-copy/file.txt"), "alpha", "symlinked directory contents copied")
+end
+
 local function test_nested_destination_rejected()
     local dir = reset_dir "nested-destination"
     write_file(dir .. "/A.txt", "alpha")
@@ -633,6 +670,8 @@ local tests = {
     test_move_plus_same_path_copy,
     test_duplicate_destination_rejected,
     test_nested_destination_rejected,
+    test_relative_symlink_copy_is_rebased,
+    test_symlink_to_directory_copies_contents,
 }
 
 for _, test in ipairs(tests) do

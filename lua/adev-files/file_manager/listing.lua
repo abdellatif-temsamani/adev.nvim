@@ -15,7 +15,7 @@ local function is_directory(root, name, ftype)
     -- type. Follow links here so links to directories are displayed and
     -- parsed as directories (with a trailing slash).
     if ftype == "link" then
-        local stat = (vim.uv or vim.loop).fs_stat(root .. "/" .. name)
+        local stat = uv.fs_stat(vim.fs.joinpath(root, name))
         return stat ~= nil and stat.type == "directory"
     end
 
@@ -62,8 +62,12 @@ function M.build_lines(root, opts)
     local dirs = {}
     local files_list = {}
     while true do
-        local fname, ftype = uv.fs_scandir_next(scan)
+        local fname, ftype, next_err = uv.fs_scandir_next(scan)
         if not fname then
+            local detail = next_err or (type(ftype) == "string" and ftype or nil)
+            if detail then
+                return nil, "fs_scandir_next " .. root .. ": " .. tostring(detail)
+            end
             break
         end
         if not show_hidden and fname:sub(1, 1) == "." then

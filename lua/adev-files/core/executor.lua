@@ -33,6 +33,9 @@ local function preflight(ops)
                 return nil, "missing source: " .. src
             end
             op._source_stat = source_stat
+            -- Listing follows symlinks, so use the followed type when deciding
+            -- whether an operation copies a directory or a file.
+            op._copy_stat = fs.stat(src) or source_stat
         end
 
         local dst = op.type == "create" and op.path or op.dst
@@ -54,7 +57,7 @@ local function preflight(ops)
         if
             dst
             and (op.type == "copy" or op.type == "move" or op.type == "rename")
-            and op._source_stat.type == "directory"
+            and op._copy_stat.type == "directory"
             and path.is_same_or_subpath(op.src, dst)
         then
             local same_path_relocation = op.type == "copy"
@@ -76,31 +79,21 @@ local function parent_dir(target)
     return vim.fs.dirname(target) or ""
 end
 
----@param parent string
----@param name string
----@return string
-local function join(parent, name)
-    if parent == "/" then
-        return "/" .. name
-    end
-    return parent .. "/" .. name
-end
-
 ---@param source string
 ---@param seed string
 ---@param index integer
----@return string
+---@return string?, string?
 local function staging_path(source, seed, index)
     local parent = parent_dir(source)
-    local attempt = 0
-    while true do
+    for attempt = 0, 999 do
         local suffix = attempt == 0 and "" or ("-" .. attempt)
-        local candidate = join(parent, ".adev-files-txn-" .. seed .. "-" .. index .. suffix)
+        local candidate =
+            vim.fs.joinpath(parent, ".adev-files-txn-" .. seed .. "-" .. index .. suffix)
         if not fs.exists(candidate) then
             return candidate
         end
-        attempt = attempt + 1
     end
+    return nil, "cannot find a free staging path near " .. source
 end
 
 ---@param target string
@@ -158,12 +151,12 @@ end
 ---@param src string
 ---@param dst string
 ---@param source_stat uv.fs_stat.result
----@return boolean, string?
+---@return boolean, string?, boolean?
 local function copy_path(src, dst, source_stat)
     if source_stat.type == "directory" then
         return fs.copy_dir_recursive(src, dst)
     end
-    return fs.copy_file(src, dst)
+    return fs.copy_file(src, dst, true)
 end
 
 ---@param message string
@@ -274,7 +267,10 @@ function M.apply_ops(ops)
     -- making rollback possible, this safely supports rename swaps.
     for _, op in ipairs(destructive) do
         local src = op.type == "delete" and op.path or op.src
-        local temp = staging_path(src, seed, op._index)
+        local temp, temp_err = staging_path(src, seed, op._index)
+        if not temp then
+            return failed(temp_err or ("failed to find a staging path for " .. src), {})
+        end
         local ok, err = rename_path(src, temp)
         if not ok then
             local rollback_errors = rollback(staged, created_paths, created_dirs)
@@ -342,7 +338,7 @@ function M.apply_ops(ops)
         local source = staged_by_source[op.src]
         local src = source and (source.materialized == "rename" and source.dst or source.temp)
             or op.src
-        local ok, err, created = copy_path(src, op.dst, op._source_stat)
+        local ok, err, created = copy_path(src, op.dst, op._copy_stat)
         if ok or created then
             table.insert(created_paths, op.dst)
         end
@@ -367,7 +363,7 @@ function M.apply_ops(ops)
             if not is_cross_device(tostring(err or "")) then
                 return abort(err or ("failed to move " .. op.src))
             end
-            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, op._source_stat)
+            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, op._copy_stat)
             if copy_ok or created then
                 item.materialized = "copy"
             end
@@ -378,8 +374,9 @@ function M.apply_ops(ops)
     end
 
     -- The visible transaction is now committed. Remove staged deletions and
-    -- cross-device move sources. A cleanup failure is returned as a warning:
-    -- rolling back after a recursive delete has started could itself lose data.
+    -- cross-device move sources. Do not roll back here: after a recursive
+    -- delete, rolling back could itself lose data. Report the failure so the
+    -- caller keeps pending changes visible instead of claiming success.
     local cleanup_errors = {}
     for _, item in ipairs(staged) do
         if fs.exists(item.temp) then
@@ -391,7 +388,7 @@ function M.apply_ops(ops)
     end
 
     if #cleanup_errors > 0 then
-        return true,
+        return false,
             "changes applied, but transaction cleanup failed: " .. table.concat(
                 cleanup_errors,
                 "; "

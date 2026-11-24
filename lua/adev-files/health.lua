@@ -97,13 +97,19 @@ function M.check()
     local ok_list, listing = has "adev-files.file_manager.listing"
     if ok_state and ok_list and type(listing.build_lines) == "function" then
         local tmp = vim.fn.tempname()
-        vim.fn.mkdir(tmp, "p")
-        local lines, list_err = listing.build_lines(tmp)
-        vim.fn.delete(tmp, "d")
-        if type(lines) == "table" then
-            ok "directory listing smoke test passed"
+        local ok_mkdir, mkdir_err = pcall(vim.fn.mkdir, tmp, "p")
+        if not ok_mkdir or vim.fn.isdirectory(tmp) ~= 1 then
+            err("cannot create temp directory for listing smoke test: " .. tostring(mkdir_err))
         else
-            err("directory listing smoke test failed: " .. tostring(list_err))
+            local ok_listing, lines, list_err = pcall(listing.build_lines, tmp)
+            pcall(vim.fn.delete, tmp, "rf")
+            if not ok_listing then
+                err("directory listing smoke test raised: " .. tostring(lines))
+            elseif type(lines) == "table" then
+                ok "directory listing smoke test passed"
+            else
+                err("directory listing smoke test failed: " .. tostring(list_err))
+            end
         end
     else
         warn("skipped listing smoke test", { "Required modules unavailable" })
