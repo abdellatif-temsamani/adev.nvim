@@ -172,20 +172,29 @@ function M.attach(buf)
         vim.bo[sbuf].modifiable = false
 
         local width = 72
-        window.floating_window {
+        local popup_win = window.floating_window {
             buf = sbuf,
-            title = "adev-files changes [q: close]",
+            title = "adev-files changes [j/k: scroll, gg/G: jump, q/Esc: close]",
             width = width,
             height = math.min(#lines + 2, 28),
-            wo = { wrap = false },
+            wo = { wrap = false, cursorline = true },
             relative = "win",
             row = 0,
             col = vim.fn.winwidth(0),
         }
+        if popup_win and vim.api.nvim_win_is_valid(popup_win) then
+            vim.api.nvim_win_set_cursor(popup_win, { 1, 0 })
+        end
 
         local s_keys = utils.keymaps.buffer(sbuf)
         s_keys("n", "q", "<cmd>bwipeout<CR>", { desc = "Close pending changes" })
         s_keys("n", "<esc>", "<cmd>bwipeout<CR>", { desc = "Close pending changes" })
+        s_keys("n", "j", "j", { desc = "Scroll down" })
+        s_keys("n", "k", "k", { desc = "Scroll up" })
+        s_keys("n", "<C-d>", "<C-d>", { desc = "Scroll half page down" })
+        s_keys("n", "<C-u>", "<C-u>", { desc = "Scroll half page up" })
+        s_keys("n", "gg", "gg", { desc = "Jump to top" })
+        s_keys("n", "G", "G", { desc = "Jump to bottom" })
     end, { desc = "View pending changes" })
 end
 

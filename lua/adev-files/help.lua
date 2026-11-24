@@ -12,6 +12,19 @@ local function content()
     local lines = {
         "  adev-files",
         "",
+        "  Reading the listing",
+        "    rwx columns: permissions before each entry (rwxr-xr-x style).",
+        "    ●: marked entry (TAB / visual selection workflows).",
+        "    @: symlink entry.",
+        "    ▸ + icon: directory entry; icon: file type.",
+        "    Git suffixes: [M] modified [A] added [D] deleted [R] renamed",
+        "                  [C] copied [?] untracked [U] conflict",
+        "    [M+]: directory has aggregated descendant git status.",
+        "    Pending labels: [new] [renamed] [deleted]",
+        "                    [copied from ...] [moved from ...]",
+        "                    [copied] [moved] clipboard markers",
+        "    Header shows file/dir/pending counts, hidden state, Git counts, or Git n/a.",
+        "",
         "  Navigation",
         entry("<CR> / L / <Right>", "open file / enter directory"),
         entry("<BS> / H / <Left>", "parent directory"),
@@ -37,7 +50,8 @@ local function content()
         "",
         "  Edits",
         "    Edit names to rename; add lines to create entries.",
-        "    Append  #del  to cancel a pasted row.",
+        "    Append  #del  to cancel a pasted row or stage delete of a real entry.",
+        "    Example: /12 notes.txt  #del  -> staged delete/removed paste row.",
         entry("<leader>bs / :write", "apply staged changes"),
         entry("<leader>nu", "revert current line"),
         entry("<leader>nc", "reset all (discard changes)"),
@@ -71,8 +85,9 @@ local function content()
         "  Help and popups",
         entry("?", "open this help menu"),
         entry("q / <Esc>", "close help / pending changes popup"),
-        entry("q", "close permissions guide when focused"),
         entry("j / k / <C-d> / <C-u>", "scroll help / pending changes"),
+        entry("gg / G", "jump to top / bottom of popup"),
+        entry("q", "close permissions guide when focused"),
         "",
         "  Disabled in file manager",
         entry("u / <C-r>", "use <leader>nu / <leader>nc to revert"),
@@ -104,17 +119,27 @@ function M.open()
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.bo[buf].modifiable = false
 
-    window.floating_window {
+    local help_win = window.floating_window {
         buf = buf,
-        title = "adev-files help [j/k: scroll, q/Esc: close]",
+        title = "adev-files help [j/k: scroll, gg/G: jump, q/Esc: close]",
         width = width,
         height = math.min(#lines + 2, math.max(1, vim.o.lines - 4), 40),
-        wo = { wrap = false },
+        wo = { wrap = false, cursorline = true },
     }
 
+    if help_win and vim.api.nvim_win_is_valid(help_win) then
+        vim.api.nvim_win_set_cursor(help_win, { 1, 0 })
+    end
+
     local set_keymap = keymaps.buffer(buf)
-    set_keymap("n", "q", "<cmd>bwipeout<CR>")
-    set_keymap("n", "<esc>", "<cmd>bwipeout<CR>")
+    set_keymap("n", "q", "<cmd>bwipeout<CR>", { desc = "Close help" })
+    set_keymap("n", "<esc>", "<cmd>bwipeout<CR>", { desc = "Close help" })
+    set_keymap("n", "j", "j", { desc = "Scroll down" })
+    set_keymap("n", "k", "k", { desc = "Scroll up" })
+    set_keymap("n", "<C-d>", "<C-d>", { desc = "Scroll half page down" })
+    set_keymap("n", "<C-u>", "<C-u>", { desc = "Scroll half page up" })
+    set_keymap("n", "gg", "gg", { desc = "Jump to top" })
+    set_keymap("n", "G", "G", { desc = "Jump to bottom" })
 end
 
 return M

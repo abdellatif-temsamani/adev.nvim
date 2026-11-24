@@ -302,7 +302,7 @@ FEATURES						*adev-files-features*
 - Create/rename/move/copy/delete files and directories
 - Multi-selection via visual mode or normal-mode marks
 - Edit entries in-place with pending-ops and confirm dialog
-- Visual labels for pending operations (| copy |, | move |, | delete |, | new |, | renamed |)
+- Visual labels for pending operations ([copied from ...], [moved from ...], [deleted], [new], [renamed], clipboard [copied]/[moved])
 - Git status markers: [M] modified, [A] added, [D] deleted, [R] renamed, [C] copied, [?] untracked, [U] conflict; directories show aggregated descendant status as [X+]; header shows Git n/a when unavailable
 - Git status auto-refreshes on FocusGained/BufEnter when buffer has no staged edits; use <leader>nf for full refresh or <leader>ng for git-only refresh
 - Toggle hidden files visibility
@@ -314,14 +314,21 @@ Planned features:
 
 CONFIGURING ADEV-FILES					*adev-files-configure*
 
-Adev-files is enabled by default. To configure it, use :ADConfig and add: >
+Adev-files is enabled by default. Configure via :ADConfig / core_plugins.adev_files: >
 
 return {
   core_plugins = {
     adev_files = {
+      enabled = true,
       replace_netrw = true,  -- Default: true
+      opts = {
+        open_files = {
+          enabled = false, -- auto-open files on cursor line
+          method = "edit", -- edit | split | vsplit | tabedit
+        },
+      },
     },
-  }
+  },
 }
 <
 
@@ -366,7 +373,6 @@ In-buffer mappings:
 | <leader>nc           | Reset all (discard changes)                 |
 | <leader>nj           | Jump to next changed entry                  |
 | <leader>nk           | Jump to previous changed entry              |
-| <leader>ne           | Jump to next plan error                     |
 | <leader>ns           | View pending changes                        |
 |                      |                                             |
 | <leader>nd           | Stage delete (current / marked / visual)    |
@@ -376,7 +382,7 @@ In-buffer mappings:
 Permissions accept octal (755) or symbolic (rwxr-xr-x) input and apply
 immediately, without :write.
 
-Help and pending changes popups: j/k or <C-d>/<C-u> scroll; q/<Esc> close.
+Help and pending changes popups: j/k/<C-d>/<C-u> scroll, gg/G jump, q/<Esc> close.
 Confirmation popups: y/<CR> confirms; n/q/<Esc> cancels.
 Permissions guide: q closes the guide when focused.
 
@@ -415,8 +421,9 @@ with `<TAB>` in normal mode. Marked entries show a `●` prefix. Use
 
 Create, rename, or delete entries by editing lines in the buffer, then apply
 changes with `:write` and confirm when prompted. Pending operations are shown
-as pipe-delimited virtual labels (e.g., `| new |`, `| renamed |`, `| delete |`,
-`| copy |`, `| move |`).
+as bracketed virtual labels (e.g., `[new]`, `[renamed]`, `[deleted]`,
+`[copied from ...]`, `[moved from ...]`). Appending `#del` to a pasted row
+cancels that paste; appending `#del` to a real entry stages deletion.
 
 The system is designed to work seamlessly with Neovim's buffer management and
 provides a more integrated experience than traditional file explorers.
