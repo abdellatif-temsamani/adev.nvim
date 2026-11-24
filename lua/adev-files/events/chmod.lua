@@ -11,10 +11,11 @@ local GUIDE_NS = vim.api.nvim_create_namespace "adev_files_chmod_guide"
 
 local function perm_from_str(str)
     str = str:gsub("%s+", "")
-    if str:match "^[0-7]+$" and #str <= 3 then
+    -- Four octal digits preserve setuid/setgid/sticky bits (0o7777).
+    if str:match "^[0-7]+$" and #str <= 4 then
         return tonumber(str, 8)
     end
-    if not str:match "^[r%-][w%-][x%-][r%-][w%-][x%-][r%-][w%-][x%-]$" then
+    if not str:match "^[r%-][w%-][xsXS%-][r%-][w%-][xsXS%-][r%-][w%-][xtXT%-]$" then
         return nil
     end
     local num = 0
@@ -22,26 +23,27 @@ local function perm_from_str(str)
         local ch = str:sub(i, i)
         if ch == "r" or ch == "w" or ch == "x" then
             num = num + BITS[i]
+        elseif ch == "s" or ch == "S" then
+            if i == 3 then
+                num = num + 2048
+            elseif i == 6 then
+                num = num + 1024
+            end
+            if ch == "s" then
+                num = num + BITS[i]
+            end
+        elseif ch == "t" or ch == "T" then
+            num = num + 512
+            if ch == "t" then
+                num = num + BITS[i]
+            end
         end
     end
     return num
 end
 
 local function format_mode(mode)
-    if not mode then
-        return nil
-    end
-    local perm = mode % 512
-    local result = {}
-    for i = 1, 9 do
-        if perm >= BITS[i] then
-            perm = perm - BITS[i]
-            result[i] = ({ "r", "w", "x", "r", "w", "x", "r", "w", "x" })[i]
-        else
-            result[i] = "-"
-        end
-    end
-    return table.concat(result)
+    return render.format_mode(mode)
 end
 
 local function highlight_perm_chars(buf, lines)
@@ -104,11 +106,11 @@ local function show_guide(perm_str)
 
     highlight_perm_chars(buf, lines)
 
-    local width = 58
-    local height = #lines
-    local ui = vim.api.nvim_list_uis()[1]
-    local row = 5
-    local col = ui and math.floor((ui.width - width) / 2) or 10
+    local ui = vim.api.nvim_list_uis()[1] or { width = 80, height = 24 }
+    local width = math.min(58, math.max(20, ui.width - 4))
+    local height = math.min(#lines, math.max(3, ui.height - 6))
+    local row = math.max(0, math.min(5, ui.height - height - 2))
+    local col = math.max(0, math.floor((ui.width - width) / 2))
 
     vim.api.nvim_open_win(buf, false, {
         relative = "editor",
@@ -164,14 +166,21 @@ function M.chmod_entry(buf)
                 vim.api.nvim_win_close(win, true)
             end
         end
-        if guide_buf and vim.api.nvim_buf_is_valid(guide_buf) then
-            vim.api.nvim_buf_delete(guide_buf, { force = true })
-        end
+        -- The guide buffer is bufhidden=wipe: closing its windows is enough.
         if not input or input == "" then
             return
         end
+        if
+            not vim.api.nvim_buf_is_valid(buf)
+            or state.get(buf) ~= st
+            or st.applying
+            or st.confirming
+            or st.needs_refresh
+        then
+            return
+        end
         local mode = perm_from_str(input)
-        if not mode or mode < 0 or mode > 511 then
+        if not mode or mode < 0 or mode > 4095 then
             vim.notify("Invalid mode: " .. input, vim.log.levels.ERROR, "adev-files")
             return
         end

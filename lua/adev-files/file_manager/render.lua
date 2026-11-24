@@ -425,4 +425,6 @@ function M.render(buf, root, opts)
     return view.render(buf, root, opts)
 end
 
+M.format_mode = format_mode
+
 return M

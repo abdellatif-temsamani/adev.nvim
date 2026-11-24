@@ -73,7 +73,7 @@ function M.open(lines, opts, cb)
             return
         end
         finished = true
-        cleanup()
+        pcall(cleanup)
 
         if cb then
             local ok, err = xpcall(cb, debug.traceback, confirmed)

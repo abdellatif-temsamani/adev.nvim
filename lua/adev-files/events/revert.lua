@@ -10,15 +10,26 @@ local state = require "adev-files.state"
 local M = {}
 
 ---@param buf integer
+---@return integer|nil
+local function cursor_row(buf)
+    local win = vim.fn.bufwinid(buf)
+    if win == -1 then
+        return nil
+    end
+    return vim.api.nvim_win_get_cursor(win)[1]
+end
+
+---@param buf integer
 function M.revert_current_line(buf)
     local st = state.get(buf)
     if not st or st.applying or st.confirming or st.needs_refresh then
         return
     end
-    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    if row < 1 then
+    local current = cursor_row(buf)
+    if not current or current < 2 then
         return
     end
+    local row = current - 1
     index.restore_ids(buf)
     local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
     local _, id = parse.strip_id(line)

@@ -22,6 +22,16 @@ local function get_buf_var(buf, name)
 end
 
 ---@param buf integer
+---@return integer|nil
+local function manager_win(buf)
+    local win = vim.fn.bufwinid(buf)
+    if win == -1 then
+        return nil
+    end
+    return win
+end
+
+---@param buf integer
 ---@return integer[], string?
 local function find_modified_rows(buf)
     local ops, err = plan.plan_ops(buf)
@@ -47,9 +57,11 @@ local function find_modified_rows(buf)
 end
 
 ---@param buf integer
+---@param rows integer[]
 ---@return integer|nil
-local function jump_next_row(rows)
-    local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
+local function jump_next_row(buf, rows)
+    local win = manager_win(buf)
+    local cur_row = win and (vim.api.nvim_win_get_cursor(win)[1] - 1) or 0
     for _, row in ipairs(rows) do
         if row > cur_row then
             return row
@@ -69,18 +81,26 @@ function M.next_modification(buf)
         end
         return
     end
-    local row = jump_next_row(rows)
-    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
-    vim.cmd "normal! zz"
+    local row = jump_next_row(buf, rows)
+    local win = manager_win(buf)
+    if not win or not row then
+        return
+    end
+    vim.api.nvim_win_set_cursor(win, { row + 1, 0 })
+    vim.api.nvim_win_call(win, function()
+        vim.cmd "normal! zz"
+    end)
     if err then
         utils.err_notify(err, "adev-files")
     end
 end
 
+---@param buf integer
 ---@param rows integer[]
 ---@return integer|nil
-local function jump_prev_row(rows)
-    local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
+local function jump_prev_row(buf, rows)
+    local win = manager_win(buf)
+    local cur_row = win and (vim.api.nvim_win_get_cursor(win)[1] - 1) or 0
     for i = #rows, 1, -1 do
         if rows[i] < cur_row then
             return rows[i]
@@ -100,9 +120,15 @@ function M.prev_modification(buf)
         end
         return
     end
-    local row = jump_prev_row(rows)
-    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
-    vim.cmd "normal! zz"
+    local row = jump_prev_row(buf, rows)
+    local win = manager_win(buf)
+    if not win or not row then
+        return
+    end
+    vim.api.nvim_win_set_cursor(win, { row + 1, 0 })
+    vim.api.nvim_win_call(win, function()
+        vim.cmd "normal! zz"
+    end)
     if err then
         utils.err_notify(err, "adev-files")
     end
@@ -121,9 +147,15 @@ function M.next_plan_error(buf)
         utils.notify("No plan errors", vim.log.levels.INFO, "adev-files")
         return
     end
-    local row = jump_next_row(rows)
-    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
-    vim.cmd "normal! zz"
+    local row = jump_next_row(buf, rows)
+    local win = manager_win(buf)
+    if not win or not row then
+        return
+    end
+    vim.api.nvim_win_set_cursor(win, { row + 1, 0 })
+    vim.api.nvim_win_call(win, function()
+        vim.cmd "normal! zz"
+    end)
     if st.plan_error then
         utils.err_notify(st.plan_error, "adev-files")
     end
@@ -137,7 +169,17 @@ function M.open_or_enter(buf)
         return
     end
 
-    local entry, err = parse.parse_line(vim.api.nvim_get_current_line())
+    local win = manager_win(buf)
+    if not win then
+        return
+    end
+    local line = vim.api.nvim_buf_get_lines(
+        buf,
+        vim.api.nvim_win_get_cursor(win)[1] - 1,
+        vim.api.nvim_win_get_cursor(win)[1],
+        false
+    )[1] or ""
+    local entry, err = parse.parse_line(line)
     if err then
         utils.err_notify(err, "adev-files")
         return

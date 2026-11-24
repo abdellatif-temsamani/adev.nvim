@@ -8,6 +8,7 @@ local script = source:sub(1, 1) == "@" and source:sub(2) or source
 local root = vim.fn.fnamemodify(script, ":p:h:h:h")
 vim.opt.rtp:append(root)
 
+local chmod = require "adev-files.events.chmod"
 local clipboard = require "adev-files.clipboard"
 local clipboard_events = require "adev-files.events.clipboard"
 local delete_events = require "adev-files.events.delete"
@@ -18,12 +19,14 @@ local path_validation = require "adev-files.validation"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
 local root = require "adev-files.root"
+local selection = require "adev-files.events.selection"
 local state = require "adev-files.state"
 local utils = require "adev-common.utils"
 local validation = require "adev-files.core.op_validation"
 local view = require "adev-files.core.view"
 
 local TEST_ROOT = "/tmp/opencode/adev-files-tests"
+local uv = vim.uv or vim.loop
 local failures = 0
 
 local function fail(message)
@@ -836,6 +839,64 @@ local function test_open_unreadable_root_notifies()
     )
 end
 
+local function test_chmod_accepts_four_digit_mode()
+    local dir = reset_dir "chmod-special"
+    local file = dir .. "/script.sh"
+    write_file(file, "#!/bin/sh\n")
+    check(uv.fs_chmod(file, 493), "chmod setup failed")
+    local buf = new_manager(dir)
+    cursor_row(buf, "script.sh")
+
+    local original_input = vim.ui.input
+    local prompt = nil
+    vim.ui.input = function(opts, cb)
+        prompt = opts.prompt
+        cb "4755"
+    end
+    chmod.chmod_entry(buf)
+    vim.ui.input = original_input
+
+    local stat = uv.fs_stat(file)
+    check(stat ~= nil, "chmod should leave the file in place")
+    if stat then
+        eq(stat.mode % 4096, tonumber("4755", 8), "setuid bit must survive chmod")
+    end
+    check(
+        prompt
+            and prompt:find("Permissions for", 1, true) ~= nil
+            and prompt:find("rwxr-xr-x", 1, true) ~= nil,
+        "chmod prompt should show the current mode"
+    )
+end
+
+local function test_clipboard_chained_relocations()
+    local dir = reset_dir "clipboard-chain"
+    clipboard.set("copy", { { kind = "file", src = dir .. "/old/nested/file.txt" } })
+    clipboard.apply_path_changes {
+        { type = "rename", src = dir .. "/old", dst = dir .. "/middle", kind = "directory" },
+        { type = "rename", src = dir .. "/middle", dst = dir .. "/new", kind = "directory" },
+    }
+    local clip = clipboard.get()
+    check(clip and clip.items and clip.items[1], "clipboard should survive chained renames")
+    if clip and clip.items[1] then
+        eq(clip.items[1].src, dir .. "/new/nested/file.txt", "all relocations should be applied")
+    end
+    clipboard.clear()
+end
+
+local function test_header_row_cannot_be_marked()
+    local dir = reset_dir "header-mark"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    local win = vim.fn.bufwinid(buf)
+    check(win ~= -1, "manager window should exist")
+    if win ~= -1 then
+        vim.api.nvim_win_set_cursor(win, { 1, 0 })
+    end
+    selection.toggle_mark(buf)
+    eq(next(state.get_selection_marks(buf)), nil, "the virtual header row must not be markable")
+end
+
 local tests = {
     test_copy_then_swap_rename,
     test_copy_with_pending_rename,
@@ -850,6 +911,9 @@ local tests = {
     test_open_unreadable_root_notifies,
     test_git_status_without_vim_system,
     test_git_status_outside_repository,
+    test_chmod_accepts_four_digit_mode,
+    test_clipboard_chained_relocations,
+    test_header_row_cannot_be_marked,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_marker_cancels_pending,

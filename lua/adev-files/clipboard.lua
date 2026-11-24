@@ -94,17 +94,28 @@ function M.apply_path_changes(ops)
         end
 
         if not removed then
-            local matched = nil
-            for _, relocation in ipairs(relocations) do
-                if
-                    is_under(relocation.src, src)
-                    and (not matched or #relocation.src > #matched.src)
-                then
-                    matched = relocation
+            -- A plan can contain chained relocations (/a -> /b -> /c). Follow
+            -- them until the path settles; `visited` breaks malformed cycles.
+            local visited = {}
+            while not visited[src] do
+                visited[src] = true
+                local matched = nil
+                for _, relocation in ipairs(relocations) do
+                    if
+                        is_under(relocation.src, src)
+                        and (not matched or #relocation.src > #matched.src)
+                    then
+                        matched = relocation
+                    end
                 end
-            end
-            if matched then
-                src = matched.dst .. src:sub(#matched.src + 1)
+                if not matched then
+                    break
+                end
+                local next_src = matched.dst .. src:sub(#matched.src + 1)
+                if visited[next_src] then
+                    break
+                end
+                src = next_src
             end
 
             if not seen[src] then
