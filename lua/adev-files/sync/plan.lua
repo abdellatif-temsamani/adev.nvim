@@ -34,20 +34,24 @@ function M.plan_ops(buf)
         return nil, "missing state"
     end
     if st.needs_refresh then
-        return nil, "Changes were saved; refresh the directory before editing again"
+        st.plan_error = "Changes were saved; refresh the directory before editing again"
+        st.plan_error_rows = {}
+        return nil, st.plan_error
     end
     index.restore_ids(buf)
-    local entries, err = view.parse_buffer(buf)
+    local entries, err, error_row = view.parse_buffer(buf)
     if err then
         st.plan_error = err
+        st.plan_error_rows = error_row and { error_row } or {}
         st.change_ops = nil
         st.row_changes = {}
         return nil, err
     end
     index.reindex(buf)
-    local ops, plan_err, updated_pending, changes =
+    local ops, plan_err, updated_pending, changes, error_rows =
         planner.plan(st.model, entries, state.get_pending_ops(buf))
     st.plan_error = plan_err
+    st.plan_error_rows = plan_err and (error_rows or {}) or {}
     st.change_ops = ops
     st.row_changes = changes or {}
     if plan_err then

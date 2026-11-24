@@ -23,6 +23,7 @@ local model = require "adev-files.core.model"
 ---@field change_ops AdevFilesOp[]|nil
 ---@field row_changes table<integer, AdevFilesRowChange>
 ---@field plan_error string|nil
+---@field plan_error_rows integer[]
 ---@field needs_refresh boolean
 ---@field refresh_modifiable? boolean
 
@@ -63,6 +64,7 @@ function M.init(buf, root)
             git_generation = 0,
             change_ops = nil,
             row_changes = {},
+            plan_error_rows = {},
         }
     states[buf].root = root
     states[buf].model = model.new(root)
@@ -80,6 +82,7 @@ function M.init(buf, root)
     states[buf].change_ops = nil
     states[buf].row_changes = {}
     states[buf].plan_error = nil
+    states[buf].plan_error_rows = {}
     states[buf].needs_refresh = false
     states[buf].refresh_modifiable = nil
     return states[buf]

@@ -35,7 +35,7 @@ function M.render(buf, root, opts)
 end
 
 ---@param buf integer
----@return { row: integer, entry: AdevFilesEntry, deleted: boolean }[]|nil, string|nil
+---@return { row: integer, entry: AdevFilesEntry, deleted: boolean }[]|nil, string|nil, integer|nil
 function M.parse_buffer(buf, opts)
     local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     local entries = {}
@@ -43,7 +43,7 @@ function M.parse_buffer(buf, opts)
     for i, line in ipairs(lines) do
         if i == 1 then
             if line ~= "" and not (opts and opts.tolerant) then
-                return nil, "the header row must remain empty"
+                return nil, "the header row must remain empty", i - 1
             end
             goto continue
         end
@@ -51,7 +51,7 @@ function M.parse_buffer(buf, opts)
         local entry, err = parse.parse_line(line)
         if err then
             if not (opts and opts.tolerant) then
-                return nil, string.format("line %d: %s", i, err)
+                return nil, string.format("line %d: %s", i, err), i - 1
             end
         end
         if entry then
