@@ -28,6 +28,18 @@ function M.setup(opts)
     opts = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
     M.config = opts
 
+    vim.api.nvim_create_user_command("AdevFiles", function(args)
+        local path = args.args ~= "" and vim.fn.fnamemodify(args.args, ":p") or vim.fn.getcwd()
+        if vim.fn.isdirectory(path) == 0 then
+            path = vim.fn.fnamemodify(path, ":h")
+        end
+        M.open(path)
+    end, {
+        nargs = "?",
+        complete = "file",
+        desc = "Open adev-files file manager",
+    })
+
     local netrw = require "adev-files.netrw"
     if opts.replace_netrw then
         netrw.setup()
