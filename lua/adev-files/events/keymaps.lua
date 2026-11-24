@@ -125,6 +125,10 @@ function M.attach(buf)
         clipboard.paste(buf, "")
     end, { desc = "Paste clipboard into current directory" })
 
+    set_keymap("n", "<leader>nX", function()
+        clipboard.clear(buf)
+    end, { desc = "Clear clipboard" })
+
     set_keymap("n", "<leader>ns", function()
         local st = state.get(buf)
         local root = st and st.root or ""
