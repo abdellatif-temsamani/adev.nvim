@@ -5,6 +5,9 @@ local M = {}
 ---@param path string
 ---@return string
 function M.abs(path)
+    if type(path) ~= "string" or path == "" then
+        return ""
+    end
     local abs = vim.fn.fnamemodify(path, ":p")
     if abs:sub(-1) == "/" and #abs > 1 then
         abs = abs:sub(1, -2)
@@ -12,16 +15,27 @@ function M.abs(path)
     return abs
 end
 
----@param base string
----@param rel string
+---@param base string?
+---@param rel string?
 ---@return string
 function M.join_abs(base, rel)
-    base = base or ""
-    rel = rel or ""
-    if base ~= "" and rel ~= "" and base:sub(-1) ~= "/" then
-        base = base .. "/"
+    base = type(base) == "string" and base or ""
+    rel = type(rel) == "string" and rel or ""
+
+    local joined
+    if vim.fs and vim.fs.joinpath then
+        joined = vim.fs.joinpath(base, rel)
+    else
+        joined = base
+        if joined ~= "" and rel ~= "" then
+            local last = joined:sub(-1)
+            if last ~= "/" and last ~= "\\" then
+                joined = joined .. "/"
+            end
+        end
+        joined = joined .. rel
     end
-    return M.abs(base .. rel)
+    return M.abs(joined)
 end
 
 ---@param path string
