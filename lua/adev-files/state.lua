@@ -22,7 +22,6 @@ local model = require "adev-files.core.model"
 ---@field git_generation integer
 ---@field git_available boolean|nil
 ---@field git_reason? string
----@field change_ops AdevFilesOp[]|nil
 ---@field row_changes table<integer, AdevFilesRowChange>
 ---@field plan_error string|nil
 ---@field plan_error_rows integer[]
@@ -66,7 +65,6 @@ function M.init(buf, root)
             git_generation = 0,
             git_available = nil,
             git_reason = nil,
-            change_ops = nil,
             row_changes = {},
             plan_error_rows = {},
         }
@@ -85,7 +83,6 @@ function M.init(buf, root)
     states[buf].git_generation = (states[buf].git_generation or 0) + 1
     states[buf].git_available = nil
     states[buf].git_reason = nil
-    states[buf].change_ops = nil
     states[buf].row_changes = {}
     states[buf].plan_error = nil
     states[buf].plan_error_rows = {}

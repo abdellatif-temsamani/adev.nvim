@@ -43,7 +43,6 @@ function M.plan_ops(buf)
     if err then
         st.plan_error = err
         st.plan_error_rows = error_row and { error_row } or {}
-        st.change_ops = nil
         st.row_changes = {}
         return nil, err
     end
@@ -52,7 +51,6 @@ function M.plan_ops(buf)
         planner.plan(st.model, entries, state.get_pending_ops(buf))
     st.plan_error = plan_err
     st.plan_error_rows = plan_err and (error_rows or {}) or {}
-    st.change_ops = ops
     st.row_changes = changes or {}
     if plan_err then
         return nil, plan_err

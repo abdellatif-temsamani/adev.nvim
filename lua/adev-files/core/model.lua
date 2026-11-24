@@ -11,7 +11,6 @@ local M = {}
 
 ---@class AdevFilesModel
 ---@field root string
----@field version integer
 ---@field original_by_id table<integer, AdevFilesNodeSnapshot>
 ---@field original_by_path table<string, integer>
 
@@ -20,7 +19,6 @@ local M = {}
 function M.new(root_path)
     return {
         root = root.normalize_root(root_path),
-        version = 0,
         original_by_id = {},
         original_by_path = {},
     }
@@ -48,7 +46,6 @@ function M.snapshot(model, entries, row_to_id)
             end
         end
     end
-    model.version = model.version + 1
     return model
 end
 
