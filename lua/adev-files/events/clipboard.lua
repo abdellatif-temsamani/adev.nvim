@@ -80,7 +80,7 @@ function M.set_clipboard(buf, mode)
     if not st or st.applying or st.confirming or st.needs_refresh then
         return
     end
-    local items, skipped, err = selection.collect_entries(buf)
+    local items, skipped, err = selection.collect_entries(buf, mode)
     if err then
         utils.err_notify(err, "adev-files")
         return
@@ -134,19 +134,21 @@ function M.paste(buf, rel_dir)
             return
         end
     end
-    for _, source_buf in ipairs(vim.api.nvim_list_bufs()) do
-        local source_state = state.get(source_buf)
-        if source_state and vim.api.nvim_buf_is_valid(source_buf) then
-            local source_ops = plan.plan_ops(source_buf)
-            for _, op in ipairs(source_ops or {}) do
-                if op.type == "rename" then
-                    for _, item in ipairs(clip.items) do
-                        if path.is_same_or_subpath(op.src, item.src) then
-                            utils.err_notify(
-                                "Save or revert the pending rename before copying or cutting",
-                                "adev-files"
-                            )
-                            return
+    if clip.mode == "move" then
+        for _, source_buf in ipairs(vim.api.nvim_list_bufs()) do
+            local source_state = state.get(source_buf)
+            if source_state and vim.api.nvim_buf_is_valid(source_buf) then
+                local source_ops = plan.plan_ops(source_buf)
+                for _, op in ipairs(source_ops or {}) do
+                    if op.type == "rename" or op.type == "move" then
+                        for _, item in ipairs(clip.items) do
+                            if path.is_same_or_subpath(op.src, item.src) then
+                                utils.err_notify(
+                                    "Save or revert the pending rename before cutting this entry",
+                                    "adev-files"
+                                )
+                                return
+                            end
                         end
                     end
                 end
@@ -203,28 +205,39 @@ function M.paste(buf, rel_dir)
         items = filtered
     end
 
-    local ops = {}
     local existing_abs = build_existing_abs(buf, st.root)
-    local insert_at = vim.api.nvim_win_get_cursor(0)[1]
+    local placements = {}
     for _, item in ipairs(items) do
         local src = path.abs(item.src or "")
         local base = vim.fs.basename(src)
         local dst = unique_dest(dest_root, base, existing_abs)
+        if item.kind == "directory" and path.is_same_or_subpath(src, dst) then
+            utils.err_notify("cannot paste a directory into itself: " .. dst, "adev-files")
+            return
+        end
+        existing_abs[dst] = true
+        table.insert(placements, { item = item, src = src, dst = dst })
+    end
 
-        local rel = path.relpath(st.root, dst)
+    local ops = {}
+    local insert_at = vim.api.nvim_win_get_cursor(0)[1]
+    for _, placement in ipairs(placements) do
+        local rel = path.relpath(st.root, placement.dst)
         rel = parse.format_name(rel)
-        if item.kind == "directory" and rel:sub(-1) ~= "/" then
+        if placement.item.kind == "directory" and rel:sub(-1) ~= "/" then
             rel = rel .. "/"
         end
         vim.api.nvim_buf_set_lines(buf, insert_at, insert_at, false, { rel })
         local dst_id = marks.ensure_row(buf, insert_at)
         insert_at = insert_at + 1
 
-        existing_abs[dst] = true
-        table.insert(
-            ops,
-            { type = clip.mode, src = src, dst = dst, dst_id = dst_id, kind = item.kind }
-        )
+        table.insert(ops, {
+            type = clip.mode,
+            src = placement.src,
+            dst = placement.dst,
+            dst_id = dst_id,
+            kind = placement.item.kind,
+        })
     end
 
     if #ops == 0 then

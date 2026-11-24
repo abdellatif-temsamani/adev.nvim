@@ -19,6 +19,7 @@ lua/adev-files/
 │   ├── view.lua                # Buffer projection (render lines from model)
 │   ├── planner.lua             # Plan generation from buffer diffs
 │   ├── executor.lua            # Execute staged ops on disk
+│   ├── op_validation.lua       # Structural validation shared by planner/executor
 │   └── marks.lua               # Row-to-mark mapping for pending ops
 │
 ├── events/
@@ -112,9 +113,13 @@ Two modes:
 
 A custom in-memory clipboard (`clipboard.lua`) stores `{mode: "copy"|"move", items: AdevFilesClipboardItem[]}`. Items are collected via `selection.lua` and applied on paste. Selection marks are cleared after paste.
 
-Save or revert a pending rename before copying or cutting that entry. A mixed
-selection containing a pending rename is rejected without changing the clipboard.
-An earlier clipboard entry also cannot paste a source that is being renamed.
+Copy and rename may be composed. A copied destination and its original can be renamed before saving, including a swap where the copied row takes the original name. A same-path copy is accepted only when a rename or move relocates the source in the same plan.
+
+A pending move is stricter: its source cannot be renamed or deleted until the move is cancelled or its destination row is adjusted. Adding `#del` to a pasted destination, or deleting that row, cancels the paste.
+
+After a successful write, clipboard sources are remapped through rename and move destinations and removed when their source was deleted.
+
+Paste appends `_1`, `_2`, and so on when a name is occupied, including names marked for deletion. Renaming a newly created directory does not rewrite child rows entered under its old path; update those rows before saving.
 
 ## Pending Ops Flow
 
@@ -122,13 +127,16 @@ An earlier clipboard entry also cannot paste a source that is being renamed.
 2. User edits lines (rename, add, delete) or uses clipboard/delete commands
 3. Concealed IDs move with entry text; diffs compare those IDs with the immutable model snapshot
 4. `sync/plan.lua` compiles one operation plan for labels, counts, change navigation, the changes window, and writes
-5. On `:write`, `sync/apply.lua` executes all staged ops
-6. Icons and pipe-delimited labels update in real time
+5. `core/op_validation.lua` rejects overlapping edits, duplicate/nested destinations, entry-kind changes, and directories pasted into themselves; the error is shown in the header and blocks writing
+6. On `:write`, `sync/apply.lua` executes all staged ops and remaps clipboard sources after success
+7. Icons and pipe-delimited labels update in real time
 
 Moving a line keeps its identity. A renamed entry retains its contents, and an
-additional line with the same identity represents a copy. `<leader>nu` restores
-the original name and identity, clearing the pending label. Whole-line edits
-retain the identity captured by the buffer's edit notification.
+additional line with the same identity represents a copy. A copied row may be
+renamed independently, and a copy may reuse its source path when that source is
+relocated by a rename or move in the same save. `<leader>nu` restores the
+original name and identity, clearing the pending label. Whole-line edits retain
+the identity captured by the buffer's edit notification.
 
 Refresh and hidden-file toggles preserve unsaved changes and require saving or
 discarding them before replacing the listing. Navigation asks before discarding

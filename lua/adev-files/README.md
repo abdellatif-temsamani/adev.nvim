@@ -16,6 +16,7 @@ set `replace_netrw = false` to opt out.
 - **In-buffer help** — press `?` in an adev-files buffer
 - **File creation/rename/deletion** — via `<leader>na`, `<leader>nr`, `<leader>nd`
 - **Pending changes** — `<leader>ns` to inspect staged filesystem operations
+- **Safe composition** — copy, rename, and move flows validate conflicts before saving
 - **Permissions** — `<leader>nz` to change permissions on current or marked entries
 
 ## Configuration
@@ -62,6 +63,18 @@ set `replace_netrw = false` to opt out.
 Edit entry names to rename them, or add lines to create files and directories.
 Permissions accept octal (`755`) or symbolic (`rwxr-xr-x`) input and apply
 immediately, without `:write`.
+
+## Change tracking
+
+Edits are staged in the buffer and validated before writing:
+
+- Renaming a copied entry, or copying an entry with a pending rename, is supported. A same-path copy is allowed when a rename or move relocates the source in the same save, so copies and renames can swap names safely.
+- A pending move's source cannot be renamed or deleted. Rename or delete the destination row, or cancel the move first.
+- Adding `#del` to a pasted row, or deleting that row, cancels the paste.
+- After a successful save, clipboard entries follow renamed or moved sources and are removed when their source is deleted.
+- Structural conflicts such as overlapping edits, nested destinations, changing a file into a directory, or pasting a directory into itself appear in the header and block writing.
+
+Paste appends `_1`, `_2`, and so on when a name is already occupied. Names marked for deletion still count as occupied until the save completes. Renaming a newly created directory does not rewrite child rows entered under its old name; update those rows too before saving.
 
 In help and pending changes popups, use `j` / `k` / `<C-d>` / `<C-u>` to scroll
 and `q` / `<Esc>` to close. In confirmation popups, `y` / `<CR>` confirms and

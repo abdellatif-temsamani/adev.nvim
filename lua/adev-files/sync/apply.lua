@@ -1,5 +1,6 @@
 local utils = require "adev-common.utils"
 
+local clipboard = require "adev-files.clipboard"
 local confirmation = require "adev-files.utils.confirmation"
 local executor = require "adev-files.core.executor"
 local fmt = require "adev-files.sync.format"
@@ -104,12 +105,8 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         end
 
         -- Refresh after clearing `applying`, otherwise refresh is a no-op.
+        clipboard.apply_path_changes(ops)
         state.clear_pending_ops(buf)
-        for _, op in ipairs(ops) do
-            if op.type == "move" then
-                require("adev-files.clipboard").remove_by_src(op.src)
-            end
-        end
         st2.needs_refresh = true
         st2.refresh_modifiable = modifiable
         if not view.refresh(buf, { force = true }) then

@@ -15,34 +15,60 @@ function M.restore_ids(buf)
     if not st or st.confirming or st.applying then
         return
     end
+
+    local function used_ids()
+        local used = {}
+        for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+            if i > 1 then
+                local clean = parse.strip_delete_marker(line)
+                local entry = parse.parse_line(clean)
+                if entry and entry.id then
+                    used[entry.id] = true
+                end
+            end
+        end
+        return used
+    end
+
+    local used = used_ids()
     local missing = st.missing_ids or {}
     st.missing_ids = {}
     for row, id in pairs(missing) do
         local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
-        if line then
-            local _, current_id = parse.strip_id(line)
-            if not current_id then
+        if line and row > 0 then
+            local clean, deleted = parse.strip_delete_marker(line)
+            local _, current_id = parse.strip_id(clean)
+            if not deleted and not current_id and not used[id] then
                 vim.api.nvim_buf_set_text(buf, row, 0, row, 0, { string.format("/%d ", id) })
+                used[id] = true
             end
         end
     end
+
     -- Recover unchanged names when a bulk edit removed their concealed IDs.
-    -- This prevents an unchanged file from becoming a delete/create pair.
+    -- This prevents an unchanged file from becoming a delete/create pair, but
+    -- must never assign an ID that is already carried by another row.
+    used = used_ids()
     for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
         if i > 1 then
-            local entry = parse.parse_line(line)
-            if entry and not entry.id then
-                local abs = path.join_abs(st.root, entry.fs_name)
-                local id = st.model.original_by_path[abs]
-                if id then
-                    vim.api.nvim_buf_set_text(
-                        buf,
-                        i - 1,
-                        0,
-                        i - 1,
-                        0,
-                        { string.format("/%d ", id) }
-                    )
+            local clean, deleted = parse.strip_delete_marker(line)
+            if not deleted then
+                local entry = parse.parse_line(clean)
+                if entry and not entry.id then
+                    local abs = path.join_abs(st.root, entry.fs_name)
+                    local id = st.model.original_by_path[abs]
+                    local original = id and st.model.original_by_id[id] or nil
+                    if id and not used[id] and original and original.kind == entry.kind then
+                        vim.api.nvim_buf_set_text(
+                            buf,
+                            i - 1,
+                            0,
+                            i - 1,
+                            0,
+                            { string.format("/%d ", id) }
+                        )
+                        used[id] = true
+                    end
                 end
             end
         end

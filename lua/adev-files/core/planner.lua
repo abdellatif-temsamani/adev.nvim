@@ -1,3 +1,4 @@
+local op_validation = require "adev-files.core.op_validation"
 local path = require "adev-files.utils.fs.path"
 
 local M = {}
@@ -60,9 +61,34 @@ function M.plan(model, entries, pending_ops)
                 return nil, "pasted entry ID appears more than once"
             end
             local item = items and items[1] or nil
+            cloned.src = path.abs(cloned.src)
+
+            -- A move owns its source row. Renaming that row would be silently
+            -- lost, so reject the combination instead of dropping the rename.
+            if cloned.type == "move" then
+                local source_id = model.original_by_path[cloned.src]
+                local source_original = source_id and originals[source_id] or nil
+                if source_original then
+                    for _, source_item in ipairs(by_id[source_id] or {}) do
+                        if source_item.deleted then
+                            return nil,
+                                "cannot delete the source of a pending move; cancel the move first"
+                        end
+                        if source_item.entry.fs_name ~= source_original.fs_name then
+                            return nil,
+                                "cannot rename the source of a pending move; "
+                                    .. "cancel the move or rename the destination row instead"
+                        end
+                    end
+                end
+            end
+
             if item and not item.deleted then
+                if cloned.kind and item.entry.kind ~= cloned.kind then
+                    return nil,
+                        "cannot change the entry type of a pasted entry: " .. item.entry.fs_name
+                end
                 cloned.dst = path.join_abs(model.root, item.entry.fs_name)
-                cloned.src = path.abs(cloned.src)
                 cloned.kind = item.entry.kind
                 destinations[item.row] = true
                 if cloned.type == "move" then
@@ -75,18 +101,24 @@ function M.plan(model, entries, pending_ops)
                     kind = cloned.kind,
                     dst_id = cloned.dst_id,
                 }, item.row)
+                -- Retain the intent so undoing removal of a destination restores it.
+                table.insert(updated_pending, cloned)
             elseif not cloned.dst_id and cloned.dst then
                 -- Allow callers to stage operations without a buffer entry.
-                cloned.src = path.abs(cloned.src)
                 cloned.dst = path.abs(cloned.dst)
                 if cloned.type == "move" then
                     move_sources[cloned.src] = true
                 end
                 add(vim.deepcopy(cloned))
+                table.insert(updated_pending, cloned)
+            elseif item and item.deleted then
+                -- Deleting a pasted destination cancels the paste. It must not
+                -- remain as an invisible pending operation.
+            else
+                -- The row is temporarily absent; keep the intent so undo can
+                -- restore the destination.
+                table.insert(updated_pending, cloned)
             end
-            -- Retain the intent so undoing removal of a destination restores it.
-            -- Only destinations present in the buffer are included in the plan.
-            table.insert(updated_pending, cloned)
         elseif cloned.type == "delete" then
             cloned.path = path.abs(cloned.path)
             delete_paths[cloned.path] = true
@@ -147,6 +179,11 @@ function M.plan(model, entries, pending_ops)
             local abs = path.join_abs(model.root, item.entry.fs_name)
             add({ type = "create", path = abs, kind = item.entry.kind }, item.row)
         end
+    end
+
+    local _, validation_err = op_validation.validate_structural(ops)
+    if validation_err then
+        return nil, validation_err
     end
 
     table.sort(ops, function(a, b)
