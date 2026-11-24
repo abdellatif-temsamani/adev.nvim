@@ -255,6 +255,9 @@ function M.paste(buf, rel_dir)
 
     plan.stage_ops(buf, ops)
     state.clear_selection_marks(buf)
+    -- A successful paste consumes the clipboard. Keeping it would leave stale
+    -- [copied]/[moved] markers on the sources and allow the same paste twice.
+    clipboard.clear()
     render.add_virtual_text(buf, st.root)
 end
 

@@ -46,6 +46,7 @@ local function content()
         entry("<leader>nx", "cut current / marked / visual entries"),
         entry("<leader>np", "paste into current directory"),
         entry("<leader>nX", "clear clipboard"),
+        "    Paste consumes the clipboard; copy/cut again to paste elsewhere.",
         "    Copies may be renamed before saving.",
         "    Cancel a move before renaming/deleting its source.",
         "",

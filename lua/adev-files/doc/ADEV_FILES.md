@@ -139,13 +139,13 @@ filesystem.
 
 ## Clipboard
 
-A custom in-memory clipboard (`clipboard.lua`) stores `{mode: "copy"|"move", items: AdevFilesClipboardItem[]}`. Items are collected via `selection.lua` and applied on paste. Selection marks are cleared after paste.
+A custom in-memory clipboard (`clipboard.lua`) stores `{mode: "copy"|"move", items: AdevFilesClipboardItem[]}`. Items are collected via `selection.lua` and applied on paste. A successful paste consumes the clipboard and clears selection marks; a rejected paste leaves it intact.
 
 Copy and rename may be composed. A copied destination and its original can be renamed before saving, including a swap where the copied row takes the original name. A same-path copy is accepted only when a rename or move relocates the source in the same plan.
 
 A pending move is stricter: its source cannot be renamed or deleted until the move is cancelled or its destination row is adjusted. Adding `#del` to a pasted destination, or deleting that row, cancels the paste.
 
-After a successful write, clipboard sources are remapped through rename and move destinations and removed when their source was deleted.
+After a successful write, clipboard entries that were not pasted are remapped through rename and move destinations and removed when their source was deleted.
 
 Paste appends `_1`, `_2`, and so on when a name is occupied, including names marked for deletion. Renaming a newly created directory does not rewrite child rows entered under its old path; update those rows before saving.
 
