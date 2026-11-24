@@ -1,3 +1,5 @@
+local utils = require "adev-common.utils"
+
 local path = require "adev-files.utils.fs.path"
 
 local M = {}
@@ -63,39 +65,72 @@ end
 ---@param root string
 ---@param callback fun(status: table<string, string>, files?: table<string, string>, meta?: AdevFilesGitMeta)
 function M.fetch_status(root, callback)
-    local executable = Adev and Adev.git or "git"
+    local executable = (Adev and Adev.git) or "git"
     root = path.norm_real(root)
-    local function run(args, cwd, done)
-        local ok = pcall(vim.system, args, { cwd = cwd, text = false }, function(result)
-            vim.schedule(function()
-                done(result)
-            end)
+
+    local function deliver(status, files, meta)
+        local handled, err = pcall(callback, status, files, meta)
+        if not handled then
+            utils.err_notify("git status callback failed: " .. tostring(err), "adev-files")
+        end
+    end
+    local function fail(reason)
+        deliver({}, {}, { available = false, reason = reason })
+    end
+    local function unavailable()
+        fail "vim.system unavailable (Neovim 0.10+ required)"
+    end
+
+    if type(vim.system) ~= "function" then
+        -- Avoid misreporting an API gap as a missing git executable.
+        vim.schedule(unavailable)
+        return
+    end
+    if vim.fn.executable(executable) ~= 1 then
+        vim.schedule(function()
+            fail("git executable not found: " .. tostring(executable))
         end)
+        return
+    end
+
+    local function run(args, cwd, done)
+        local ok = pcall(
+            vim.system,
+            args,
+            { cwd = cwd, text = false, timeout = 10000 },
+            function(result)
+                vim.schedule(function()
+                    local handled, err = pcall(done, result)
+                    if not handled then
+                        utils.err_notify("git status failed: " .. tostring(err), "adev-files")
+                        fail("git status failed: " .. tostring(err))
+                    end
+                end)
+            end
+        )
         if not ok then
-            vim.schedule(function()
-                done(nil)
-            end)
+            vim.schedule(unavailable)
         end
     end
 
     run({ executable, "rev-parse", "--show-toplevel" }, root, function(result)
         if not result then
-            callback(
-                {},
-                {},
-                { available = false, reason = "git command unavailable: " .. executable }
-            )
+            fail("git command unavailable: " .. executable)
+            return
+        end
+        if result.code == 124 then
+            fail "git status timed out"
             return
         end
         if result.code ~= 0 then
             local stderr = (result.stderr or ""):gsub("[\r\n]+$", "")
             local reason = stderr ~= "" and stderr or "not a git repository"
-            callback({}, {}, { available = false, reason = reason })
+            fail(reason)
             return
         end
         local git_root = (result.stdout or ""):gsub("[\r\n]+$", "")
         if git_root == "" then
-            callback({}, {}, { available = false, reason = "not a git repository" })
+            fail "not a git repository"
             return
         end
         run(
@@ -113,23 +148,20 @@ function M.fetch_status(root, callback)
             git_root,
             function(status_result)
                 if not status_result then
-                    callback(
-                        {},
-                        {},
-                        { available = false, reason = "git command unavailable: " .. executable }
-                    )
+                    fail("git command unavailable: " .. executable)
+                    return
+                end
+                if status_result.code == 124 then
+                    fail "git status timed out"
                     return
                 end
                 if status_result.code ~= 0 then
                     local stderr = (status_result.stderr or ""):gsub("[\r\n]+$", "")
-                    callback({}, {}, {
-                        available = false,
-                        reason = stderr ~= "" and stderr or "git status failed",
-                    })
+                    fail(stderr ~= "" and stderr or "git status failed")
                     return
                 end
                 local status, files = parse_porcelain(status_result.stdout or "", root, git_root)
-                callback(status, files, { available = true })
+                deliver(status, files, { available = true })
             end
         )
     end)

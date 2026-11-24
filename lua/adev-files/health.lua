@@ -68,17 +68,18 @@ function M.check()
     end
 
     vim.health.start "adev-files dependencies"
-    if vim.fn.executable "git" == 1 then
-        local git = (Adev and Adev.git) or "git"
-        if vim.fn.executable(git) == 1 then
-            ok("git executable: " .. git)
-        else
-            warn("configured git executable not found: " .. tostring(git), {
-                "Set Adev.git to a valid executable",
-            })
-        end
+    if type(vim.system) == "function" then
+        ok "vim.system available"
     else
-        warn("git executable not found", { "Git status indicators will be unavailable" })
+        err("vim.system unavailable", { "adev-files needs Neovim 0.10+ for git status" })
+    end
+    local git = (Adev and Adev.git) or "git"
+    if vim.fn.executable(git) == 1 then
+        ok("git executable: " .. git)
+    else
+        warn("git executable not found: " .. tostring(git), {
+            "Set Adev.git to a valid executable on PATH",
+        })
     end
 
     if vim.fn.executable "fd" == 1 then
@@ -102,7 +103,12 @@ function M.check()
             err("cannot create temp directory for listing smoke test: " .. tostring(mkdir_err))
         else
             local ok_listing, lines, list_err = pcall(listing.build_lines, tmp)
-            pcall(vim.fn.delete, tmp, "rf")
+            local ok_delete, delete_result = pcall(vim.fn.delete, tmp, "rf")
+            if not ok_delete or delete_result ~= 0 then
+                warn("could not clean up temp directory: " .. tmp, {
+                    "Remove it manually; adev-files only uses it for a smoke test",
+                })
+            end
             if not ok_listing then
                 err("directory listing smoke test raised: " .. tostring(lines))
             elseif type(lines) == "table" then
