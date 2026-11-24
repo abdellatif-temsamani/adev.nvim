@@ -2,40 +2,9 @@ if vim.b.current_syntax then
     return
 end
 
+-- Buffer lines contain concealed entry IDs followed by editable filenames.
+-- Header, icons, git markers, and pending labels are rendered via extmarks.
 vim.cmd [[syntax match adevFilesEntryId "^/\d\+ " conceal]]
-
-vim.cmd [[syntax match adevFilesHelp "^│.*$" contains=adevFilesHelpKey]]
-
-vim.cmd [[syntax match adevFilesHelpKey "\c<CR>" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "\c<bs>" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "[=?]" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "ny" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "nx" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "np" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "nd" contained containedin=adevFilesHelp]]
-vim.cmd [[syntax match adevFilesHelpKey "nc" contained containedin=adevFilesHelp]]
-
-vim.cmd [[syntax match adevFilesSeparator "^=\+$"]]
-
-vim.cmd [[syntax match adevFilesDirValue "^.\+/$"]]
-
-vim.cmd [[syntax match adevFilesTitle "^root:.*$"]]
-
-vim.cmd [[syntax match adevFilesGroupSep "^$"]]
-
-vim.cmd [[syntax match adevFilesFileValue "^[^r│=].*[^/]$"]]
-vim.cmd [[syntax match adevFilesFileValue "^r[^o].*[^/]$"]]
-vim.cmd [[syntax match adevFilesFileValue "^ro[^o].*[^/]$"]]
-vim.cmd [[syntax match adevFilesFileValue "^roo[^t].*[^/]$"]]
-vim.cmd [[syntax match adevFilesFileValue "^root[^:].*[^/]$"]]
-
-vim.api.nvim_set_hl(0, "adevFilesHelp", { link = "Comment", default = true })
-vim.api.nvim_set_hl(0, "adevFilesHelpKey", { link = "Identifier", default = true })
-vim.api.nvim_set_hl(0, "adevFilesSeparator", { link = "Comment", default = true })
-vim.api.nvim_set_hl(0, "adevFilesGroupSep", { link = "Comment", default = true })
-vim.api.nvim_set_hl(0, "adevFilesTitle", { link = "Type", default = true })
-vim.api.nvim_set_hl(0, "adevFilesDirValue", { link = "Function", default = true })
-vim.api.nvim_set_hl(0, "adevFilesFileValue", { link = "Normal", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingDelete", { link = "adevFilesGitDeleted", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingCopy", { link = "adevFilesGitCopied", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPendingMove", { link = "adevFilesGitModified", default = true })
