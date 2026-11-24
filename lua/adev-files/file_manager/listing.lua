@@ -73,11 +73,10 @@ function M.build_lines(root, opts)
         if not show_hidden and fname:sub(1, 1) == "." then
             goto continue
         end
-        local entry_name = parse.format_name(fname)
         local is_dir = is_directory(root, fname, ftype)
-        if is_dir and entry_name:sub(-1) ~= "/" then
-            entry_name = entry_name .. "/"
-        end
+        -- Encode the trailing slash together with the name so quoted names
+        -- (newlines, quotes, leading/trailing spaces) round-trip as directories.
+        local entry_name = parse.format_name(is_dir and (fname .. "/") or fname)
         if is_dir then
             table.insert(dirs, entry_name)
         else

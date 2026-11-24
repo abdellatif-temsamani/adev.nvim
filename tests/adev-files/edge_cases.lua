@@ -665,6 +665,74 @@ local function test_plan_error_highlights_duplicate_path()
     )
 end
 
+local function virt_text_for_row(buf, row)
+    local marks =
+        vim.api.nvim_buf_get_extmarks(buf, state.display_ns(), row, row, { details = true })
+    local parts = {}
+    for _, mark in ipairs(marks) do
+        for _, chunk in ipairs(mark[4].virt_text or {}) do
+            table.insert(parts, chunk[1])
+        end
+    end
+    return table.concat(parts)
+end
+
+local function test_parse_round_trip_special_names()
+    local dir = reset_dir "round-trip-names"
+    local names = { "with space.txt", 'quote"name.txt', "café.txt", "line\nbreak.txt" }
+    for _, name in ipairs(names) do
+        vim.fn.writefile({ "x" }, dir .. "/" .. name)
+    end
+    local buf = new_manager(dir)
+    local entries = view.parse_buffer(buf)
+    check(entries ~= nil, "parse should succeed for special names")
+    local found = {}
+    for _, item in ipairs(entries or {}) do
+        found[item.entry.fs_name] = item.entry
+    end
+    for _, name in ipairs(names) do
+        check(found[name] ~= nil, "round-trip missing name: " .. string.format("%q", name))
+        if found[name] then
+            eq(found[name].kind, "file", "kind for " .. string.format("%q", name))
+        end
+    end
+    local ops, err = plan.plan_ops(buf)
+    eq(#(ops or {}), 0, "unchanged special names should not create ops: " .. tostring(err))
+end
+
+local function test_quoted_directory_round_trip()
+    local dir = reset_dir "round-trip-dir"
+    local name = "dir\nquoted"
+    vim.fn.mkdir(dir .. "/" .. name, "p")
+    vim.fn.writefile({ "x" }, dir .. "/" .. name .. "/child.txt")
+    local buf = new_manager(dir)
+    local entries = view.parse_buffer(buf)
+    local found
+    for _, item in ipairs(entries or {}) do
+        if item.entry.kind == "directory" then
+            found = item.entry.fs_name
+        end
+    end
+    eq(found, name, "quoted directory name round-trip")
+    local ops, err = plan.plan_ops(buf)
+    eq(#(ops or {}), 0, "unchanged directory should not create ops: " .. tostring(err))
+end
+
+local function test_special_mode_display()
+    local dir = reset_dir "mode-special-bits"
+    local file = dir .. "/setuid.txt"
+    vim.fn.writefile({ "x" }, file)
+    local uv = vim.uv or vim.loop
+    uv.fs_chmod(file, tonumber("4755", 8))
+    local buf = new_manager(dir)
+    local row = row_with(buf, "setuid.txt")
+    check(row ~= nil, "setuid row should be rendered")
+    if row then
+        local text = virt_text_for_row(buf, row)
+        check(text:find("s", 1, true) ~= nil, "setuid bit should render as s: " .. text)
+    end
+end
+
 local function test_plan_error_highlights_parse_error()
     local dir = reset_dir "plan-error-highlight-parse"
     write_file(dir .. "/A.txt", "alpha")
@@ -697,6 +765,9 @@ local tests = {
     test_move_source_rename_rejected,
     test_plan_error_highlights_duplicate_path,
     test_plan_error_highlights_parse_error,
+    test_parse_round_trip_special_names,
+    test_quoted_directory_round_trip,
+    test_special_mode_display,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_marker_cancels_pending,

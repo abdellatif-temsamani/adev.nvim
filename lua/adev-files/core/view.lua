@@ -6,7 +6,7 @@ local M = {}
 
 ---@param buf integer
 ---@param root string
----@param opts? { show_hidden?: boolean }
+---@param opts? { show_hidden?: boolean, lines?: string[] }
 ---@return string[]
 function M.render(buf, root, opts)
     local entries, err
@@ -28,9 +28,25 @@ function M.render(buf, root, opts)
     for _, l in ipairs(entries) do
         table.insert(lines, l)
     end
+    -- The buffer may be locked after an apply or while a refresh is pending.
+    -- Unlock only for the write itself, then restore the state's intent so a
+    -- failed or deferred refresh does not silently make entries editable.
+    local st = state.get(buf)
+    local desired_modifiable = vim.bo[buf].modifiable
+    if st then
+        if st.refresh_modifiable ~= nil then
+            desired_modifiable = st.refresh_modifiable
+        elseif st.needs_refresh then
+            desired_modifiable = false
+        end
+    end
     vim.bo[buf].modifiable = true
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    local ok, set_err = pcall(vim.api.nvim_buf_set_lines, buf, 0, -1, false, lines)
     vim.bo[buf].modified = false
+    vim.bo[buf].modifiable = desired_modifiable and true or false
+    if not ok then
+        return nil, tostring(set_err)
+    end
     return lines
 end
 

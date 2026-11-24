@@ -69,11 +69,17 @@ local function render_snapshot(buf, st)
     local lines, err = listing.build_lines(st.root, { show_hidden = st.show_hidden })
     if not lines then
         utils.err_notify("Cannot read directory: " .. tostring(err), "adev-files")
+        -- Keep needs_refresh so a later refresh can still retry, but never
+        -- leave stale, unreadable content editable.
+        st.refresh_modifiable = nil
+        if vim.api.nvim_buf_is_valid(buf) then
+            vim.bo[buf].modifiable = false
+            vim.bo[buf].modified = false
+        end
         return false
     end
     if st.refresh_modifiable ~= nil then
         vim.bo[buf].modifiable = st.refresh_modifiable
-        st.refresh_modifiable = nil
     end
     st.needs_refresh = false
     state.clear_pending_ops(buf)
@@ -85,7 +91,12 @@ local function render_snapshot(buf, st)
     end
     vim.api.nvim_buf_set_name(buf, name)
     window.set_title_from_state(buf, st.root)
-    render.render(buf, st.root, { lines = lines })
+    local rendered, render_err = render.render(buf, st.root, { lines = lines })
+    if not rendered then
+        utils.err_notify("Cannot render directory: " .. tostring(render_err), "adev-files")
+        return false
+    end
+    st.refresh_modifiable = nil
     index.index_original(buf)
     index.reindex(buf)
     render.add_virtual_text(buf, st.root)
@@ -163,8 +174,12 @@ function M.toggle_hidden(buf)
         return false
     end
     st.show_hidden = not st.show_hidden
-    if not render_snapshot(buf, st) then
+    local ok, rendered = pcall(render_snapshot, buf, st)
+    if not ok or not rendered then
         st.show_hidden = not st.show_hidden
+        if not ok then
+            utils.err_notify("Failed to toggle hidden files: " .. tostring(rendered), "adev-files")
+        end
         return false
     end
     return true

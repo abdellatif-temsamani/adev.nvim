@@ -108,27 +108,10 @@ function M.parse_line(line)
         return nil, nil
     end
 
-    local kind
-    if name:sub(-1) == "/" then
-        kind = "directory"
-    else
-        kind = "file"
-    end
-
-    if kind == "directory" then
-        if name:sub(-1) ~= "/" then
-            name = name .. "/"
-        end
-    else
-        if name:sub(-1) == "/" then
-            return nil, "file entry cannot end with '/'"
-        end
-    end
-
+    -- Decode before deciding the kind: a quoted directory name carries its
+    -- trailing slash inside the JSON string, otherwise it would look like a
+    -- file whose display name merely ends with a quote.
     local fs_name = name
-    if kind == "directory" then
-        fs_name = name:sub(1, -2)
-    end
     if fs_name:sub(1, 1) == '"' then
         local ok, decoded = pcall(vim.json.decode, fs_name)
         if not ok or type(decoded) ~= "string" then
@@ -137,16 +120,29 @@ function M.parse_line(line)
         fs_name = decoded
     end
 
+    local kind
+    if fs_name:sub(-1) == "/" then
+        kind = "directory"
+        fs_name = fs_name:sub(1, -2)
+    else
+        kind = "file"
+    end
+
     if not validate.is_valid_rel_path(fs_name) then
         return nil, "invalid path: '" .. fs_name .. "'"
+    end
+
+    local display = fs_name
+    if kind == "directory" then
+        display = display .. "/"
     end
 
     return {
         id = id,
         kind = kind,
-        name = name,
+        name = display,
         fs_name = fs_name,
-        display = name,
+        display = display,
     },
         nil
 end
