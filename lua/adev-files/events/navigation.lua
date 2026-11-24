@@ -142,7 +142,10 @@ function M.next_plan_error(buf)
     end
     plan.plan_ops(buf)
     st = state.get(buf)
-    local rows = st and st.plan_error_rows or {}
+    if not st then
+        return
+    end
+    local rows = st.plan_error_rows or {}
     if #rows == 0 then
         utils.notify("No plan errors", vim.log.levels.INFO, "adev-files")
         return
@@ -231,6 +234,7 @@ function M.open_or_enter(buf)
         end
         -- Resolve windows at open time: a stored window ID may have been
         -- reused for an unrelated buffer since this manager was opened.
+        ---@type integer|nil
         local manager_win = vim.fn.bufwinid(buf)
         if manager_win == -1 then
             manager_win = nil

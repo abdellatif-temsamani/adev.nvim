@@ -68,6 +68,7 @@ function M.copy_file(src, dst, follow_symlink)
                     (write_err_name or "fs_write") .. ": " .. (write_err_msg or "short write"),
                     true
             end
+            ---@cast n integer
             written = written + n
         end
         off = off + #data

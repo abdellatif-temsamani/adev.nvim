@@ -25,6 +25,9 @@ end
 ---@field dst? string
 ---@field dst_id? integer
 ---@field row? integer
+---@field _index integer
+---@field _source_stat uv.fs_stat.result
+---@field _copy_stat uv.fs_stat.result
 
 ---@param buf integer
 ---@return AdevFilesOp[]|nil, string|nil, table<integer, AdevFilesRowChange>?
@@ -40,11 +43,12 @@ function M.plan_ops(buf)
     end
     index.restore_ids(buf)
     local entries, err, error_row = view.parse_buffer(buf)
-    if err then
-        st.plan_error = err
+    if not entries then
+        local message = err or "failed to parse buffer"
+        st.plan_error = message
         st.plan_error_rows = error_row and { error_row } or {}
         st.row_changes = {}
-        return nil, err
+        return nil, message
     end
     index.reindex(buf)
     local ops, plan_err, updated_pending, changes, error_rows =

@@ -6,8 +6,8 @@ local utils = require "adev-common.utils"
 local M = {}
 
 ---@param buf integer
----@param destination string|fun(ok:boolean):nil
----@param cb fun(ok: boolean): nil
+---@param destination? string|fun(ok:boolean):nil
+---@param cb? fun(ok: boolean): nil
 function M.confirm_discard_if_modified(buf, destination, cb)
     if type(destination) == "function" then
         cb = destination

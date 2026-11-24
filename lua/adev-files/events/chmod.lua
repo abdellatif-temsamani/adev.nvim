@@ -146,7 +146,7 @@ function M.chmod_entry(buf)
     local target = items[1]
     local stat = uv.fs_stat(target.src)
     if not stat then
-        vim.notify("Cannot stat: " .. target.src, vim.log.levels.ERROR, "adev-files")
+        vim.notify("Cannot stat: " .. target.src, vim.log.levels.ERROR, { title = "adev-files" })
         return
     end
 
@@ -181,7 +181,7 @@ function M.chmod_entry(buf)
         end
         local mode = perm_from_str(input)
         if not mode or mode < 0 or mode > 4095 then
-            vim.notify("Invalid mode: " .. input, vim.log.levels.ERROR, "adev-files")
+            vim.notify("Invalid mode: " .. input, vim.log.levels.ERROR, { title = "adev-files" })
             return
         end
         local ok_count = 0
@@ -196,7 +196,7 @@ function M.chmod_entry(buf)
                 vim.notify(
                     "Chmod failed: " .. name .. " - " .. tostring(err),
                     vim.log.levels.ERROR,
-                    "adev-files"
+                    { title = "adev-files" }
                 )
             end
         end
@@ -213,7 +213,7 @@ function M.chmod_entry(buf)
             vim.notify(
                 msg,
                 #failures > 0 and vim.log.levels.WARN or vim.log.levels.INFO,
-                "adev-files"
+                { title = "adev-files" }
             )
             if ok_count > 0 then
                 render.add_virtual_text(buf, st.root)

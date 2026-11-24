@@ -55,7 +55,12 @@ function M.refresh_git_status(buf)
             return
         end
         local current = state.get(buf)
-        if current ~= st or current.root ~= root or current.git_generation ~= generation then
+        if
+            not current
+            or current ~= st
+            or current.root ~= root
+            or current.git_generation ~= generation
+        then
             return
         end
         local prev_available = current.git_available

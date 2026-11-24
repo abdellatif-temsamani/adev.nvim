@@ -4,7 +4,7 @@ local uv = vim.uv or vim.loop
 
 ---@param root string
 ---@param name string
----@param ftype string
+---@param ftype string|nil
 ---@return boolean
 local function is_directory(root, name, ftype)
     if ftype == "directory" then
@@ -49,7 +49,7 @@ end
 --- Build file entry lines (without icons - icons are virtual text)
 ---@param root string
 ---@param opts? { show_hidden?: boolean }
----@return string[]
+---@return string[]|nil, string|nil
 function M.build_lines(root, opts)
     local scan, err = uv.fs_scandir(root)
     if not scan then

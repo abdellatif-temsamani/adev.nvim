@@ -83,7 +83,7 @@ function M.create_file()
             vim.notify(
                 "Invalid path: " .. tostring(rel_err or "invalid path"),
                 vim.log.levels.ERROR,
-                "adev-files"
+                { title = "adev-files" }
             )
             return
         end
@@ -92,12 +92,16 @@ function M.create_file()
         if is_dir then
             local ok, err = fs_ops.mkdir_p(abs_path)
             if ok then
-                vim.notify("Created directory: " .. input, vim.log.levels.INFO, "adev-files")
+                vim.notify(
+                    "Created directory: " .. input,
+                    vim.log.levels.INFO,
+                    { title = "adev-files" }
+                )
             else
                 vim.notify(
                     "Failed to create directory: " .. tostring(err),
                     vim.log.levels.ERROR,
-                    "adev-files"
+                    { title = "adev-files" }
                 )
             end
             return
@@ -108,7 +112,7 @@ function M.create_file()
             vim.notify(
                 "Failed to create directory: " .. tostring(mkdir_err),
                 vim.log.levels.ERROR,
-                "adev-files"
+                { title = "adev-files" }
             )
             return
         end
@@ -123,7 +127,7 @@ function M.create_file()
                         .. " - "
                         .. tostring(ferr_name or ferr_msg),
                     vim.log.levels.ERROR,
-                    "adev-files"
+                    { title = "adev-files" }
                 )
                 return
             end
@@ -132,25 +136,27 @@ function M.create_file()
                 vim.notify(
                     "Failed to close new file: " .. abs_path .. " - " .. tostring(close_err),
                     vim.log.levels.ERROR,
-                    "adev-files"
+                    { title = "adev-files" }
                 )
                 return
             end
         end
 
-        local ok_edit, edit_err = pcall(vim.cmd, "edit " .. vim.fn.fnameescape(abs_path))
+        local ok_edit, edit_err = pcall(function()
+            vim.cmd("edit " .. vim.fn.fnameescape(abs_path))
+        end)
         if not ok_edit then
             vim.notify(
                 "Failed to open " .. abs_path .. ": " .. tostring(edit_err),
                 vim.log.levels.ERROR,
-                "adev-files"
+                { title = "adev-files" }
             )
             return
         end
         vim.notify(
             (existed and "Opened: " or "Created: ") .. input,
             vim.log.levels.INFO,
-            "adev-files"
+            { title = "adev-files" }
         )
     end)
 end
@@ -159,7 +165,7 @@ function M.rename_file()
     local buf = vim.api.nvim_get_current_buf()
     local file = vim.api.nvim_buf_get_name(buf)
     if file == "" then
-        vim.notify("No file in current buffer", vim.log.levels.WARN, "adev-files")
+        vim.notify("No file in current buffer", vim.log.levels.WARN, { title = "adev-files" })
         return
     end
     local old_name = vim.fn.fnamemodify(file, ":t")
@@ -175,19 +181,23 @@ function M.rename_file()
             vim.notify(
                 "Invalid name: use a single name without path separators",
                 vim.log.levels.ERROR,
-                "adev-files"
+                { title = "adev-files" }
             )
             return
         end
         if not validation.is_valid_rel_path(clean) then
-            vim.notify("Invalid name: " .. input, vim.log.levels.ERROR, "adev-files")
+            vim.notify("Invalid name: " .. input, vim.log.levels.ERROR, { title = "adev-files" })
             return
         end
         local dir = vim.fn.fnamemodify(file, ":h")
         local new_path = path.join_abs(dir, clean)
         local ok, err = fs_ops.rename_path(file, new_path)
         if not ok then
-            vim.notify("Rename failed: " .. tostring(err), vim.log.levels.ERROR, "adev-files")
+            vim.notify(
+                "Rename failed: " .. tostring(err),
+                vim.log.levels.ERROR,
+                { title = "adev-files" }
+            )
             return
         end
 
@@ -222,12 +232,16 @@ function M.rename_file()
                         .. tostring(rollback_err)
                     ),
                 vim.log.levels.ERROR,
-                "adev-files"
+                { title = "adev-files" }
             )
             return
         end
 
-        vim.notify("Renamed: " .. old_name .. " -> " .. clean, vim.log.levels.INFO, "adev-files")
+        vim.notify(
+            "Renamed: " .. old_name .. " -> " .. clean,
+            vim.log.levels.INFO,
+            { title = "adev-files" }
+        )
     end)
 end
 
@@ -235,7 +249,7 @@ function M.delete_file()
     local buf = vim.api.nvim_get_current_buf()
     local file = vim.api.nvim_buf_get_name(buf)
     if file == "" then
-        vim.notify("No file in current buffer", vim.log.levels.WARN, "adev-files")
+        vim.notify("No file in current buffer", vim.log.levels.WARN, { title = "adev-files" })
         return
     end
     local name = vim.fn.fnamemodify(file, ":t")
@@ -255,11 +269,17 @@ function M.delete_file()
         if ok then
             clipboard.remove_by_src(file)
             if vim.api.nvim_buf_is_valid(buf) then
-                pcall(vim.cmd, "bwipeout! " .. buf)
+                pcall(function()
+                    vim.cmd("bwipeout! " .. buf)
+                end)
             end
-            vim.notify("Deleted: " .. name, vim.log.levels.INFO, "adev-files")
+            vim.notify("Deleted: " .. name, vim.log.levels.INFO, { title = "adev-files" })
         else
-            vim.notify("Delete failed: " .. tostring(err), vim.log.levels.ERROR, "adev-files")
+            vim.notify(
+                "Delete failed: " .. tostring(err),
+                vim.log.levels.ERROR,
+                { title = "adev-files" }
+            )
         end
     end)
 end
