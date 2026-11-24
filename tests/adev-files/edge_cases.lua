@@ -13,8 +13,10 @@ local clipboard_events = require "adev-files.events.clipboard"
 local delete_events = require "adev-files.events.delete"
 local executor = require "adev-files.core.executor"
 local open = require "adev-files.file_manager.open"
+local path_validation = require "adev-files.validation"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
+local root = require "adev-files.root"
 local state = require "adev-files.state"
 local utils = require "adev-common.utils"
 local validation = require "adev-files.core.op_validation"
@@ -759,6 +761,37 @@ local function test_plan_error_highlights_parse_error()
     check(row_set(plan_error_highlight_rows(buf))[row], "parse-error row should be highlighted")
 end
 
+local function test_child_root_rejects_escaping_names()
+    local dir = reset_dir "root-escape"
+    eq(root.child_root(dir, "sub"), dir .. "/sub/", "normal child root")
+    eq(root.child_root(dir, "../elsewhere"), dir .. "/", "parent traversal must not escape root")
+    eq(root.child_root(dir, "/etc"), dir .. "/", "absolute child must not escape root")
+end
+
+local function test_path_validation_guards_nil()
+    eq(path_validation.is_valid_rel_path(nil), false, "nil relative path is invalid")
+    local ok, err = path_validation.validate_rel_dir(nil)
+    eq(ok, false, "nil relative dir is invalid")
+    check(err ~= nil, "nil relative dir should explain the error")
+end
+
+local function test_open_unreadable_root_notifies()
+    vim.cmd "silent! %bwipeout!"
+    local buf = vim.api.nvim_get_current_buf()
+    local original_err_notify = utils.err_notify
+    local message = nil
+    utils.err_notify = function(msg)
+        message = msg
+    end
+    local opened = open.open("/definitely/missing/adev-files-root", { mode = "current", buf = buf })
+    utils.err_notify = original_err_notify
+    eq(opened, nil, "open should not return a buffer for an unreadable root")
+    check(
+        message and message:find("Cannot read", 1, true) ~= nil,
+        "unreadable root should notify with the reason: " .. tostring(message)
+    )
+end
+
 local tests = {
     test_copy_then_swap_rename,
     test_copy_with_pending_rename,
@@ -768,6 +801,9 @@ local tests = {
     test_parse_round_trip_special_names,
     test_quoted_directory_round_trip,
     test_special_mode_display,
+    test_child_root_rejects_escaping_names,
+    test_path_validation_guards_nil,
+    test_open_unreadable_root_notifies,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_marker_cancels_pending,

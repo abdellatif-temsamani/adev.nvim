@@ -36,7 +36,7 @@ end
 
 ---@param root? string
 ---@param opts? AdevFilesOpenOpts
----@return integer
+---@return integer?
 function M.open(root, opts)
     opts = opts or {}
     local prev_win = vim.api.nvim_get_current_win()
@@ -45,7 +45,11 @@ function M.open(root, opts)
     root = roots.normalize_root(root)
     local lines, list_err = listing.build_lines(root)
     if not lines then
-        error(string.format("cannot read %s: %s", root, tostring(list_err or "unknown error")))
+        utils.err_notify(
+            string.format("Cannot read %s: %s", root, tostring(list_err or "unknown error")),
+            "adev-files"
+        )
+        return nil
     end
     local current_mode = opts.mode == "current"
 

@@ -31,7 +31,9 @@ function M.setup()
     -- Prevent the built-in plugin from registering its FileExplorer autocmd.
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
-    pcall(vim.api.nvim_del_augroup_by_name, "FileExplorer")
+    -- Do not delete the user's whole FileExplorer augroup: it may contain
+    -- unrelated autocmds. Setting the loaded flags above prevents netrw from
+    -- registering its own in a fresh session.
 
     local group = vim.api.nvim_create_augroup(GROUP, { clear = true })
     vim.api.nvim_create_autocmd("BufEnter", {
@@ -48,6 +50,13 @@ function M.setup()
             open_directory_buffer(vim.api.nvim_get_current_buf())
         end,
         desc = "Replace netrw startup directory with adev-files",
+    })
+    vim.api.nvim_create_autocmd({ "BufDelete", "BufWipeout" }, {
+        group = group,
+        callback = function(args)
+            opening[args.buf] = nil
+        end,
+        desc = "Forget netrw replacement guards for closed buffers",
     })
 end
 

@@ -1,3 +1,5 @@
+local validation = require "adev-files.validation"
+
 local M = {}
 
 ---@param root string
@@ -5,6 +7,7 @@ local M = {}
 function M.normalize_root(root)
     root = vim.fn.fnamemodify(root and root ~= "" and root or ".", ":p")
     root = vim.fs.normalize(root, { expand_env = false })
+    root = root:gsub("\\", "/")
     if root:sub(-1) ~= "/" then
         root = root .. "/"
     end
@@ -19,7 +22,13 @@ function M.child_root(root, fs_name)
     if not fs_name or fs_name == "" then
         return root
     end
-    return M.normalize_root(root .. fs_name)
+    -- Never let a parsed entry name escape the manager root (absolute paths,
+    -- drive prefixes, dot segments or embedded separators).
+    local name = fs_name:gsub("/$", "")
+    if not validation.is_valid_rel_path(name) or name:find("/", 1, true) then
+        return root
+    end
+    return M.normalize_root(vim.fs.joinpath(root, name))
 end
 
 ---@param root string

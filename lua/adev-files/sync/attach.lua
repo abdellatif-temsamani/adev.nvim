@@ -12,11 +12,47 @@ local parse = require "adev-files.parse"
 
 local M = {}
 
+---@type table<integer, boolean>
+local detachments = {}
+---@type table<integer, table<integer, { conceallevel: integer, concealcursor: string }>>
+local window_options = {}
+
+local function restore_window_options(win)
+    local saved = window_options[win]
+    if not saved then
+        return
+    end
+    window_options[win] = nil
+    if not vim.api.nvim_win_is_valid(win) then
+        return
+    end
+    if vim.wo[win].conceallevel == 3 then
+        vim.wo[win].conceallevel = saved.conceallevel
+    end
+    if vim.wo[win].concealcursor == "nvic" then
+        vim.wo[win].concealcursor = saved.concealcursor
+    end
+end
+
 ---@param buf integer
 ---@param root string
 function M.attach(buf, root)
+    -- Re-attaching must not stack a second on_lines callback on the buffer.
+    if detachments[buf] then
+        pcall(vim.api.nvim_buf_detach, buf)
+        detachments[buf] = nil
+    end
+    for win in pairs(window_options) do
+        if vim.api.nvim_win_is_valid(win) and vim.fn.winbufnr(win) == buf then
+            restore_window_options(win)
+        end
+    end
+
     local st = state.init(buf, root)
-    index.index_original(buf)
+    local indexed, index_err = index.index_original(buf)
+    if not indexed then
+        utils.err_notify("Cannot index directory: " .. tostring(index_err), "adev-files")
+    end
     index.reindex(buf)
     render.add_virtual_text(buf, root)
 
@@ -61,7 +97,26 @@ function M.attach(buf, root)
         group = group,
         buffer = buf,
         callback = function(args)
+            if detachments[args.buf] then
+                pcall(vim.api.nvim_buf_detach, args.buf)
+                detachments[args.buf] = nil
+            end
+            for win in pairs(window_options) do
+                restore_window_options(win)
+            end
             state.clear(args.buf)
+        end,
+    })
+
+    vim.api.nvim_create_autocmd("BufWinLeave", {
+        group = group,
+        buffer = buf,
+        callback = function(args)
+            for win in pairs(window_options) do
+                if vim.api.nvim_win_is_valid(win) and vim.fn.winbufnr(win) == args.buf then
+                    restore_window_options(win)
+                end
+            end
         end,
     })
 
@@ -114,7 +169,7 @@ function M.attach(buf, root)
         local _, id = parse.strip_id(line)
         ids_by_row[i - 1] = id
     end
-    vim.api.nvim_buf_attach(buf, false, {
+    local attached = vim.api.nvim_buf_attach(buf, false, {
         on_lines = function(_, b, _, first, last, new_last)
             local current = state.get(b)
             if not current then
@@ -160,7 +215,13 @@ function M.attach(buf, root)
             current.missing_ids = missing
             schedule_update()
         end,
+        on_detach = function(_, b)
+            detachments[b] = nil
+        end,
     })
+    if attached then
+        detachments[buf] = true
+    end
     vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
         group = group,
         buffer = buf,
@@ -188,6 +249,12 @@ function M.attach(buf, root)
                 or ""
             local _, _, prefix_length = parse.strip_id(line)
             cursor[2] = math.max(cursor[2], prefix_length)
+            if not window_options[win] then
+                window_options[win] = {
+                    conceallevel = vim.wo[win].conceallevel,
+                    concealcursor = vim.wo[win].concealcursor,
+                }
+            end
             vim.wo[win].conceallevel = 3
             vim.wo[win].concealcursor = "nvic"
             vim.api.nvim_win_set_cursor(win, cursor)

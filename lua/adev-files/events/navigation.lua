@@ -180,7 +180,6 @@ function M.open_or_enter(buf)
     local method = open_files.method or "edit"
     local path = original.abs_path
     local prev_win = get_buf_var(buf, "adev_files_prev_win")
-    local manager_win = get_buf_var(buf, "adev_files_win")
     local manager_mode = get_buf_var(buf, "adev_files_mode")
 
     local open_cmd = function()
@@ -188,7 +187,22 @@ function M.open_or_enter(buf)
         if cmd ~= "edit" and cmd ~= "split" and cmd ~= "vsplit" and cmd ~= "tabedit" then
             cmd = "edit"
         end
-        if manager_mode == "current" and manager_win and vim.api.nvim_win_is_valid(manager_win) then
+        -- Resolve windows at open time: a stored window ID may have been
+        -- reused for an unrelated buffer since this manager was opened.
+        local manager_win = vim.fn.bufwinid(buf)
+        if manager_win == -1 then
+            manager_win = nil
+        end
+        if
+            prev_win
+            and (
+                not vim.api.nvim_win_is_valid(prev_win)
+                or vim.api.nvim_win_get_buf(prev_win) == buf
+            )
+        then
+            prev_win = nil
+        end
+        if manager_mode == "current" and manager_win then
             vim.api.nvim_set_current_win(manager_win)
         elseif prev_win and vim.api.nvim_win_is_valid(prev_win) then
             vim.api.nvim_set_current_win(prev_win)

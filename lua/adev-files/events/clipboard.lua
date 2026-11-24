@@ -113,6 +113,9 @@ end
 ---@param buf integer
 ---@param rel_dir string
 function M.paste(buf, rel_dir)
+    if not vim.api.nvim_buf_is_valid(buf) then
+        return
+    end
     local st = state.get(buf)
     if not st or st.applying or st.confirming or st.needs_refresh then
         return
@@ -136,18 +139,20 @@ function M.paste(buf, rel_dir)
     end
     if clip.mode == "move" then
         for _, source_buf in ipairs(vim.api.nvim_list_bufs()) do
-            local source_state = state.get(source_buf)
-            if source_state and vim.api.nvim_buf_is_valid(source_buf) then
-                local source_ops = plan.plan_ops(source_buf)
-                for _, op in ipairs(source_ops or {}) do
-                    if op.type == "rename" or op.type == "move" then
-                        for _, item in ipairs(clip.items) do
-                            if path.is_same_or_subpath(op.src, item.src) then
-                                utils.err_notify(
-                                    "Save or revert the pending rename before cutting this entry",
-                                    "adev-files"
-                                )
-                                return
+            if vim.api.nvim_buf_is_valid(source_buf) then
+                local source_state = state.get(source_buf)
+                if source_state then
+                    local source_ops = plan.plan_ops(source_buf)
+                    for _, op in ipairs(source_ops or {}) do
+                        if op.type == "rename" or op.type == "move" then
+                            for _, item in ipairs(clip.items) do
+                                if path.is_same_or_subpath(op.src, item.src) then
+                                    utils.err_notify(
+                                        "Save or revert the pending rename before cutting this entry",
+                                        "adev-files"
+                                    )
+                                    return
+                                end
                             end
                         end
                     end
@@ -220,7 +225,11 @@ function M.paste(buf, rel_dir)
     end
 
     local ops = {}
-    local insert_at = vim.api.nvim_win_get_cursor(0)[1]
+    local manager_win = vim.fn.bufwinid(buf)
+    local insert_at = 1
+    if manager_win ~= -1 then
+        insert_at = vim.api.nvim_win_get_cursor(manager_win)[1]
+    end
     for _, placement in ipairs(placements) do
         local rel = path.relpath(st.root, placement.dst)
         rel = parse.format_name(rel)
