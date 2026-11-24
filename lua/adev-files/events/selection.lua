@@ -109,8 +109,10 @@ function M.toggle_mark(buf)
         return
     end
     local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local entry = parse.parse_line(vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1])
+    local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
+    local entry = parse.parse_line(line)
     if not entry or not entry.id then
+        utils.notify("Cannot mark this row", vim.log.levels.INFO, "adev-files")
         return
     end
     local selected = state.get_selection_marks(buf)

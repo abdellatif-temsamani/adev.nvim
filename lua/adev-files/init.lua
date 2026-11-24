@@ -88,10 +88,16 @@ function M.create_file()
                 vim.fn.mkdir(dir, "p")
             end
             if vim.fn.filereadable(path) == 0 then
-                local fd = vim.loop.fs_open(path, "w", 420)
-                if fd then
-                    vim.loop.fs_close(fd)
+                local fd, ferr = vim.loop.fs_open(path, "w", 420)
+                if not fd then
+                    vim.notify(
+                        "Failed to create file: " .. path .. " - " .. tostring(ferr),
+                        vim.log.levels.ERROR,
+                        "adev-files"
+                    )
+                    return
                 end
+                vim.loop.fs_close(fd)
             end
             vim.cmd("edit " .. vim.fn.fnameescape(path))
             vim.notify("Created: " .. input, vim.log.levels.INFO, "adev-files")

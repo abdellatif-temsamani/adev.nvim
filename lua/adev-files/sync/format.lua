@@ -19,7 +19,33 @@ function M.format_ops(st, ops)
             if op.kind == "directory" and p:sub(-1) ~= "/" then
                 p = p .. "/"
             end
-            table.insert(lines, string.format("delete: %s", p))
+            local prefix = "delete: "
+            if op.kind == "directory" then
+                local uv = vim.uv or vim.loop
+                local stat = uv.fs_stat(op.path)
+                if stat and stat.type == "directory" then
+                    local count = 0
+                    local function walk(dir)
+                        local handle = uv.fs_scandir(dir)
+                        if not handle then
+                            return
+                        end
+                        while true do
+                            local name, typ = uv.fs_scandir_next(handle)
+                            if not name then
+                                break
+                            end
+                            count = count + 1
+                            if typ == "directory" then
+                                walk(dir .. "/" .. name)
+                            end
+                        end
+                    end
+                    walk(op.path)
+                    prefix = string.format("recursive delete (%d descendants): ", count)
+                end
+            end
+            table.insert(lines, prefix .. p)
         elseif op.type == "rename" then
             local src = path.relpath(st.root, op.src)
             local dst = path.relpath(st.root, op.dst)

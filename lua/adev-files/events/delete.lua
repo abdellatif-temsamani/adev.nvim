@@ -74,6 +74,7 @@ function M.delete_selected(buf)
     local ops = {}
     local remove_rows = {}
     local _, _, changes = plan.plan_ops(buf)
+    local staged_dir_deletes = 0
     for _, item in ipairs(selected) do
         local entry = item.entry
         local original = entry and st.model.original_by_id[entry.id] or nil
@@ -84,6 +85,9 @@ function M.delete_selected(buf)
         if was_destination then
             table.insert(remove_rows, item.row)
         elseif original and not duplicate_copy then
+            if original.kind == "directory" then
+                staged_dir_deletes = staged_dir_deletes + 1
+            end
             table.insert(ops, {
                 type = "delete",
                 path = original.abs_path,
@@ -103,6 +107,19 @@ function M.delete_selected(buf)
 
     plan.stage_ops(buf, ops)
     render.add_virtual_text(buf, st.root)
+    local staged = #ops + #remove_rows
+    if staged > 0 then
+        local msg = string.format("Staged %d deletion(s)", staged)
+        if staged_dir_deletes > 0 then
+            msg = msg
+                .. string.format(
+                    " (%d director%s)",
+                    staged_dir_deletes,
+                    staged_dir_deletes == 1 and "y" or "ies"
+                )
+        end
+        utils.notify(msg, vim.log.levels.INFO, "adev-files")
+    end
 end
 
 return M

@@ -6,8 +6,14 @@ local utils = require "adev-common.utils"
 local M = {}
 
 ---@param buf integer
----@param cb fun(ok: boolean): nil
-function M.confirm_discard_if_modified(buf, cb)
+---@param destination string|fun(ok:boolean):nil
+---@param cb? fun(ok: boolean): nil
+function M.confirm_discard_if_modified(buf, destination, cb)
+    if type(destination) == "function" then
+        cb = destination
+        destination = nil
+    end
+
     local st = state.get(buf)
     if not st or st.applying or st.confirming then
         cb(false)
@@ -20,7 +26,11 @@ function M.confirm_discard_if_modified(buf, cb)
     st.confirming = true
     local modifiable = vim.bo[buf].modifiable
     vim.bo[buf].modifiable = false
-    confirmation.open({ "Discard unsaved file changes?" }, {
+    local lines = { "Discard unsaved file changes?" }
+    if destination and destination ~= "" then
+        table.insert(lines, "Destination: " .. destination)
+    end
+    confirmation.open(lines, {
         title = "adev-files",
         footer = "y/<CR>: discard    n/q/<Esc>: keep editing",
     }, function(confirmed)

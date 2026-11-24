@@ -20,6 +20,27 @@ local function count_fs_ops(ops)
 end
 
 ---@param ops AdevFilesOp[]
+---@return string
+local function summarize_ops(ops)
+    local counts = {}
+    for _, op in ipairs(ops) do
+        counts[op.type] = (counts[op.type] or 0) + 1
+    end
+    local parts = {}
+    local order = { "create", "rename", "delete", "copy", "move" }
+    for _, t in ipairs(order) do
+        local c = counts[t]
+        if c and c > 0 then
+            table.insert(parts, string.format("%d %s", c, t))
+        end
+    end
+    if #parts == 0 then
+        return string.format("Applied %d changes", #ops)
+    end
+    return string.format("Applied %d changes (%s)", #ops, table.concat(parts, ", "))
+end
+
+---@param ops AdevFilesOp[]
 ---@return boolean, string?
 local function apply_ops(ops)
     return executor.apply_ops(ops)
@@ -109,6 +130,7 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         state.clear_pending_ops(buf)
         st2.needs_refresh = true
         st2.refresh_modifiable = modifiable
+        utils.notify(summarize_ops(ops), vim.log.levels.INFO, "adev-files")
         if not view.refresh(buf, { force = true }) then
             vim.bo[buf].modifiable = false
             vim.bo[buf].modified = false

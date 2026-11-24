@@ -26,6 +26,13 @@ end
 local function find_modified_rows(buf)
     local ops, err = plan.plan_ops(buf)
     if err then
+        local st = state.get(buf)
+        local rows = st and st.plan_error_rows or {}
+        if #rows > 0 then
+            local copy = vim.deepcopy(rows)
+            table.sort(copy)
+            return copy, err
+        end
         return {}, err
     end
     local found = {}
@@ -40,45 +47,86 @@ local function find_modified_rows(buf)
 end
 
 ---@param buf integer
-function M.next_modification(buf)
-    local rows, err = find_modified_rows(buf)
-    if err then
-        utils.err_notify(err, "adev-files")
-        return
-    end
-    if #rows == 0 then
-        utils.notify("No modifications", vim.log.levels.INFO, "adev-files")
-        return
-    end
+---@return integer|nil
+local function jump_next_row(rows)
     local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
     for _, row in ipairs(rows) do
         if row > cur_row then
-            vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
-            return
+            return row
         end
     end
-    vim.api.nvim_win_set_cursor(0, { rows[1] + 1, 0 })
+    return rows[1]
+end
+
+---@param buf integer
+function M.next_modification(buf)
+    local rows, err = find_modified_rows(buf)
+    if #rows == 0 then
+        if err then
+            utils.err_notify(err, "adev-files")
+        else
+            utils.notify("No modifications", vim.log.levels.INFO, "adev-files")
+        end
+        return
+    end
+    local row = jump_next_row(rows)
+    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+    vim.cmd "normal! zz"
+    if err then
+        utils.err_notify(err, "adev-files")
+    end
+end
+
+---@param rows integer[]
+---@return integer|nil
+local function jump_prev_row(rows)
+    local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    for i = #rows, 1, -1 do
+        if rows[i] < cur_row then
+            return rows[i]
+        end
+    end
+    return rows[#rows]
 end
 
 ---@param buf integer
 function M.prev_modification(buf)
     local rows, err = find_modified_rows(buf)
+    if #rows == 0 then
+        if err then
+            utils.err_notify(err, "adev-files")
+        else
+            utils.notify("No modifications", vim.log.levels.INFO, "adev-files")
+        end
+        return
+    end
+    local row = jump_prev_row(rows)
+    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+    vim.cmd "normal! zz"
     if err then
         utils.err_notify(err, "adev-files")
+    end
+end
+
+---@param buf integer
+function M.next_plan_error(buf)
+    local st = state.get(buf)
+    if not st then
         return
     end
+    plan.plan_ops(buf)
+    st = state.get(buf)
+    local rows = st and st.plan_error_rows or {}
     if #rows == 0 then
-        utils.notify("No modifications", vim.log.levels.INFO, "adev-files")
+        utils.notify("No plan errors", vim.log.levels.INFO, "adev-files")
         return
     end
-    local cur_row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    for i = #rows, 1, -1 do
-        if rows[i] < cur_row then
-            vim.api.nvim_win_set_cursor(0, { rows[i] + 1, 0 })
-            return
-        end
+    local row = jump_next_row(rows)
+    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+    vim.cmd "normal! zz"
+    if st.plan_error then
+        utils.err_notify(st.plan_error, "adev-files")
     end
-    vim.api.nvim_win_set_cursor(0, { rows[#rows] + 1, 0 })
 end
 
 --- enter directory under cursor
@@ -104,7 +152,8 @@ function M.open_or_enter(buf)
         return
     end
     if original.kind == "directory" then
-        confirm.confirm_discard_if_modified(buf, function(ok)
+        local dest = roots.child_root(st.root, original.fs_name)
+        confirm.confirm_discard_if_modified(buf, dest, function(ok)
             if not ok then
                 return
             end
@@ -112,7 +161,7 @@ function M.open_or_enter(buf)
             if not st2 or st2.applying then
                 return
             end
-            sync.set_root(buf, roots.child_root(st2.root, original.fs_name))
+            sync.set_root(buf, dest)
         end)
         return
     end
@@ -150,7 +199,7 @@ function M.open_or_enter(buf)
         end
     end
 
-    confirm.confirm_discard_if_modified(buf, function(ok)
+    confirm.confirm_discard_if_modified(buf, path, function(ok)
         if not ok then
             return
         end
@@ -167,10 +216,11 @@ function M.go_parent(buf)
     end
     local parent = roots.parent_root(st.root)
     if parent == st.root then
+        utils.notify("Already at filesystem root", vim.log.levels.INFO, "adev-files")
         return
     end
 
-    confirm.confirm_discard_if_modified(buf, function(ok)
+    confirm.confirm_discard_if_modified(buf, parent, function(ok)
         if not ok then
             return
         end
@@ -234,10 +284,11 @@ function M.go_root(buf)
         return
     end
     if st.root == st.initial_root then
+        utils.notify("Already at initial root", vim.log.levels.INFO, "adev-files")
         return
     end
 
-    confirm.confirm_discard_if_modified(buf, function(ok)
+    confirm.confirm_discard_if_modified(buf, st.initial_root, function(ok)
         if not ok then
             return
         end
