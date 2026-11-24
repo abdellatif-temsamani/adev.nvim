@@ -59,6 +59,7 @@ return {
 | `<leader>ny` | Copy current, marked, or visually selected entries |
 | `<leader>nx` | Cut current, marked, or visually selected entries |
 | `<leader>np` | Paste into current directory |
+| `<leader>nX` | Clear clipboard |
 | `<leader>bs` / `:write` | Apply staged changes |
 | `<leader>nu` | Revert current line |
 | `<leader>nc` | Reset all (discard changes) |

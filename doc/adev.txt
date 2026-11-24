@@ -366,6 +366,7 @@ In-buffer mappings:
 | <leader>ny           | Copy selection                              |
 | <leader>nx           | Cut/move selection                          |
 | <leader>np           | Paste into current directory                |
+| <leader>nX           | Clear clipboard                             |
 |                      |                                             |
 | Edits                                         |
 | <leader>bs / :write  | Apply staged changes                        |

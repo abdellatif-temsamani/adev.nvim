@@ -61,7 +61,6 @@ function M.attach(buf, root)
         group = group,
         buffer = buf,
         callback = function(args)
-            clipboard.clear()
             state.clear(args.buf)
         end,
     })

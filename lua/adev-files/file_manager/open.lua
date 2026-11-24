@@ -97,46 +97,41 @@ function M.open(root, opts)
         pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_buf", previous_buf)
     end
 
-    -- Try to position cursor on the file that was active before opening,
-    -- or on the file under the cursor in the previous window.
+    -- Position cursor on the previously active file, or the file under cursor
+    -- in the previous window. Read previous window state via nvim_win_call so it
+    -- works after the manager window becomes current.
+    local parse_line = require("adev-files.parse").parse_line
     local target_row = 2
-    local ok_prev, prev_buf = pcall(vim.api.nvim_win_get_buf, prev_win)
-    if ok_prev and prev_buf and vim.api.nvim_buf_is_valid(prev_buf) then
-        local buf_name = vim.api.nvim_buf_get_name(prev_buf)
-        if buf_name ~= "" then
-            local fname = vim.fn.fnamemodify(buf_name, ":t")
-            if fname ~= "" then
-                local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-                for i, line in ipairs(buf_lines) do
-                    local stripped = line:gsub("/$", ""):gsub("^/%d+ ", "")
-                    if stripped == fname then
-                        target_row = i
-                        break
-                    end
-                end
-            end
+    local prev_name, prev_line
+    if prev_win and vim.api.nvim_win_is_valid(prev_win) then
+        local ok_prev, prev_buf = pcall(vim.api.nvim_win_get_buf, prev_win)
+        if ok_prev and prev_buf and vim.api.nvim_buf_is_valid(prev_buf) then
+            prev_name = vim.api.nvim_buf_get_name(prev_buf)
+            pcall(vim.api.nvim_win_call, prev_win, function()
+                prev_line = vim.api.nvim_get_current_line()
+            end)
         end
     end
-    -- If no previous buffer match, try to find the file under the cursor
-    if target_row == 2 then
-        local ok, cur_win = pcall(vim.api.nvim_get_current_win)
-        if ok and cur_win then
-            local ok2, cur_line = pcall(vim.api.nvim_win_get_cur_line, cur_win)
-            if ok2 and cur_line then
-                local cur_fname = vim.fn.fnamemodify(cur_line, ":t")
-                if cur_fname ~= "" then
-                    local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-                    for i, line in ipairs(buf_lines) do
-                        local entry_name = line:gsub("/$", ""):gsub("^/%d+ ", "")
-                        if entry_name == cur_fname then
-                            target_row = i
-                            break
-                        end
-                    end
-                end
+
+    local function find_row_for_name(name)
+        if not name or name == "" then
+            return nil
+        end
+        local fname = vim.fn.fnamemodify(name, ":t")
+        if fname == "" then
+            return nil
+        end
+        local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+        for i, line in ipairs(buf_lines) do
+            local entry = parse_line(line)
+            if entry and entry.fs_name == fname then
+                return i
             end
         end
+        return nil
     end
+
+    target_row = find_row_for_name(prev_name) or find_row_for_name(prev_line) or 2
     pcall(vim.api.nvim_win_set_cursor, 0, { target_row, 0 })
     if vim.api.nvim_win_is_valid(manager_win) then
         vim.api.nvim_win_call(manager_win, function()

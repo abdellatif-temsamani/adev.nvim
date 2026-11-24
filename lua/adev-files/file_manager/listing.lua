@@ -103,6 +103,7 @@ end
 ---@field files integer
 ---@field directories integer
 ---@field pending integer
+---@field marked integer
 ---@field show_hidden boolean
 ---@field git_counts table<string, integer>
 ---@field git_available boolean|nil
@@ -129,10 +130,16 @@ function M.summarize(buf, entries, ops)
             git_counts[s] = (git_counts[s] or 0) + 1
         end
     end
+    local marked = 0
+    local marks = st and st.selection_ids or {}
+    for _ in pairs(marks) do
+        marked = marked + 1
+    end
     return {
         files = file_count,
         directories = dir_count,
         pending = #pending,
+        marked = marked,
         show_hidden = st and st.show_hidden or false,
         git_counts = git_counts,
         git_available = st and st.git_available,

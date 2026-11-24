@@ -45,6 +45,7 @@ local function content()
         entry("<leader>ny", "copy current / marked / visual entries"),
         entry("<leader>nx", "cut current / marked / visual entries"),
         entry("<leader>np", "paste into current directory"),
+        entry("<leader>nX", "clear clipboard"),
         "    Copies may be renamed before saving.",
         "    Cancel a move before renaming/deleting its source.",
         "",

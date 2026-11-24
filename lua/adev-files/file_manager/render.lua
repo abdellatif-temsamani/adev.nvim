@@ -115,6 +115,10 @@ local function summary_chunks(summary)
         { string.format("%d dirs", summary.directories), "Normal" },
     }
 
+    if summary.marked and summary.marked > 0 then
+        table.insert(chunks, { "  •  ", "Comment" })
+        table.insert(chunks, { string.format("%d marked", summary.marked), "adevFilesPendingMark" })
+    end
     if summary.pending > 0 then
         table.insert(chunks, { "  •  ", "Comment" })
         table.insert(
@@ -335,6 +339,20 @@ local function add_virtual_text(buf, root)
     end
 
     local summary = listing.summarize(buf, entries, ops or {})
+    if #entries == 0 and not plan_error then
+        local line = vim.api.nvim_buf_get_lines(buf, 1, 2, false)[1] or ""
+        if line == "" then
+            vim.api.nvim_buf_set_extmark(buf, ns, 1, 0, {
+                virt_text = {
+                    {
+                        "(empty directory — type a name to create an entry)",
+                        "Comment",
+                    },
+                },
+                virt_text_pos = "overlay",
+            })
+        end
+    end
     local header_lines = {
         close_box {
             { "│ root  ", "Comment" },
