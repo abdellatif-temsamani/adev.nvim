@@ -12,12 +12,22 @@ local window = require "adev-files.file_manager.window"
 local M = {}
 
 local function resolve_root(buf)
+    local stored = vim.b[buf] and vim.b[buf].adev_files_root
+    if type(stored) == "string" and stored ~= "" then
+        return roots.normalize_root(stored)
+    end
     local name = vim.api.nvim_buf_get_name(buf)
     local prefix = "adev-files://"
     if name:sub(1, #prefix) ~= prefix then
         return nil
     end
-    return roots.normalize_root(name:sub(#prefix + 1):gsub("#%d+$", ""))
+    local raw = name:sub(#prefix + 1)
+    -- Only strip the disambiguation suffix we appended for this exact buffer.
+    local suffix = "#" .. buf
+    if vim.endswith(raw, suffix) then
+        raw = raw:sub(1, -#suffix - 1)
+    end
+    return roots.normalize_root(raw)
 end
 
 ---@param buf integer
@@ -90,6 +100,7 @@ local function render_snapshot(buf, st)
         name = name .. "#" .. buf
     end
     vim.api.nvim_buf_set_name(buf, name)
+    vim.b[buf].adev_files_root = st.root
     window.set_title_from_state(buf, st.root)
     local rendered, render_err = render.render(buf, st.root, { lines = lines })
     if not rendered then
@@ -97,7 +108,11 @@ local function render_snapshot(buf, st)
         return false
     end
     st.refresh_modifiable = nil
-    index.index_original(buf)
+    local indexed, index_err = index.index_original(buf)
+    if not indexed then
+        utils.err_notify("Cannot index directory: " .. tostring(index_err), "adev-files")
+        return false
+    end
     index.reindex(buf)
     render.add_virtual_text(buf, st.root)
     M.refresh_git_status(buf)

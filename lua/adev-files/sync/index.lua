@@ -84,7 +84,8 @@ function M.index_original(buf)
     end
     st.missing_ids = {}
 
-    marks.clear(buf)
+    -- Parse before touching extmarks: a failed parse must leave the existing
+    -- model and marks intact for callers that can keep the buffer usable.
     local entries, err = view.parse_buffer(buf)
     if err then
         return false, err

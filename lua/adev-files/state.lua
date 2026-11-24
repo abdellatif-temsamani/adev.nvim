@@ -1,8 +1,12 @@
 local M = {}
 
-local NS = vim.api.nvim_create_namespace "adev-files"
-local LIVE_NS = vim.api.nvim_create_namespace "adev_files_live"
-local DISPLAY_NS = vim.api.nvim_create_namespace "adev_files_display"
+local NS, LIVE_NS, DISPLAY_NS
+
+local function ensure_namespaces()
+    NS = NS or vim.api.nvim_create_namespace "adev-files"
+    LIVE_NS = LIVE_NS or vim.api.nvim_create_namespace "adev_files_live"
+    DISPLAY_NS = DISPLAY_NS or vim.api.nvim_create_namespace "adev_files_display"
+end
 
 local model = require "adev-files.core.model"
 
@@ -32,14 +36,17 @@ local model = require "adev-files.core.model"
 local states = {}
 
 function M.ns()
+    ensure_namespaces()
     return NS
 end
 
 function M.display_ns()
+    ensure_namespaces()
     return DISPLAY_NS
 end
 
 function M.live_ns()
+    ensure_namespaces()
     return LIVE_NS
 end
 
@@ -47,47 +54,43 @@ end
 ---@param root string
 ---@return AdevFilesState
 function M.init(buf, root)
-    states[buf] = states[buf]
-        or {
-            root = root,
-            initial_root = root,
-            model = model.new(root),
-            view = nil,
-            applying = false,
-            confirming = false,
-            pending_ops = {},
-            original_lines = {},
-            show_hidden = false,
-            selection_marks = {},
-            selection_ids = {},
-            git_status = nil,
-            git_files = nil,
-            git_generation = 0,
-            git_available = nil,
-            git_reason = nil,
-            row_changes = {},
-            plan_error_rows = {},
-        }
-    states[buf].root = root
-    states[buf].model = model.new(root)
-    states[buf].view = nil
-    states[buf].applying = false
-    states[buf].confirming = false
-    states[buf].pending_ops = {}
-    states[buf].original_lines = {}
-    states[buf].show_hidden = false
-    states[buf].selection_marks = {}
-    states[buf].selection_ids = {}
-    states[buf].git_status = nil
-    states[buf].git_files = nil
-    states[buf].git_generation = (states[buf].git_generation or 0) + 1
-    states[buf].git_available = nil
-    states[buf].git_reason = nil
-    states[buf].row_changes = {}
-    states[buf].plan_error = nil
-    states[buf].plan_error_rows = {}
-    states[buf].needs_refresh = false
-    states[buf].refresh_modifiable = nil
+    local previous = states[buf]
+    states[buf] = {
+        root = root,
+        -- The first root stays the anchor for "back to start" navigation.
+        initial_root = previous and previous.initial_root or root,
+        model = model.new(root),
+        view = nil,
+        applying = false,
+        confirming = false,
+        pending_ops = {},
+        original_lines = {},
+        show_hidden = false,
+        selection_marks = {},
+        selection_ids = {},
+        git_status = nil,
+        git_files = nil,
+        git_generation = (previous and previous.git_generation or 0) + 1,
+        git_available = nil,
+        git_reason = nil,
+        row_changes = {},
+        plan_error = nil,
+        plan_error_rows = {},
+        needs_refresh = false,
+        refresh_modifiable = nil,
+    }
+
+    -- Any state creation gets a teardown hook, including paths that bypass
+    -- sync/attach (for example discard-reset of a plain buffer).
+    local group = vim.api.nvim_create_augroup("adev_files_state_" .. buf, { clear = true })
+    vim.api.nvim_create_autocmd("BufWipeout", {
+        group = group,
+        buffer = buf,
+        callback = function(args)
+            M.clear(args.buf)
+        end,
+    })
+
     return states[buf]
 end
 
@@ -226,11 +229,14 @@ function M.set_selection_marks(buf, marks)
     states[buf].selection_marks = marks or {}
     states[buf].selection_ids = {}
     local parse = require "adev-files.parse"
+    local line_count = vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_line_count(buf) or 0
     for row in pairs(marks or {}) do
-        local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
-        local _, id = parse.strip_id(line)
-        if id then
-            states[buf].selection_ids[id] = true
+        if row >= 0 and row < line_count then
+            local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1]
+            local _, id = parse.strip_id(line)
+            if id then
+                states[buf].selection_ids[id] = true
+            end
         end
     end
 end

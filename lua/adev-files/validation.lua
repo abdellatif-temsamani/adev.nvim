@@ -3,13 +3,13 @@ local M = {}
 ---@param p string
 ---@return boolean
 function M.is_valid_rel_path(p)
-    if p == "" then
+    if type(p) ~= "string" or p == "" then
         return false
     end
     if p:sub(1, 1) == "/" then
         return false
     end
-    if vim.fn.has "win32" == 1 and p:find("\\", 1, true) then
+    if vim.fn.has "win32" == 1 and (p:find("\\", 1, true) or p:match "^%a:") then
         return false
     end
     if p:find "%z" then
@@ -31,7 +31,9 @@ end
 ---@param s string
 ---@return boolean, string?
 function M.validate_rel_dir(s)
-    s = (s or "")
+    if type(s) ~= "string" then
+        return false, "invalid path"
+    end
     s = s:gsub("^%s+", ""):gsub("%s+$", "")
     if s == "" then
         return true, ""
