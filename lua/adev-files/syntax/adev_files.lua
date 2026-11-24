@@ -24,5 +24,6 @@ vim.api.nvim_set_hl(0, "adevFilesGitCopied", { link = "Special", default = true 
 vim.api.nvim_set_hl(0, "adevFilesGitUntracked", { link = "DiagnosticHint", default = true })
 vim.api.nvim_set_hl(0, "adevFilesGitConflict", { link = "DiagnosticError", default = true })
 vim.api.nvim_set_hl(0, "adevFilesPlanError", { link = "DiagnosticError", default = true })
+vim.api.nvim_set_hl(0, "adevFilesGenericFile", { link = "Normal", default = true })
 
 vim.b.current_syntax = "adev_files"

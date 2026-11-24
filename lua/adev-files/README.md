@@ -12,6 +12,7 @@ set `replace_netrw = false` to opt out.
 - **Multi-selection** — visual mode selection or TAB marks for batch operations
 - **Clipboard** — copy/cut/paste files in-memory with visual labels
 - **Git integration** — per-file git status indicators with color-coded suffixes; directories show aggregated status (`[M+]` when only descendants changed), and `[C]` is included in header counts. Use `<leader>nf` for full refresh or `<leader>ng` for git-only refresh; status also refreshes on focus/enter when the buffer has no staged edits.
+- **Replace netrw caveat** — runtime `replace_netrw=false` teardown removes adev-files directory autocmds, but restoring netrw in the same session requires restarting Neovim.
 - **Toggle hidden files**
 - **In-buffer help** — press `?` in an adev-files buffer
 - **File creation/rename/deletion** — via `<leader>na`, `<leader>nr`, `<leader>nd`
