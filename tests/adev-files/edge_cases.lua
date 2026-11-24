@@ -12,6 +12,7 @@ local clipboard = require "adev-files.clipboard"
 local clipboard_events = require "adev-files.events.clipboard"
 local delete_events = require "adev-files.events.delete"
 local executor = require "adev-files.core.executor"
+local git = require "adev-files.git"
 local open = require "adev-files.file_manager.open"
 local path_validation = require "adev-files.validation"
 local plan = require "adev-files.sync.plan"
@@ -775,6 +776,49 @@ local function test_path_validation_guards_nil()
     check(err ~= nil, "nil relative dir should explain the error")
 end
 
+local function test_git_status_without_vim_system()
+    local dir = reset_dir "git-no-system"
+    local original_system = vim.system
+    local result = nil
+    vim.system = nil
+    git.fetch_status(dir, function(status, files, meta)
+        result = { status = status, files = files, meta = meta }
+    end)
+    vim.system = original_system
+    vim.wait(2000, function()
+        return result ~= nil
+    end, 10)
+    check(result ~= nil, "git status callback should run without vim.system")
+    if result then
+        eq(result.meta and result.meta.available, false, "git should be unavailable")
+        check(
+            result.meta
+                and result.meta.reason
+                and result.meta.reason:find("vim.system", 1, true) ~= nil,
+            "reason should name the missing API: " .. tostring(result.meta and result.meta.reason)
+        )
+    end
+end
+
+local function test_git_status_outside_repository()
+    local dir = reset_dir "git-no-repo"
+    local result = nil
+    git.fetch_status(dir, function(status, files, meta)
+        result = { status = status, files = files, meta = meta }
+    end)
+    vim.wait(3000, function()
+        return result ~= nil
+    end, 10)
+    check(result ~= nil, "git status callback should run outside a repository")
+    if result then
+        eq(result.meta and result.meta.available, false, "non-repo should be unavailable")
+        check(
+            result.meta and result.meta.reason and result.meta.reason ~= "",
+            "non-repo should explain why git status is unavailable"
+        )
+    end
+end
+
 local function test_open_unreadable_root_notifies()
     vim.cmd "silent! %bwipeout!"
     local buf = vim.api.nvim_get_current_buf()
@@ -804,6 +848,8 @@ local tests = {
     test_child_root_rejects_escaping_names,
     test_path_validation_guards_nil,
     test_open_unreadable_root_notifies,
+    test_git_status_without_vim_system,
+    test_git_status_outside_repository,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_marker_cancels_pending,
