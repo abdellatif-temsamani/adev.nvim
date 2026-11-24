@@ -335,6 +335,8 @@ return {
 Adev-files provides the file management interface. By default it also replaces
 netrw: opening a directory with `nvim .` or `:edit path/to/directory` opens
 adev-files in the current window. Set `replace_netrw = false` to retain netrw.
+Runtime toggling back to netrw in the same session is not fully supported;
+restart Neovim to restore netrw.
 
 KEYMAPS							*adev-files-keymaps*
 

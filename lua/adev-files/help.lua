@@ -16,7 +16,7 @@ local function content()
         "    rwx columns: permissions before each entry (rwxr-xr-x style).",
         "    ●: marked entry (TAB / visual selection workflows).",
         "    @: symlink entry.",
-        "    ▸ + icon: directory entry; icon: file type.",
+        "    ▸ + icon: directory entry; icon: file type (unknown files use generic icon).",
         "    Git suffixes: [M] modified [A] added [D] deleted [R] renamed",
         "                  [C] copied [?] untracked [U] conflict",
         "    [M+]: directory has aggregated descendant git status.",
