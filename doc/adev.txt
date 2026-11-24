@@ -393,6 +393,14 @@ Global commands (outside file manager):
 USAGE							*adev-files-usage*
 
 Open the file manager: >
+:AdevFiles
+<
+
+Open the file manager at a path: >
+:AdevFiles /tmp
+<
+
+Or from Lua: >
 :lua require('adev-files').open()
 <
 
