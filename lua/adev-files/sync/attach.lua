@@ -14,7 +14,7 @@ local M = {}
 
 ---@type table<integer, boolean>
 local attached = {}
----@type table<integer, table<integer, { conceallevel: integer, concealcursor: string }>>
+---@type table<integer, { conceallevel: integer, concealcursor: string }>
 local window_options = {}
 
 local function restore_window_options(win)
@@ -153,7 +153,7 @@ function M.attach(buf, root)
         current.update_scheduled = true
         vim.schedule(function()
             local latest = state.get(buf)
-            if latest ~= current or not vim.api.nvim_buf_is_valid(buf) then
+            if not latest or latest ~= current or not vim.api.nvim_buf_is_valid(buf) then
                 return
             end
             latest.update_scheduled = false

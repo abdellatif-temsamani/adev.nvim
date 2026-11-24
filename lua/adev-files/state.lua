@@ -21,6 +21,9 @@ local model = require "adev-files.core.model"
 ---@field original_lines table<integer, {entry: AdevFilesEntry, abs_path: string}>
 ---@field show_hidden boolean
 ---@field selection_marks table<integer, true>
+---@field selection_ids table<integer, true>
+---@field missing_ids table<integer, integer>
+---@field update_scheduled boolean
 ---@field git_status table<string, string>|nil  -- rel_path -> status char (includes directory aggregates)
 ---@field git_files table<string, string>|nil -- direct file statuses only
 ---@field git_generation integer
@@ -68,6 +71,8 @@ function M.init(buf, root)
         show_hidden = false,
         selection_marks = {},
         selection_ids = {},
+        missing_ids = {},
+        update_scheduled = false,
         git_status = nil,
         git_files = nil,
         git_generation = (previous and previous.git_generation or 0) + 1,

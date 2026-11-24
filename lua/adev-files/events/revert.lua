@@ -59,7 +59,7 @@ function M.revert_current_line(buf)
     end
     state.set_pending_ops(buf, kept)
 
-    if original and not duplicate_copy then
+    if id and original and not duplicate_copy then
         local name = parse.format_name(original.fs_name)
             .. (original.kind == "directory" and "/" or "")
         vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { parse.with_id(name, id) })

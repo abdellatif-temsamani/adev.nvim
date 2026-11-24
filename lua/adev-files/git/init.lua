@@ -65,6 +65,7 @@ end
 ---@param root string
 ---@param callback fun(status: table<string, string>, files?: table<string, string>, meta?: AdevFilesGitMeta)
 function M.fetch_status(root, callback)
+    local Adev = rawget(_G, "Adev")
     local executable = (Adev and Adev.git) or "git"
     root = path.norm_real(root)
 

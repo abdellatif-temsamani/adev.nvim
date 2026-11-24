@@ -34,7 +34,7 @@ end
 
 ---@param buf integer
 ---@param root string
----@param total integer
+---@param total? integer
 function M.set_title_from_state(buf, root, total)
     total = total or 0
     local title = title_for_root(root, total)

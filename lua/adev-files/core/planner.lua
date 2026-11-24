@@ -139,8 +139,10 @@ function M.plan(model, entries, pending_ops)
                             add_rows(conflict_rows, seen, item and item.row)
                         elseif source_item.entry.fs_name ~= source_original.fs_name then
                             conflict_message = conflict_message
-                                or "cannot rename the source of a pending move; "
+                                or (
+                                    "cannot rename the source of a pending move; "
                                     .. "cancel the move or rename the destination row instead"
+                                )
                             add_rows(conflict_rows, seen, source_item.row)
                             add_rows(conflict_rows, seen, item and item.row)
                         end

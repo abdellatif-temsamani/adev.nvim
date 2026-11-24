@@ -52,7 +52,11 @@ local function apply_plan_error_highlights(buf, ns, rows)
     local line_count = vim.api.nvim_buf_line_count(buf)
     for _, row in ipairs(rows) do
         if row >= 0 and row < line_count then
-            vim.api.nvim_buf_add_highlight(buf, ns, "adevFilesPlanError", row, 0, -1)
+            local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
+            vim.api.nvim_buf_set_extmark(buf, ns, row, 0, {
+                end_col = #line,
+                hl_group = "adevFilesPlanError",
+            })
         end
     end
 end
@@ -94,7 +98,10 @@ local HEADER_WIDTH = 72
 ---@param original table|nil
 ---@return string|nil, string|nil
 local function git_indicator(st, entry, original)
-    local git_status = st and st.git_status
+    if not st then
+        return nil, nil
+    end
+    local git_status = st.git_status
     if not git_status then
         return nil, nil
     end
@@ -238,6 +245,9 @@ local function add_virtual_text(buf, root)
     end
 
     local entries = view.parse_buffer(buf, { tolerant = true })
+    if not entries then
+        return
+    end
 
     update_title(buf, root, entries)
 

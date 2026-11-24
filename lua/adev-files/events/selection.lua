@@ -112,7 +112,7 @@ function M.collect_entries(buf, mode)
 end
 
 ---@param buf integer
----@return AdevFilesClipboardItem[], integer[]
+---@return AdevFilesClipboardItem[], integer[], integer?, string?
 function M.collect_entries_with_rows(buf)
     return collect(buf, false)
 end

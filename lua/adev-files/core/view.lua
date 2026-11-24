@@ -7,7 +7,7 @@ local M = {}
 ---@param buf integer
 ---@param root string
 ---@param opts? { show_hidden?: boolean, lines?: string[] }
----@return string[]
+---@return string[]|nil, string|nil
 function M.render(buf, root, opts)
     local entries, err
     if opts and opts.lines then

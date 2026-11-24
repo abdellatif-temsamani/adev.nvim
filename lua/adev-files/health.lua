@@ -73,6 +73,7 @@ function M.check()
     else
         err("vim.system unavailable", { "adev-files needs Neovim 0.10+ for git status" })
     end
+    local Adev = rawget(_G, "Adev")
     local git = (Adev and Adev.git) or "git"
     if vim.fn.executable(git) == 1 then
         ok("git executable: " .. git)

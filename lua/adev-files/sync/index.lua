@@ -87,8 +87,8 @@ function M.index_original(buf)
     -- Parse before touching extmarks: a failed parse must leave the existing
     -- model and marks intact for callers that can keep the buffer usable.
     local entries, err = view.parse_buffer(buf)
-    if err then
-        return false, err
+    if not entries then
+        return false, err or "failed to parse buffer"
     end
     for _, item in ipairs(entries) do
         item.entry.id = marks.ensure_row(buf, item.row)
@@ -121,8 +121,8 @@ function M.reindex(buf)
     end
 
     local entries, err = view.parse_buffer(buf)
-    if err then
-        return false, err
+    if not entries then
+        return false, err or "failed to parse buffer"
     end
     local row_to_id = marks.sync(buf, entries)
     local current_model = st.model or model.new(st.root)

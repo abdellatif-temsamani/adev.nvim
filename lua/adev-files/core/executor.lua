@@ -27,6 +27,7 @@ local function preflight(ops)
 
     for _, op in ipairs(normalized) do
         local src = op.src or op.path
+        ---@cast src string
         if op.type ~= "create" then
             local source_stat = fs.lstat(src)
             if not source_stat then
