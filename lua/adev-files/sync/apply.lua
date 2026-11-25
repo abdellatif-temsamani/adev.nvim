@@ -122,19 +122,26 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         end
 
         st2.applying = true
-        local ok, apply_ok_or_err, apply_err_msg = pcall(apply_ops, ops)
+        local ok, applied, apply_message, outcome = pcall(apply_ops, ops)
         st2.applying = false
 
         if not ok then
-            utils.err_notify(tostring(apply_ok_or_err or "failed to apply changes"), "adev-files")
+            utils.err_notify(tostring(applied or "failed to apply changes"), "adev-files")
             return
         end
-        if not apply_ok_or_err then
-            utils.err_notify(apply_err_msg or "failed to apply changes", "adev-files")
+        if not applied then
+            utils.err_notify(apply_message or "failed to apply changes", "adev-files")
             return
         end
-        if apply_err_msg then
-            utils.notify(apply_err_msg, vim.log.levels.WARN, "adev-files")
+        -- Cleanup failed after commit: report the error instead of claiming a
+        -- clean success, but still treat the operations as applied below.
+        if outcome == "cleanup_failed" then
+            utils.err_notify(apply_message or "transaction cleanup failed", "adev-files")
+        else
+            if apply_message then
+                utils.notify(apply_message, vim.log.levels.WARN, "adev-files")
+            end
+            utils.notify(summarize_ops(ops), vim.log.levels.INFO, "adev-files")
         end
 
         -- Refresh after clearing `applying`, otherwise refresh is a no-op.
@@ -142,7 +149,6 @@ function M.apply_ops_with_confirm(buf, ops, opts)
         state.clear_pending_ops(buf)
         st2.needs_refresh = true
         st2.refresh_modifiable = modifiable
-        utils.notify(summarize_ops(ops), vim.log.levels.INFO, "adev-files")
         if not view.refresh(buf, { force = true }) then
             vim.bo[buf].modifiable = false
             vim.bo[buf].modified = false

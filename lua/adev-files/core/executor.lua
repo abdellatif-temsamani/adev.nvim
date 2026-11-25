@@ -236,7 +236,7 @@ local function is_cross_device(err)
 end
 
 ---@param ops AdevFilesOp[]
----@return boolean, string?
+---@return boolean applied, string? message, string? outcome
 function M.apply_ops(ops)
     local planned, validation_err = preflight(ops)
     if not planned then
@@ -377,8 +377,9 @@ function M.apply_ops(ops)
 
     -- The visible transaction is now committed. Remove staged deletions and
     -- cross-device move sources. Do not roll back here: after a recursive
-    -- delete, rolling back could itself lose data. Report the failure so the
-    -- caller keeps pending changes visible instead of claiming success.
+    -- delete, rolling back could itself lose data. A cleanup failure is a
+    -- committed outcome, not an apply failure: the caller must still refresh
+    -- the committed state, but report the error instead of claiming success.
     local cleanup_errors = {}
     for _, item in ipairs(staged) do
         if fs.exists(item.temp) then
@@ -390,11 +391,12 @@ function M.apply_ops(ops)
     end
 
     if #cleanup_errors > 0 then
-        return false,
+        return true,
             "changes applied, but transaction cleanup failed: " .. table.concat(
                 cleanup_errors,
                 "; "
-            )
+            ),
+            "cleanup_failed"
     end
     return true
 end
