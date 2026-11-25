@@ -8,6 +8,8 @@ local uv = vim.uv or vim.loop
 
 local M = {}
 
+M._VERSION = "1.0.0"
+
 ---@class FilesProps
 ---@field replace_netrw boolean
 ---@field open_files FilesOpenFilesProps
