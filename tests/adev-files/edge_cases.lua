@@ -750,6 +750,63 @@ local function test_cross_device_move_preserves_top_level_symlink()
     eq(read_file(dst), "alpha", "moved top-level symlink should resolve")
 end
 
+local function test_cross_device_move_resolves_symlinked_source_parent()
+    local dir = reset_dir "symlink-move-physical-parent"
+    local real = dir .. "/real"
+    local deep = real .. "/deep"
+    local alias = dir .. "/alias"
+    vim.fn.mkdir(deep .. "/src/sub", "p")
+    uv.fs_symlink(deep, alias)
+    write_file(deep .. "/src/target.txt", "alpha")
+    write_file(deep .. "/outside.txt", "outside")
+    write_file(deep .. "/src/absolute.txt", "beta")
+    uv.fs_symlink("target.txt", alias .. "/src/plain-link.txt")
+    uv.fs_symlink("../target.txt", alias .. "/src/sub/internal-link.txt")
+    uv.fs_symlink("../../outside.txt", alias .. "/src/sub/outside-link.txt")
+    uv.fs_symlink(alias .. "/src/absolute.txt", alias .. "/src/sub/absolute-link.txt")
+
+    local dst = dir .. "/dst"
+    local real_rename = uv.fs_rename
+    uv.fs_rename = function(old, new)
+        if new == dst then
+            return false, "EXDEV", "cross-device link"
+        end
+        return real_rename(old, new)
+    end
+    local ok, err = executor.apply_ops {
+        { type = "move", src = alias .. "/src", dst = dst, kind = "directory" },
+    }
+    uv.fs_rename = real_rename
+
+    check(ok, "cross-device move via symlinked parent failed: " .. tostring(err))
+    local function read_if_exists(file)
+        if not uv.fs_stat(file) then
+            return "<missing>"
+        end
+        return read_file(file)
+    end
+    eq(
+        read_if_exists(dst .. "/plain-link.txt"),
+        "alpha",
+        "moved plain relative symlink should be remapped through the source root"
+    )
+    eq(
+        read_if_exists(dst .. "/sub/internal-link.txt"),
+        "alpha",
+        "moved internal symlink should resolve in the destination tree"
+    )
+    eq(
+        read_if_exists(dst .. "/sub/outside-link.txt"),
+        "outside",
+        "moved symlink should resolve from the source link's physical directory"
+    )
+    eq(
+        read_if_exists(dst .. "/sub/absolute-link.txt"),
+        "beta",
+        "moved absolute symlink should still map through the original root"
+    )
+end
+
 local function test_symlink_to_directory_copies_contents()
     local uv = vim.uv or vim.loop
     local dir = reset_dir "symlink-dir-copy"
@@ -1487,6 +1544,7 @@ local tests = {
     test_relative_symlink_copy_is_rebased,
     test_cross_device_move_remaps_internal_symlink,
     test_cross_device_move_preserves_top_level_symlink,
+    test_cross_device_move_resolves_symlinked_source_parent,
     test_symlink_to_directory_copies_contents,
     test_directory_rename_then_create_inside,
     test_malformed_staged_op_rejected_before_abs,

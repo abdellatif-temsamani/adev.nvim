@@ -28,7 +28,7 @@ end
 ---@param opts? {move?: boolean, source_root?: string, original_root?: string, dest_root?: string}
 ---@return string
 local function copied_target(src, dst, target, opts)
-    local src_dir = vim.fs.dirname(src)
+    local src_dir = path.norm_real(vim.fs.dirname(src))
     local dst_dir = vim.fs.dirname(dst)
     local abs_target = is_absolute(target) and path.abs(target)
         or path.abs(path.join_abs(src_dir, target))
@@ -38,11 +38,14 @@ local function copied_target(src, dst, target, opts)
     -- of being rebased against the temporary source.
     if opts and opts.move and opts.dest_root then
         for _, root in ipairs { opts.source_root, opts.original_root } do
-            if root and is_within(root, abs_target) then
-                local relative = path.relpath(root, abs_target)
-                local mapped = path.join_abs(opts.dest_root, relative)
-                local mapped_rel = path.relpath(dst_dir, mapped)
-                return mapped_rel and mapped_rel ~= "" and mapped_rel or mapped
+            if root then
+                local normalized_root = path.norm_real(root)
+                if is_within(normalized_root, abs_target) then
+                    local relative = path.relpath(normalized_root, abs_target)
+                    local mapped = path.join_abs(opts.dest_root, relative)
+                    local mapped_rel = path.relpath(dst_dir, mapped)
+                    return mapped_rel and mapped_rel ~= "" and mapped_rel or mapped
+                end
             end
         end
     end
