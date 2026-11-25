@@ -337,6 +337,53 @@ local function test_delete_pasted_row_cancels_pending()
     eq(#(ops or {}), 0, "no filesystem ops after canceled paste")
 end
 
+local function test_delete_classifies_before_cancelling_pending()
+    local dir = reset_dir "delete-classify-order"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+
+    cursor_row(buf, "A.txt")
+    clipboard_events.set_clipboard(buf, "copy")
+    clipboard_events.paste(buf, "")
+
+    local original_plan = plan.plan_ops
+    local pending_at_plan = nil
+    plan.plan_ops = function(plan_buf)
+        if pending_at_plan == nil then
+            pending_at_plan = #state.get_pending_ops(plan_buf)
+        end
+        return original_plan(plan_buf)
+    end
+    cursor_row(buf, "A_1.txt")
+    delete_events.delete_selected(buf)
+    plan.plan_ops = original_plan
+
+    eq(pending_at_plan, 1, "delete must classify before cancelling the pending paste")
+    eq(#state.get_pending_ops(buf), 0, "deleting pasted row should cancel pending op")
+end
+
+local function test_delete_failed_plan_does_not_stage_original()
+    local dir = reset_dir "delete-failed-plan"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+
+    cursor_row(buf, "A.txt")
+    clipboard_events.set_clipboard(buf, "copy")
+    clipboard_events.paste(buf, "")
+    local pasted = row_with(buf, "A_1.txt")
+    local pasted_line = lines(buf)[pasted + 1]
+    local duplicate_line = pasted_line:gsub("A_1.txt", "A_2.txt", 1)
+    vim.api.nvim_buf_set_lines(buf, -1, -1, false, { duplicate_line })
+
+    cursor_row(buf, "A.txt")
+    delete_events.delete_selected(buf)
+
+    check(
+        not has_op(state.get_pending_ops(buf), "delete", nil, nil, dir .. "/A.txt"),
+        "failed plan must not stage deletion of the original file"
+    )
+end
+
 local function test_delete_marker_cancels_pending()
     local dir = reset_dir "delete-marker-destination"
     write_file(dir .. "/A.txt", "alpha")
@@ -1129,6 +1176,8 @@ local tests = {
     test_scandir_next_error_is_surfaced,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
+    test_delete_classifies_before_cancelling_pending,
+    test_delete_failed_plan_does_not_stage_original,
     test_delete_marker_cancels_pending,
     test_kind_change_rejected,
     test_directory_into_itself,
