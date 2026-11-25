@@ -18,10 +18,12 @@ local delete_events = require "adev-files.events.delete"
 local executor = require "adev-files.core.executor"
 local git = require "adev-files.git"
 local listing = require "adev-files.file_manager.listing"
+local navigation = require "adev-files.events.navigation"
 local open = require "adev-files.file_manager.open"
 local path_validation = require "adev-files.validation"
 local plan = require "adev-files.sync.plan"
 local render = require "adev-files.file_manager.render"
+local revert = require "adev-files.events.revert"
 local root = require "adev-files.root"
 local selection = require "adev-files.events.selection"
 local state = require "adev-files.state"
@@ -1002,6 +1004,90 @@ local function test_header_row_cannot_be_marked()
     eq(next(state.get_selection_marks(buf)), nil, "the virtual header row must not be markable")
 end
 
+local function write_three_entries(dir)
+    write_file(dir .. "/A.txt", "alpha")
+    write_file(dir .. "/B.txt", "beta")
+    write_file(dir .. "/C.txt", "gamma")
+end
+
+local function split_manager()
+    local first_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_cursor(first_win, { 2, 0 })
+    vim.cmd "vsplit"
+    local second_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_cursor(second_win, { 4, 0 })
+    return first_win, second_win
+end
+
+local function test_selection_uses_current_manager_window()
+    local dir = reset_dir "selection-current-window"
+    write_three_entries(dir)
+    vim.cmd "silent! only"
+    local buf = new_manager(dir)
+    split_manager()
+
+    selection.toggle_mark(buf)
+
+    local marks = state.get_selection_marks(buf)
+    eq(marks[3], true, "selection should use the current manager window")
+    eq(marks[1], nil, "selection should not use the fallback window")
+end
+
+local function test_navigation_uses_current_manager_window()
+    local dir = reset_dir "navigation-current-window"
+    write_three_entries(dir)
+    vim.cmd "silent! only"
+    local buf = new_manager(dir)
+    set_row(buf, row_with(buf, "B.txt"), "B_renamed.txt")
+
+    local first_win, second_win = split_manager()
+    vim.api.nvim_win_set_cursor(first_win, { 4, 0 })
+    vim.api.nvim_win_set_cursor(second_win, { 2, 0 })
+    navigation.next_modification(buf)
+
+    eq(vim.api.nvim_win_get_cursor(second_win)[1], 3, "navigation should move the current window")
+    eq(
+        vim.api.nvim_win_get_cursor(first_win)[1],
+        4,
+        "navigation should not move the fallback window"
+    )
+end
+
+local function test_revert_uses_current_manager_window()
+    local dir = reset_dir "revert-current-window"
+    write_three_entries(dir)
+    vim.cmd "silent! only"
+    local buf = new_manager(dir)
+    local b_row = row_with(buf, "B.txt")
+    set_row(buf, b_row, "B_renamed.txt")
+
+    local first_win, second_win = split_manager()
+    vim.api.nvim_win_set_cursor(first_win, { 4, 0 })
+    vim.api.nvim_win_set_cursor(second_win, { b_row + 1, 0 })
+    revert.revert_current_line(buf)
+
+    check(
+        lines(buf)[b_row + 1]:find("B.txt", 1, true) ~= nil,
+        "revert should target the current window's row"
+    )
+    check(lines(buf)[4]:find("C.txt", 1, true) ~= nil, "revert should not target the fallback row")
+end
+
+local function test_paste_uses_current_manager_window()
+    local dir = reset_dir "paste-current-window"
+    write_three_entries(dir)
+    vim.cmd "silent! only"
+    local buf = new_manager(dir)
+
+    cursor_row(buf, "A.txt")
+    clipboard_events.set_clipboard(buf, "copy")
+    split_manager()
+    clipboard_events.paste(buf, "")
+
+    local last = lines(buf)[#lines(buf)]
+    check(last:find("A_1.txt", 1, true) ~= nil, "paste should use the current window's cursor")
+end
+
 local function test_reattach_replaces_on_lines_callback()
     local dir = reset_dir "attach-idempotent"
     write_file(dir .. "/A.txt", "alpha")
@@ -1168,6 +1254,10 @@ local tests = {
     test_chmod_accepts_four_digit_mode,
     test_clipboard_chained_relocations,
     test_header_row_cannot_be_marked,
+    test_selection_uses_current_manager_window,
+    test_navigation_uses_current_manager_window,
+    test_revert_uses_current_manager_window,
+    test_paste_uses_current_manager_window,
     test_reattach_replaces_on_lines_callback,
     test_confirmation_restores_modifiable_when_state_replaced,
     test_confirmation_escapes_destination_control_chars,

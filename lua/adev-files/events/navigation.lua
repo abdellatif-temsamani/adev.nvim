@@ -24,7 +24,8 @@ end
 ---@param buf integer
 ---@return integer|nil
 local function manager_win(buf)
-    local win = vim.fn.bufwinid(buf)
+    local current = vim.api.nvim_get_current_win()
+    local win = vim.api.nvim_win_get_buf(current) == buf and current or vim.fn.bufwinid(buf)
     if win == -1 then
         return nil
     end
