@@ -9,6 +9,7 @@ M.floating_defaults = {
 
 --- create a floating window for a buffer
 ---@param opts snacks.win.Config
+---@return number?
 function M.floating_window(opts)
     ---@type snacks.win.Config
     opts = vim.tbl_deep_extend("force", {}, M.floating_defaults, opts or {})
@@ -20,7 +21,8 @@ function M.floating_window(opts)
 
     if Snacks then
         opts.border = border
-        Snacks.win(opts)
+        local snacks_win = Snacks.win(opts)
+        return snacks_win and snacks_win.win
     else
         -- fallback
         local ui = vim.api.nvim_list_uis()[1]
@@ -55,7 +57,7 @@ function M.floating_window(opts)
             win_opts.col = 0
         end
 
-        vim.api.nvim_open_win(opts.buf, true, win_opts)
+        return vim.api.nvim_open_win(opts.buf, true, win_opts)
     end
 end
 

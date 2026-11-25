@@ -130,7 +130,7 @@ function M.open()
         height = math.min(#lines + 2, math.max(1, vim.o.lines - 4), 40),
         wo = { wrap = false, cursorline = true },
     })
-    if not win_ok or not help_win then
+    if not win_ok or type(help_win) ~= "number" or not vim.api.nvim_win_is_valid(help_win) then
         pcall(vim.api.nvim_buf_delete, buf, { force = true })
         return
     end
