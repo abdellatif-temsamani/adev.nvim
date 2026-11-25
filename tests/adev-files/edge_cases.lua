@@ -725,6 +725,31 @@ local function test_cross_device_move_remaps_internal_symlink()
     eq(read_file(dst .. "/sub/absolute-link.txt"), "beta", "moved absolute symlink should resolve")
 end
 
+local function test_cross_device_move_preserves_top_level_symlink()
+    local dir = reset_dir "symlink-move-top-level"
+    write_file(dir .. "/target.txt", "alpha")
+    uv.fs_symlink("target.txt", dir .. "/link.txt")
+
+    local dst = dir .. "/moved-link.txt"
+    local real_rename = uv.fs_rename
+    uv.fs_rename = function(old, new)
+        if new == dst then
+            return false, "EXDEV", "cross-device link"
+        end
+        return real_rename(old, new)
+    end
+    local ok, err = executor.apply_ops {
+        { type = "move", src = dir .. "/link.txt", dst = dst },
+    }
+    uv.fs_rename = real_rename
+
+    check(ok, "cross-device top-level symlink move failed: " .. tostring(err))
+    local st = uv.fs_lstat(dst)
+    check(st ~= nil and st.type == "link", "moved top-level symlink should remain a link")
+    eq(uv.fs_readlink(dst) or "", "target.txt", "moved top-level symlink target")
+    eq(read_file(dst), "alpha", "moved top-level symlink should resolve")
+end
+
 local function test_symlink_to_directory_copies_contents()
     local uv = vim.uv or vim.loop
     local dir = reset_dir "symlink-dir-copy"
@@ -1461,6 +1486,7 @@ local tests = {
     test_nested_destination_rejected,
     test_relative_symlink_copy_is_rebased,
     test_cross_device_move_remaps_internal_symlink,
+    test_cross_device_move_preserves_top_level_symlink,
     test_symlink_to_directory_copies_contents,
     test_directory_rename_then_create_inside,
     test_malformed_staged_op_rejected_before_abs,

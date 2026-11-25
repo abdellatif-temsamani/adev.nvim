@@ -155,6 +155,9 @@ end
 ---@param opts? {move?: boolean, original_root?: string}
 ---@return boolean, string?, boolean?
 local function copy_path(src, dst, source_stat, opts)
+    if source_stat.type == "link" then
+        return fs.copy_file(src, dst, false, opts)
+    end
     if source_stat.type == "directory" then
         return fs.copy_dir_recursive(src, dst, opts)
     end
@@ -366,7 +369,8 @@ function M.apply_ops(ops)
             if not is_cross_device(tostring(err or "")) then
                 return abort(err or ("failed to move " .. op.src))
             end
-            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, op._copy_stat, {
+            local source_stat = op._source_stat.type == "link" and op._source_stat or op._copy_stat
+            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, source_stat, {
                 move = true,
                 original_root = op.src,
             })

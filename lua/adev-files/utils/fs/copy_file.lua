@@ -8,15 +8,16 @@ local M = {}
 ---@param src string
 ---@param dst string
 ---@param follow_symlink? boolean Copy the link target instead of the link itself.
+---@param opts? {move?: boolean, source_root?: string, original_root?: string, dest_root?: string}
 ---@return boolean, string?, boolean?
-function M.copy_file(src, dst, follow_symlink)
+function M.copy_file(src, dst, follow_symlink, opts)
     if stat.exists(dst) then
         return false, "target exists: " .. dst
     end
 
     local st = stat.lstat(src)
     if st and st.type == "link" and not follow_symlink then
-        return symlink.copy_symlink(src, dst)
+        return symlink.copy_symlink(src, dst, opts)
     end
 
     local parent = vim.fn.fnamemodify(dst, ":h")
