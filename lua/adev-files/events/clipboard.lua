@@ -225,7 +225,8 @@ function M.paste(buf, rel_dir)
     end
 
     local ops = {}
-    local manager_win = vim.fn.bufwinid(buf)
+    local current = vim.api.nvim_get_current_win()
+    local manager_win = vim.api.nvim_win_get_buf(current) == buf and current or vim.fn.bufwinid(buf)
     local insert_at = 1
     if manager_win ~= -1 then
         insert_at = vim.api.nvim_win_get_cursor(manager_win)[1]
