@@ -94,7 +94,8 @@ function M.open(root, opts)
     local manager_win = vim.api.nvim_get_current_win()
     if current_mode and vim.api.nvim_win_is_valid(manager_win) then
         pcall(function()
-            vim.wo[manager_win].winbar = "Adev Files [" .. root .. "] [?: help]"
+            local escaped_root = win.escape_winbar_root(root)
+            vim.wo[manager_win].winbar = "Adev Files [" .. escaped_root .. "] [?: help]"
         end)
     end
     pcall(vim.api.nvim_buf_set_var, buf, "adev_files_prev_win", prev_win)
