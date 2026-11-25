@@ -804,8 +804,13 @@ local function test_plan_error_highlights_duplicate_path()
 end
 
 local function virt_text_for_row(buf, row)
-    local marks =
-        vim.api.nvim_buf_get_extmarks(buf, state.display_ns(), row, row, { details = true })
+    local marks = vim.api.nvim_buf_get_extmarks(
+        buf,
+        state.display_ns(),
+        { row, 0 },
+        { row, -1 },
+        { details = true }
+    )
     local parts = {}
     for _, mark in ipairs(marks) do
         for _, chunk in ipairs(mark[4].virt_text or {}) do
