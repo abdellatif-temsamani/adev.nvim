@@ -30,7 +30,7 @@ function M.copy_file(src, dst, follow_symlink)
     if uv.fs_copyfile then
         local ok, err_name, err_msg = uv.fs_copyfile(src, dst, 1)
         if not ok then
-            return false, (err_name or "fs_copyfile") .. ": " .. (err_msg or ""), true
+            return false, (err_name or "fs_copyfile") .. ": " .. (err_msg or "")
         end
         return true
     end
