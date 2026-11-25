@@ -16,6 +16,7 @@ local confirm_events = require "adev-files.events.confirm"
 local confirmation = require "adev-files.utils.confirmation"
 local delete_events = require "adev-files.events.delete"
 local executor = require "adev-files.core.executor"
+local format = require "adev-files.sync.format"
 local git = require "adev-files.git"
 local listing = require "adev-files.file_manager.listing"
 local navigation = require "adev-files.events.navigation"
@@ -1343,6 +1344,60 @@ local function test_scandir_next_error_is_surfaced()
     )
 end
 
+local function test_delete_preview_counts_small_tree_exactly()
+    local dir = reset_dir "delete-preview-small"
+    local tree = dir .. "/tree"
+    vim.fn.mkdir(tree .. "/sub/deep", "p")
+    write_file(tree .. "/a.txt", "a")
+    write_file(tree .. "/sub/b.txt", "b")
+    write_file(tree .. "/sub/deep/c.txt", "c")
+
+    local formatted = format.format_ops({ root = dir }, {
+        { type = "delete", path = tree, kind = "directory" },
+    })
+    eq(
+        formatted[1] or "",
+        "recursive delete (5 descendants): tree/",
+        "small delete preview should count every descendant"
+    )
+end
+
+local function test_delete_preview_is_bounded()
+    local dir = reset_dir "delete-preview-cap"
+    local tree = dir .. "/tree"
+    vim.fn.mkdir(tree, "p")
+    local real_scandir = uv.fs_scandir
+    local real_next = uv.fs_scandir_next
+    local next_calls = 0
+    uv.fs_scandir = function()
+        return { index = 0 }
+    end
+    uv.fs_scandir_next = function(handle)
+        next_calls = next_calls + 1
+        handle.index = handle.index + 1
+        if handle.index <= 5000 then
+            return "f" .. handle.index, "file"
+        end
+        return nil
+    end
+
+    local formatted = format.format_ops({ root = dir }, {
+        { type = "delete", path = tree, kind = "directory" },
+    })
+    uv.fs_scandir = real_scandir
+    uv.fs_scandir_next = real_next
+
+    local line = formatted[1] or ""
+    check(
+        line:find("recursive delete (at least 1000 descendants): tree/", 1, true) ~= nil,
+        "capped delete preview should report a lower bound: " .. line
+    )
+    check(
+        next_calls <= 1001,
+        "delete preview should stop scanning at the cap: " .. tostring(next_calls)
+    )
+end
+
 local tests = {
     test_copy_then_swap_rename,
     test_paste_consumes_clipboard,
@@ -1376,6 +1431,8 @@ local tests = {
     test_confirmation_open_failure_restores_state,
     test_failed_refresh_keeps_buffer_read_only,
     test_scandir_next_error_is_surfaced,
+    test_delete_preview_counts_small_tree_exactly,
+    test_delete_preview_is_bounded,
     test_duplicate_id_recovery,
     test_delete_pasted_row_cancels_pending,
     test_delete_classifies_before_cancelling_pending,

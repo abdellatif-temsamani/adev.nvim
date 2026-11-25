@@ -2,6 +2,8 @@ local path = require "adev-files.utils.fs.path"
 
 local M = {}
 
+local MAX_DELETE_PREVIEW_DESCENDANTS = 1000
+
 ---@param st AdevFilesState
 ---@param ops AdevFilesOp[]
 ---@return string[]
@@ -26,37 +28,44 @@ function M.format_ops(st, ops)
                 if stat and stat.type == "directory" then
                     local count = 0
                     local scan_errors = {}
-                    local function walk(dir)
+                    local capped = false
+                    local pending = { op.path }
+                    while #pending > 0 and not capped do
+                        local dir = table.remove(pending)
                         local handle, scan_err = uv.fs_scandir(dir)
                         if not handle then
                             table.insert(
                                 scan_errors,
                                 "fs_scandir " .. dir .. ": " .. tostring(scan_err)
                             )
-                            return
-                        end
-                        while true do
-                            local name, typ, next_err = uv.fs_scandir_next(handle)
-                            if not name then
-                                local detail = next_err or (type(typ) == "string" and typ or nil)
-                                if detail then
-                                    table.insert(
-                                        scan_errors,
-                                        "fs_scandir_next " .. dir .. ": " .. tostring(detail)
-                                    )
+                        else
+                            while true do
+                                local name, typ, next_err = uv.fs_scandir_next(handle)
+                                if not name then
+                                    local detail = next_err
+                                        or (type(typ) == "string" and typ or nil)
+                                    if detail then
+                                        table.insert(
+                                            scan_errors,
+                                            "fs_scandir_next " .. dir .. ": " .. tostring(detail)
+                                        )
+                                    end
+                                    break
                                 end
-                                break
-                            end
-                            count = count + 1
-                            if typ == "directory" then
-                                walk(vim.fs.joinpath(dir, name))
+                                if count >= MAX_DELETE_PREVIEW_DESCENDANTS then
+                                    capped = true
+                                    break
+                                end
+                                count = count + 1
+                                if typ == "directory" then
+                                    table.insert(pending, vim.fs.joinpath(dir, name))
+                                end
                             end
                         end
                     end
-                    walk(op.path)
                     prefix = string.format(
                         "recursive delete (%s%d descendants): ",
-                        #scan_errors > 0 and "at least " or "",
+                        (capped or #scan_errors > 0) and "at least " or "",
                         count
                     )
                     if #scan_errors > 0 then
