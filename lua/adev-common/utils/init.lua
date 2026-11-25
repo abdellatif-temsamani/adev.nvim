@@ -1,3 +1,5 @@
+local notified_messages = {}
+
 local Utils = {
     ignored_files = {
         "Cargo.lock",
@@ -29,6 +31,18 @@ function Utils.notify(msg, level, title)
     else
         vim.notify(msg, level, { title = "[" .. title .. "]" })
     end
+end
+
+--- Notify once per unique message for the lifetime of the session.
+---@param msg string
+---@param level integer|nil One of the values from |vim.log.levels|.
+---@param title? string if not provided defautls to adev.nvim
+function Utils.notify_once(msg, level, title)
+    if notified_messages[msg] then
+        return
+    end
+    notified_messages[msg] = true
+    Utils.notify(msg, level, title)
 end
 
 ---@param msg string
