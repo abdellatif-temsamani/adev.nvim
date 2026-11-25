@@ -786,6 +786,17 @@ local function test_special_mode_display()
     end
 end
 
+local function test_format_mode_special_bits()
+    eq(
+        render.format_mode(tonumber("4755", 8)),
+        "rwsr-xr-x",
+        "setuid must not imply setgid or sticky"
+    )
+    eq(render.format_mode(tonumber("2755", 8)), "rwxr-sr-x", "setgid must not imply sticky")
+    eq(render.format_mode(tonumber("1755", 8)), "rwxr-xr-t", "sticky mode")
+    eq(render.format_mode(tonumber("6755", 8)), "rwsr-sr-x", "setuid+setgid must not imply sticky")
+end
+
 local function test_plan_error_highlights_parse_error()
     local dir = reset_dir "plan-error-highlight-parse"
     write_file(dir .. "/A.txt", "alpha")
@@ -1043,6 +1054,7 @@ local tests = {
     test_parse_round_trip_special_names,
     test_quoted_directory_round_trip,
     test_special_mode_display,
+    test_format_mode_special_bits,
     test_child_root_rejects_escaping_names,
     test_path_validation_guards_nil,
     test_open_unreadable_root_notifies,
