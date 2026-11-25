@@ -1,7 +1,7 @@
 -- Headless edge-case regression tests for adev-files change tracking.
 --
 -- Run from the repository root:
---   nvim --headless -u NONE -c "luafile tests/adev-files/edge_cases.lua"
+--   nvim --headless -u NONE -l tests/adev-files/edge_cases.lua
 
 local source = debug.getinfo(1, "S").source
 local script = source:sub(1, 1) == "@" and source:sub(2) or source
