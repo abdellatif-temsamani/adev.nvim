@@ -119,18 +119,4 @@ return {
             },
         },
     },
-    config = function(_, opts)
-        require("laravel").setup(opts)
-
-        local blink = require "blink.cmp"
-
-        blink.add_source_provider("laravel", {
-            name = "laravel",
-            module = "blink.compat.source",
-            score_offset = 95,
-            opts = {},
-        })
-
-        blink.add_filetype_source("php", "laravel")
-    end,
 }
