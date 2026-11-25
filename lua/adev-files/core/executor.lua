@@ -270,7 +270,8 @@ function M.apply_ops(ops)
         local src = op.type == "delete" and op.path or op.src
         local temp, temp_err = staging_path(src, seed, op._index)
         if not temp then
-            return failed(temp_err or ("failed to find a staging path for " .. src), {})
+            local rollback_errors = rollback(staged, created_paths, created_dirs)
+            return failed(temp_err or ("failed to find a staging path for " .. src), rollback_errors)
         end
         local ok, err = rename_path(src, temp)
         if not ok then
