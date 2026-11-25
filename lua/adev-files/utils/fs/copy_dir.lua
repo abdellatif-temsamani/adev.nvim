@@ -14,8 +14,9 @@ end
 
 ---@param src_dir string
 ---@param dst_dir string
+---@param opts {move?: boolean, source_root?: string, original_root?: string, dest_root?: string}
 ---@return boolean, string?, boolean?
-local function copy_dir(src_dir, dst_dir)
+local function copy_dir(src_dir, dst_dir, opts)
     if stat.exists(dst_dir) then
         return false, "target exists: " .. dst_dir
     end
@@ -53,19 +54,19 @@ local function copy_dir(src_dir, dst_dir)
         local copied, copy_err, created
 
         if typ == "directory" then
-            copied, copy_err, created = copy_dir(src, dst)
+            copied, copy_err, created = copy_dir(src, dst, opts)
         elseif typ == "file" then
             copied, copy_err, created = copy_file.copy_file(src, dst)
         elseif typ == "link" then
-            copied, copy_err, created = symlink.copy_symlink(src, dst)
+            copied, copy_err, created = symlink.copy_symlink(src, dst, opts)
         else
             local st = stat.lstat(src)
             if st and st.type == "directory" then
-                copied, copy_err, created = copy_dir(src, dst)
+                copied, copy_err, created = copy_dir(src, dst, opts)
             elseif st and st.type == "file" then
                 copied, copy_err, created = copy_file.copy_file(src, dst)
             elseif st and st.type == "link" then
-                copied, copy_err, created = symlink.copy_symlink(src, dst)
+                copied, copy_err, created = symlink.copy_symlink(src, dst, opts)
             else
                 return false, "unsupported entry type: " .. tostring(typ), true
             end
@@ -81,9 +82,16 @@ end
 
 ---@param src_dir string
 ---@param dst_dir string
+---@param opts? {move?: boolean, original_root?: string}
 ---@return boolean, string?, boolean?
-function M.copy_dir_recursive(src_dir, dst_dir)
-    local ok, err, created = copy_dir(src_dir, dst_dir)
+function M.copy_dir_recursive(src_dir, dst_dir, opts)
+    local copy_opts = {
+        source_root = src_dir,
+        dest_root = dst_dir,
+        original_root = opts and opts.original_root or nil,
+        move = opts and opts.move or false,
+    }
+    local ok, err, created = copy_dir(src_dir, dst_dir, copy_opts)
     if not ok then
         if created then
             remove_partial(dst_dir)

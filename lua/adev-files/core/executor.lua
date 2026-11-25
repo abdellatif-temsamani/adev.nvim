@@ -152,10 +152,11 @@ end
 ---@param src string
 ---@param dst string
 ---@param source_stat uv.fs_stat.result
+---@param opts? {move?: boolean, original_root?: string}
 ---@return boolean, string?, boolean?
-local function copy_path(src, dst, source_stat)
+local function copy_path(src, dst, source_stat, opts)
     if source_stat.type == "directory" then
-        return fs.copy_dir_recursive(src, dst)
+        return fs.copy_dir_recursive(src, dst, opts)
     end
     return fs.copy_file(src, dst, true)
 end
@@ -365,7 +366,10 @@ function M.apply_ops(ops)
             if not is_cross_device(tostring(err or "")) then
                 return abort(err or ("failed to move " .. op.src))
             end
-            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, op._copy_stat)
+            local copy_ok, copy_err, created = copy_path(item.temp, op.dst, op._copy_stat, {
+                move = true,
+                original_root = op.src,
+            })
             if copy_ok or created then
                 item.materialized = "copy"
             end

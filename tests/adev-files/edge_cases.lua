@@ -690,6 +690,40 @@ local function test_relative_symlink_copy_is_rebased()
     )
 end
 
+local function test_cross_device_move_remaps_internal_symlink()
+    local dir = reset_dir "symlink-move"
+    local src = dir .. "/src"
+    local dst = dir .. "/dst"
+    vim.fn.mkdir(src .. "/sub", "p")
+    write_file(src .. "/target.txt", "alpha")
+    write_file(src .. "/absolute.txt", "beta")
+    uv.fs_symlink("../target.txt", src .. "/sub/link.txt")
+    uv.fs_symlink(src .. "/absolute.txt", src .. "/sub/absolute-link.txt")
+
+    local real_rename = uv.fs_rename
+    uv.fs_rename = function(old, new)
+        if new == dst then
+            return false, "EXDEV", "cross-device link"
+        end
+        return real_rename(old, new)
+    end
+    local ok, err = executor.apply_ops {
+        { type = "move", src = src, dst = dst, kind = "directory" },
+    }
+    uv.fs_rename = real_rename
+
+    check(ok, "cross-device directory move failed: " .. tostring(err))
+    local target = uv.fs_readlink(dst .. "/sub/link.txt")
+    eq(target or "", "../target.txt", "moved symlink should target the destination tree")
+    eq(read_file(dst .. "/sub/link.txt"), "alpha", "moved symlink contents should resolve")
+    eq(
+        uv.fs_readlink(dst .. "/sub/absolute-link.txt") or "",
+        "../absolute.txt",
+        "moved absolute symlink should target the destination tree"
+    )
+    eq(read_file(dst .. "/sub/absolute-link.txt"), "beta", "moved absolute symlink should resolve")
+end
+
 local function test_symlink_to_directory_copies_contents()
     local uv = vim.uv or vim.loop
     local dir = reset_dir "symlink-dir-copy"
@@ -1360,6 +1394,7 @@ local tests = {
     test_duplicate_destination_rejected,
     test_nested_destination_rejected,
     test_relative_symlink_copy_is_rebased,
+    test_cross_device_move_remaps_internal_symlink,
     test_symlink_to_directory_copies_contents,
     test_directory_rename_then_create_inside,
     test_malformed_staged_op_rejected_before_abs,
