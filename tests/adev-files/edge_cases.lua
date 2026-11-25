@@ -1091,7 +1091,7 @@ local function test_chmod_accepts_four_digit_mode()
     )
 end
 
-local function test_clipboard_chained_relocations()
+local function test_clipboard_single_hop_relocation()
     local dir = reset_dir "clipboard-chain"
     clipboard.set("copy", { { kind = "file", src = dir .. "/old/nested/file.txt" } })
     clipboard.apply_path_changes {
@@ -1099,9 +1099,13 @@ local function test_clipboard_chained_relocations()
         { type = "rename", src = dir .. "/middle", dst = dir .. "/new", kind = "directory" },
     }
     local clip = clipboard.get()
-    check(clip and clip.items and clip.items[1], "clipboard should survive chained renames")
+    check(clip and clip.items and clip.items[1], "clipboard should survive simultaneous renames")
     if clip and clip.items[1] then
-        eq(clip.items[1].src, dir .. "/new/nested/file.txt", "all relocations should be applied")
+        eq(
+            clip.items[1].src,
+            dir .. "/middle/nested/file.txt",
+            "only the matching relocation should be applied"
+        )
     end
     clipboard.clear()
 end
@@ -1424,7 +1428,7 @@ local tests = {
     test_git_status_without_vim_system,
     test_git_status_outside_repository,
     test_chmod_accepts_four_digit_mode,
-    test_clipboard_chained_relocations,
+    test_clipboard_single_hop_relocation,
     test_header_row_cannot_be_marked,
     test_selection_uses_current_manager_window,
     test_navigation_uses_current_manager_window,
