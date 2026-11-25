@@ -61,9 +61,13 @@ function M.delete_selected(buf)
             cancelled[id] = true
         end
     end
+    -- Classify rows while the planner can still see the pending operations;
+    -- removing cancelled destinations first makes pasted IDs look unknown.
+    local _, plan_err, changes = plan.plan_ops(buf)
+    local classified = not plan_err and changes ~= nil
     if next(cancelled) then
         local kept = {}
-        for _, op in ipairs(pending) do
+        for _, op in ipairs(state.get_pending_ops(buf)) do
             if not (op.dst_id and cancelled[op.dst_id]) then
                 table.insert(kept, op)
             end
@@ -73,12 +77,11 @@ function M.delete_selected(buf)
 
     local ops = {}
     local remove_rows = {}
-    local _, _, changes = plan.plan_ops(buf)
     local staged_dir_deletes = 0
     for _, item in ipairs(selected) do
         local entry = item.entry
-        local original = entry and st.model.original_by_id[entry.id] or nil
-        local change = changes and changes[item.row]
+        local change = classified and changes[item.row] or nil
+        local original = change and change.original or nil
         local duplicate_copy = change and change.op and change.op.type == "copy"
         local was_destination = entry and entry.id and cancelled[entry.id]
 
