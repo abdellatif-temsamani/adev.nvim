@@ -31,6 +31,7 @@ local sync_view = require "adev-files.sync.view"
 local utils = require "adev-common.utils"
 local validation = require "adev-files.core.op_validation"
 local view = require "adev-files.core.view"
+local window = require "adev-files.file_manager.window"
 
 local TEST_ROOT = "/tmp/opencode/adev-files-tests"
 local uv = vim.uv or vim.loop
@@ -946,6 +947,80 @@ local function test_open_unreadable_root_notifies()
     )
 end
 
+local function expected_winbar(dir, total)
+    local normalized = root.normalize_root(dir)
+    local escaped = normalized:gsub("%%", "%%%%")
+    local suffix = total and (" [%d]"):format(total) or ""
+    return "Adev Files [" .. escaped .. "] [?: help]" .. suffix
+end
+
+local function title_text(title)
+    if type(title) == "string" then
+        return title
+    end
+    local chunks = {}
+    for _, chunk in ipairs(title or {}) do
+        local text = type(chunk) == "table" and tostring(chunk[1] or "") or tostring(chunk)
+        table.insert(chunks, text)
+    end
+    return table.concat(chunks)
+end
+
+local function test_open_escapes_percent_in_current_winbar()
+    local dir = reset_dir "winbar-percent-open-%value"
+    write_file(dir .. "/A.txt", "alpha")
+    vim.cmd "silent! only"
+    local buf = new_manager(dir)
+    local win = vim.fn.bufwinid(buf)
+    check(win ~= -1, "manager window should exist")
+    if win == -1 then
+        return
+    end
+    eq(vim.wo[win].winbar, expected_winbar(dir), "open should escape percent signs in the winbar")
+end
+
+local function test_set_title_from_state_escapes_percent_in_current_winbar()
+    local dir = reset_dir "winbar-percent-state-%value"
+    write_file(dir .. "/A.txt", "alpha")
+    vim.cmd "silent! only"
+    local buf = new_manager(dir)
+    local win = vim.fn.bufwinid(buf)
+    check(win ~= -1, "manager window should exist")
+    if win == -1 then
+        return
+    end
+    window.set_title_from_state(buf, root.normalize_root(dir), 2)
+    eq(
+        vim.wo[win].winbar,
+        expected_winbar(dir, 2),
+        "set_title_from_state should escape percent signs in the winbar"
+    )
+end
+
+local function test_floating_title_keeps_percent_signs_raw()
+    local dir = reset_dir "winbar-percent-float-%value"
+    write_file(dir .. "/A.txt", "alpha")
+    vim.cmd "silent! only"
+    local buf = open.open(dir, { mode = "float" })
+    check(buf ~= nil, "float open should return a buffer")
+    if not buf then
+        return
+    end
+    local win = vim.fn.bufwinid(buf)
+    check(win ~= -1, "floating manager window should exist")
+    if win == -1 then
+        return
+    end
+    window.set_title_from_state(buf, root.normalize_root(dir), 1)
+    local cfg = vim.api.nvim_win_get_config(win)
+    local normalized = root.normalize_root(dir)
+    eq(
+        title_text(cfg.title),
+        "Adev Files [" .. normalized .. "] [?: help] [1]",
+        "floating titles must keep raw percent signs"
+    )
+end
+
 local function test_chmod_accepts_four_digit_mode()
     local dir = reset_dir "chmod-special"
     local file = dir .. "/script.sh"
@@ -1249,6 +1324,9 @@ local tests = {
     test_child_root_rejects_escaping_names,
     test_path_validation_guards_nil,
     test_open_unreadable_root_notifies,
+    test_open_escapes_percent_in_current_winbar,
+    test_set_title_from_state_escapes_percent_in_current_winbar,
+    test_floating_title_keeps_percent_signs_raw,
     test_git_status_without_vim_system,
     test_git_status_outside_repository,
     test_chmod_accepts_four_digit_mode,
