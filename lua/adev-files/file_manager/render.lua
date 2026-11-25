@@ -69,10 +69,11 @@ local function format_mode(mode)
     local result = {}
     local bits = { 256, 128, 64, 32, 16, 8, 4, 2, 1 }
     local chars = { "r", "w", "x", "r", "w", "x", "r", "w", "x" }
-    -- Setuid, setgid and sticky bits live above the 9 permission bits.
+    -- Setuid, setgid and sticky bits live above the 9 permission bits; strip
+    -- higher bits before checking each lower special bit.
     local setuid = mode % 4096 >= 2048
-    local setgid = mode % 4096 >= 1024
-    local sticky = mode % 4096 >= 512
+    local setgid = mode % 2048 >= 1024
+    local sticky = mode % 1024 >= 512
     for i = 1, 9 do
         local ch = "-"
         if perm >= bits[i] then
