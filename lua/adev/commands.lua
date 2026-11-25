@@ -1,6 +1,7 @@
 local changelog = require "adev.changelog"
 local onboarding = require "adev.onboarding"
 local update_manager = require "adev.update"
+local utils = require "adev-common.utils"
 
 local M = {
     commands = {
@@ -46,6 +47,22 @@ local M = {
             name = "ADInfo",
             command = changelog.get_info,
             opts = { desc = "List available versions" },
+        },
+        {
+            name = "ADversion",
+            command = function()
+                local adev = require "adev"
+                local adev_files = require "adev-files"
+                utils.notify(
+                    string.format(
+                        "adev.nvim %s\nadev-files %s",
+                        adev._VERSION or "unknown",
+                        adev_files._VERSION or "unknown"
+                    ),
+                    vim.log.levels.INFO
+                )
+            end,
+            opts = { desc = "Show adev versions" },
         },
     },
 }
