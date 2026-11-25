@@ -29,9 +29,9 @@ function M.confirm_discard_if_modified(buf, destination, cb)
     vim.bo[buf].modifiable = false
     local lines = { "Discard unsaved file changes?" }
     if destination and destination ~= "" then
-        table.insert(lines, "Destination: " .. destination)
+        table.insert(lines, "Destination: " .. vim.fn.strtrans(destination))
     end
-    confirmation.open(lines, {
+    local ok, err = pcall(confirmation.open, lines, {
         title = "adev-files",
         footer = "y/<CR>: discard    n/q/<Esc>: keep editing",
     }, function(confirmed)
@@ -49,12 +49,20 @@ function M.confirm_discard_if_modified(buf, destination, cb)
             cb(false)
             return
         end
-        local ok, err = sync.discard_reset(buf, { keep_clipboard = true })
-        if not ok then
-            utils.err_notify(err or "failed to discard changes", "adev-files")
+        local reset_ok, reset_err = sync.discard_reset(buf, { keep_clipboard = true })
+        if not reset_ok then
+            utils.err_notify(reset_err or "failed to discard changes", "adev-files")
         end
-        cb(ok)
+        cb(reset_ok)
     end)
+    if not ok then
+        st.confirming = false
+        if vim.api.nvim_buf_is_valid(buf) then
+            vim.bo[buf].modifiable = modifiable
+        end
+        utils.err_notify("Failed to open discard confirmation: " .. tostring(err), "adev-files")
+        cb(false)
+    end
 end
 
 return M

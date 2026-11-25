@@ -1008,6 +1008,64 @@ local function test_confirmation_restores_modifiable_when_state_replaced()
     eq(called, false, "stale confirmation must not discard against a replaced state")
 end
 
+local function test_confirmation_escapes_destination_control_chars()
+    local dir = reset_dir "confirm-control-chars"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    set_row(buf, row_with(buf, "A.txt"), "Changed.txt")
+
+    local captured
+    local original_open = confirmation.open
+    confirmation.open = function(lines, _, cb)
+        captured = lines
+        cb(false)
+    end
+    local called = nil
+    confirm_events.confirm_discard_if_modified(buf, dir .. "/line\nbreak.txt", function(ok)
+        called = ok
+    end)
+    confirmation.open = original_open
+
+    eq(#captured, 2, "destination should remain one buffer line")
+    check(captured[2]:find("\n", 1, true) == nil, "destination newlines must be escaped")
+    check(captured[2]:find("line", 1, true) ~= nil, "destination text should be preserved")
+    eq(state.get(buf).confirming, false, "confirmation must clear confirming")
+    eq(vim.bo[buf].modifiable, true, "confirmation must restore modifiable")
+    eq(called, false, "cancel should report false")
+end
+
+local function test_confirmation_open_failure_restores_state()
+    local dir = reset_dir "confirm-open-failure"
+    write_file(dir .. "/A.txt", "alpha")
+    local buf = new_manager(dir)
+    set_row(buf, row_with(buf, "A.txt"), "Changed.txt")
+
+    local original_open = confirmation.open
+    local original_err_notify = utils.err_notify
+    local message
+    confirmation.open = function()
+        error "simulated prompt failure"
+    end
+    utils.err_notify = function(msg)
+        message = msg
+    end
+    local called = nil
+    local ok, err = pcall(confirm_events.confirm_discard_if_modified, buf, dir, function(confirmed)
+        called = confirmed
+    end)
+    confirmation.open = original_open
+    utils.err_notify = original_err_notify
+
+    check(ok, "prompt creation failure must not propagate: " .. tostring(err))
+    eq(state.get(buf).confirming, false, "failed prompt must clear confirming")
+    eq(vim.bo[buf].modifiable, true, "failed prompt must restore modifiable")
+    eq(called, false, "failed prompt must cancel callback")
+    check(
+        message and message:find("simulated prompt failure", 1, true) ~= nil,
+        "prompt failure should be reported: " .. tostring(message)
+    )
+end
+
 local function test_failed_refresh_keeps_buffer_read_only()
     local dir = reset_dir "refresh-failure"
     write_file(dir .. "/A.txt", "alpha")
@@ -1065,6 +1123,8 @@ local tests = {
     test_header_row_cannot_be_marked,
     test_reattach_replaces_on_lines_callback,
     test_confirmation_restores_modifiable_when_state_replaced,
+    test_confirmation_escapes_destination_control_chars,
+    test_confirmation_open_failure_restores_state,
     test_failed_refresh_keeps_buffer_read_only,
     test_scandir_next_error_is_surfaced,
     test_duplicate_id_recovery,
